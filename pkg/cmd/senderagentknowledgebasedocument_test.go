@@ -41,6 +41,7 @@ func TestSendersAgentKnowledgeBasesDocumentsList(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t, "senders:agent:knowledge-bases:documents", "list",
 			"--api-key", "string",
+			"--max-items", "10",
 			"--sender-id", "senderId",
 			"--kb-id", "kbId",
 			"--cursor", "cursor",

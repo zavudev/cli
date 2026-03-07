@@ -89,6 +89,7 @@ func TestSendersList(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t, "senders", "list",
 			"--api-key", "string",
+			"--max-items", "10",
 			"--cursor", "cursor",
 			"--limit", "100",
 		)

@@ -50,6 +50,7 @@ func TestPhoneNumbersList(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t, "phone-numbers", "list",
 			"--api-key", "string",
+			"--max-items", "10",
 			"--cursor", "cursor",
 			"--limit", "100",
 			"--status", "active",
