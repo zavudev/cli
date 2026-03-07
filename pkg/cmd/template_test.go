@@ -33,6 +33,7 @@ func TestTemplatesCreate(t *testing.T) {
 	mocktest.TestRunMockTestWithFlags(
 		t,
 		"templates", "create",
+		"--api-key", "string",
 		"--body", "Hi {{1}}, your order {{2}} has been confirmed and will ship within 24 hours.",
 		"--language", "en",
 		"--name", "order_confirmation",

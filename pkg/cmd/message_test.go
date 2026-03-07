@@ -73,6 +73,7 @@ func TestMessagesSend(t *testing.T) {
 	mocktest.TestRunMockTestWithFlags(
 		t,
 		"messages", "send",
+		"--api-key", "string",
 		"--to", "+56912345678",
 		"--channel", "auto",
 		"--content.buttons", "[{id: id, title: title}]",

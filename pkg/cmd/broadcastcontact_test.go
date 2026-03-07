@@ -40,6 +40,7 @@ func TestBroadcastsContactsAdd(t *testing.T) {
 	mocktest.TestRunMockTestWithFlags(
 		t,
 		"broadcasts:contacts", "add",
+		"--api-key", "string",
 		"--broadcast-id", "broadcastId",
 		"--contact.recipient", "+14155551234",
 		"--contact.template-variables", "{name: John, order_id: ORD-001}",

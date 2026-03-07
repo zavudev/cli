@@ -35,6 +35,7 @@ func TestBroadcastsCreate(t *testing.T) {
 	mocktest.TestRunMockTestWithFlags(
 		t,
 		"broadcasts", "create",
+		"--api-key", "string",
 		"--channel", "sms",
 		"--name", "Black Friday Sale",
 		"--content.filename", "filename",
@@ -86,6 +87,7 @@ func TestBroadcastsUpdate(t *testing.T) {
 	mocktest.TestRunMockTestWithFlags(
 		t,
 		"broadcasts", "update",
+		"--api-key", "string",
 		"--broadcast-id", "broadcastId",
 		"--content.filename", "filename",
 		"--content.media-id", "mediaId",
