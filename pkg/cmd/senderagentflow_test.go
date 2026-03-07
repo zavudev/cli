@@ -32,6 +32,7 @@ func TestSendersAgentFlowsCreate(t *testing.T) {
 	mocktest.TestRunMockTestWithFlags(
 		t,
 		"senders:agent:flows", "create",
+		"--api-key", "string",
 		"--sender-id", "senderId",
 		"--name", "Lead Capture",
 		"--step.id", "welcome",
@@ -85,6 +86,7 @@ func TestSendersAgentFlowsUpdate(t *testing.T) {
 	mocktest.TestRunMockTestWithFlags(
 		t,
 		"senders:agent:flows", "update",
+		"--api-key", "string",
 		"--sender-id", "senderId",
 		"--flow-id", "flowId",
 		"--description", "description",

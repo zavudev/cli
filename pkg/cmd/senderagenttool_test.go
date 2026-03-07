@@ -31,6 +31,7 @@ func TestSendersAgentToolsCreate(t *testing.T) {
 	mocktest.TestRunMockTestWithFlags(
 		t,
 		"senders:agent:tools", "create",
+		"--api-key", "string",
 		"--sender-id", "senderId",
 		"--description", "Get the status of a customer order",
 		"--name", "get_order_status",
@@ -77,6 +78,7 @@ func TestSendersAgentToolsUpdate(t *testing.T) {
 	mocktest.TestRunMockTestWithFlags(
 		t,
 		"senders:agent:tools", "update",
+		"--api-key", "string",
 		"--sender-id", "senderId",
 		"--tool-id", "toolId",
 		"--description", "description",
