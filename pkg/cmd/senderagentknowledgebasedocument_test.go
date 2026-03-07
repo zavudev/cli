@@ -10,38 +10,54 @@ import (
 
 func TestSendersAgentKnowledgeBasesDocumentsCreate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
-	mocktest.TestRunMockTestWithFlags(
-		t,
-		"senders:agent:knowledge-bases:documents", "create",
-		"--api-key", "string",
-		"--sender-id", "senderId",
-		"--kb-id", "kbId",
-		"--content", "Our return policy allows returns within 30 days of purchase...",
-		"--title", "Return Policy",
-	)
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t, "senders:agent:knowledge-bases:documents", "create",
+			"--api-key", "string",
+			"--sender-id", "senderId",
+			"--kb-id", "kbId",
+			"--content", "Our return policy allows returns within 30 days of purchase...",
+			"--title", "Return Policy",
+		)
+	})
+
+	t.Run("piping data", func(t *testing.T) {
+		// Test piping YAML data over stdin
+		pipeData := []byte("" +
+			"content: Our return policy allows returns within 30 days of purchase...\n" +
+			"title: Return Policy\n")
+		mocktest.TestRunMockTestWithPipeAndFlags(
+			t, pipeData, "senders:agent:knowledge-bases:documents", "create",
+			"--api-key", "string",
+			"--sender-id", "senderId",
+			"--kb-id", "kbId",
+		)
+	})
 }
 
 func TestSendersAgentKnowledgeBasesDocumentsList(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
-	mocktest.TestRunMockTestWithFlags(
-		t,
-		"senders:agent:knowledge-bases:documents", "list",
-		"--api-key", "string",
-		"--sender-id", "senderId",
-		"--kb-id", "kbId",
-		"--cursor", "cursor",
-		"--limit", "100",
-	)
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t, "senders:agent:knowledge-bases:documents", "list",
+			"--api-key", "string",
+			"--sender-id", "senderId",
+			"--kb-id", "kbId",
+			"--cursor", "cursor",
+			"--limit", "100",
+		)
+	})
 }
 
 func TestSendersAgentKnowledgeBasesDocumentsDelete(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
-	mocktest.TestRunMockTestWithFlags(
-		t,
-		"senders:agent:knowledge-bases:documents", "delete",
-		"--api-key", "string",
-		"--sender-id", "senderId",
-		"--kb-id", "kbId",
-		"--doc-id", "docId",
-	)
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t, "senders:agent:knowledge-bases:documents", "delete",
+			"--api-key", "string",
+			"--sender-id", "senderId",
+			"--kb-id", "kbId",
+			"--doc-id", "docId",
+		)
+	})
 }
