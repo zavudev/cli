@@ -173,6 +173,7 @@ func TestSendersAgentFlowsList(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t, "senders:agent:flows", "list",
 			"--api-key", "string",
+			"--max-items", "10",
 			"--sender-id", "senderId",
 			"--cursor", "cursor",
 			"--enabled=true",

@@ -54,6 +54,7 @@ func TestRegulatoryDocumentsList(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t, "regulatory-documents", "list",
 			"--api-key", "string",
+			"--max-items", "10",
 			"--cursor", "cursor",
 			"--limit", "100",
 		)

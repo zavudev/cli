@@ -26,6 +26,7 @@ func TestMessagesList(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t, "messages", "list",
 			"--api-key", "string",
+			"--max-items", "10",
 			"--channel", "auto",
 			"--cursor", "cursor",
 			"--limit", "100",

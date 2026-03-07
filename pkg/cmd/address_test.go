@@ -62,6 +62,7 @@ func TestAddressesList(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t, "addresses", "list",
 			"--api-key", "string",
+			"--max-items", "10",
 			"--cursor", "cursor",
 			"--limit", "100",
 		)

@@ -65,6 +65,10 @@ var sendersAgentKnowledgeBasesDocumentsList = cli.Command{
 			Default:   50,
 			QueryPath: "limit",
 		},
+		&requestflag.Flag[int64]{
+			Name:  "max-items",
+			Usage: "The maximum number of items to return (use -1 for unlimited).",
+		},
 	},
 	Action:          handleSendersAgentKnowledgeBasesDocumentsList,
 	HideHelpCommand: true,
@@ -185,7 +189,11 @@ func handleSendersAgentKnowledgeBasesDocumentsList(ctx context.Context, cmd *cli
 			params,
 			options...,
 		)
-		return ShowJSONIterator(os.Stdout, "senders:agent:knowledge-bases:documents list", iter, format, transform)
+		maxItems := int64(-1)
+		if cmd.IsSet("max-items") {
+			maxItems = cmd.Value("max-items").(int64)
+		}
+		return ShowJSONIterator(os.Stdout, "senders:agent:knowledge-bases:documents list", iter, format, transform, maxItems)
 	}
 }
 

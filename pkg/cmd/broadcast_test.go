@@ -166,6 +166,7 @@ func TestBroadcastsList(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t, "broadcasts", "list",
 			"--api-key", "string",
+			"--max-items", "10",
 			"--cursor", "cursor",
 			"--limit", "100",
 			"--status", "draft",

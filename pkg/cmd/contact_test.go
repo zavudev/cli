@@ -51,6 +51,7 @@ func TestContactsList(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t, "contacts", "list",
 			"--api-key", "string",
+			"--max-items", "10",
 			"--cursor", "cursor",
 			"--limit", "100",
 			"--phone-number", "phoneNumber",
