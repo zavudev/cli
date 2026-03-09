@@ -5,8 +5,8 @@ package cmd
 import (
 	"testing"
 
-	"github.com/stainless-sdks/zavudev-cli/internal/mocktest"
-	"github.com/stainless-sdks/zavudev-cli/internal/requestflag"
+	"github.com/zavudev/cli/internal/mocktest"
+	"github.com/zavudev/cli/internal/requestflag"
 )
 
 func TestBroadcastsCreate(t *testing.T) {

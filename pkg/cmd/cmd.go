@@ -12,10 +12,10 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/stainless-sdks/zavudev-cli/internal/autocomplete"
-	"github.com/stainless-sdks/zavudev-cli/internal/requestflag"
 	docs "github.com/urfave/cli-docs/v3"
 	"github.com/urfave/cli/v3"
+	"github.com/zavudev/cli/internal/autocomplete"
+	"github.com/zavudev/cli/internal/requestflag"
 )
 
 var (
