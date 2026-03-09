@@ -14,11 +14,11 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/stainless-sdks/zavudev-cli/internal/apiform"
-	"github.com/stainless-sdks/zavudev-cli/internal/apiquery"
-	"github.com/stainless-sdks/zavudev-cli/internal/debugmiddleware"
-	"github.com/stainless-sdks/zavudev-cli/internal/requestflag"
-	"github.com/stainless-sdks/zavudev-go/option"
+	"github.com/zavudev/cli/internal/apiform"
+	"github.com/zavudev/cli/internal/apiquery"
+	"github.com/zavudev/cli/internal/debugmiddleware"
+	"github.com/zavudev/cli/internal/requestflag"
+	"github.com/zavudev/sdk-go/option"
 
 	"github.com/goccy/go-yaml"
 	"github.com/urfave/cli/v3"

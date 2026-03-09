@@ -16,8 +16,8 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/stainless-sdks/zavudev-cli/internal/jsonview"
-	"github.com/stainless-sdks/zavudev-go/option"
+	"github.com/zavudev/cli/internal/jsonview"
+	"github.com/zavudev/sdk-go/option"
 
 	"github.com/charmbracelet/x/term"
 	"github.com/itchyny/json2yaml"

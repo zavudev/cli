@@ -5,7 +5,7 @@ package cmd
 import (
 	"testing"
 
-	"github.com/stainless-sdks/zavudev-cli/internal/mocktest"
+	"github.com/zavudev/cli/internal/mocktest"
 )
 
 func TestSendersAgentKnowledgeBasesCreate(t *testing.T) {
