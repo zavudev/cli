@@ -96,7 +96,7 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
 			Name:     "to",
-			Usage:    "Recipient phone number in E.164 format or email address.",
+			Usage:    "Recipient phone number in E.164 format, email address, or numeric chat ID (for Telegram/Instagram).",
 			Required: true,
 			BodyPath: "to",
 		},
