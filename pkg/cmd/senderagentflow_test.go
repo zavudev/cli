@@ -13,8 +13,9 @@ func TestSendersAgentFlowsCreate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:flows", "create",
+			t,
 			"--api-key", "string",
+			"senders:agent:flows", "create",
 			"--sender-id", "senderId",
 			"--name", "Lead Capture",
 			"--step", "{id: welcome, config: {text: bar}, type: message, nextStepId: ask_name}",
@@ -32,8 +33,9 @@ func TestSendersAgentFlowsCreate(t *testing.T) {
 
 		// Alternative argument passing style using inner flags
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:flows", "create",
+			t,
 			"--api-key", "string",
+			"senders:agent:flows", "create",
 			"--sender-id", "senderId",
 			"--name", "Lead Capture",
 			"--step.id", "welcome",
@@ -80,8 +82,9 @@ func TestSendersAgentFlowsCreate(t *testing.T) {
 			"enabled: true\n" +
 			"priority: 0\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "senders:agent:flows", "create",
+			t, pipeData,
 			"--api-key", "string",
+			"senders:agent:flows", "create",
 			"--sender-id", "senderId",
 		)
 	})
@@ -91,8 +94,9 @@ func TestSendersAgentFlowsRetrieve(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:flows", "retrieve",
+			t,
 			"--api-key", "string",
+			"senders:agent:flows", "retrieve",
 			"--sender-id", "senderId",
 			"--flow-id", "flowId",
 		)
@@ -103,8 +107,9 @@ func TestSendersAgentFlowsUpdate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:flows", "update",
+			t,
 			"--api-key", "string",
+			"senders:agent:flows", "update",
 			"--sender-id", "senderId",
 			"--flow-id", "flowId",
 			"--description", "description",
@@ -122,8 +127,9 @@ func TestSendersAgentFlowsUpdate(t *testing.T) {
 
 		// Alternative argument passing style using inner flags
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:flows", "update",
+			t,
 			"--api-key", "string",
+			"senders:agent:flows", "update",
 			"--sender-id", "senderId",
 			"--flow-id", "flowId",
 			"--description", "description",
@@ -159,8 +165,9 @@ func TestSendersAgentFlowsUpdate(t *testing.T) {
 			"  keywords:\n" +
 			"    - string\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "senders:agent:flows", "update",
+			t, pipeData,
 			"--api-key", "string",
+			"senders:agent:flows", "update",
 			"--sender-id", "senderId",
 			"--flow-id", "flowId",
 		)
@@ -171,8 +178,9 @@ func TestSendersAgentFlowsList(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:flows", "list",
+			t,
 			"--api-key", "string",
+			"senders:agent:flows", "list",
 			"--max-items", "10",
 			"--sender-id", "senderId",
 			"--cursor", "cursor",
@@ -186,8 +194,9 @@ func TestSendersAgentFlowsDelete(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:flows", "delete",
+			t,
 			"--api-key", "string",
+			"senders:agent:flows", "delete",
 			"--sender-id", "senderId",
 			"--flow-id", "flowId",
 		)
@@ -198,8 +207,9 @@ func TestSendersAgentFlowsDuplicate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:flows", "duplicate",
+			t,
 			"--api-key", "string",
+			"senders:agent:flows", "duplicate",
 			"--sender-id", "senderId",
 			"--flow-id", "flowId",
 			"--new-name", "Lead Capture (Copy)",
@@ -210,8 +220,9 @@ func TestSendersAgentFlowsDuplicate(t *testing.T) {
 		// Test piping YAML data over stdin
 		pipeData := []byte("newName: Lead Capture (Copy)")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "senders:agent:flows", "duplicate",
+			t, pipeData,
 			"--api-key", "string",
+			"senders:agent:flows", "duplicate",
 			"--sender-id", "senderId",
 			"--flow-id", "flowId",
 		)

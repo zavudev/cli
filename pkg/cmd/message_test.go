@@ -13,8 +13,9 @@ func TestMessagesRetrieve(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "messages", "retrieve",
+			t,
 			"--api-key", "string",
+			"messages", "retrieve",
 			"--message-id", "messageId",
 		)
 	})
@@ -24,8 +25,9 @@ func TestMessagesList(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "messages", "list",
+			t,
 			"--api-key", "string",
+			"messages", "list",
 			"--max-items", "10",
 			"--channel", "auto",
 			"--cursor", "cursor",
@@ -40,8 +42,9 @@ func TestMessagesReact(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "messages", "react",
+			t,
 			"--api-key", "string",
+			"messages", "react",
 			"--message-id", "messageId",
 			"--emoji", "👍",
 			"--zavu-sender", "sender_12345",
@@ -52,8 +55,9 @@ func TestMessagesReact(t *testing.T) {
 		// Test piping YAML data over stdin
 		pipeData := []byte("emoji: 👍")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "messages", "react",
+			t, pipeData,
 			"--api-key", "string",
+			"messages", "react",
 			"--message-id", "messageId",
 			"--zavu-sender", "sender_12345",
 		)
@@ -64,8 +68,9 @@ func TestMessagesSend(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "messages", "send",
+			t,
 			"--api-key", "string",
+			"messages", "send",
 			"--to", "+56912345678",
 			"--channel", "auto",
 			"--content", "{buttons: [{id: id, title: title}], contacts: [{name: name, phones: [string]}], emoji: emoji, filename: invoice.pdf, latitude: 0, listButton: listButton, locationAddress: locationAddress, locationName: locationName, longitude: 0, mediaId: mediaId, mediaUrl: https://example.com/image.jpg, mimeType: image/jpeg, reactToMessageId: reactToMessageId, sections: [{rows: [{id: id, title: title, description: description}], title: title}], templateId: templateId, templateVariables: {'1': John, '2': ORD-12345}}",
@@ -88,8 +93,9 @@ func TestMessagesSend(t *testing.T) {
 
 		// Alternative argument passing style using inner flags
 		mocktest.TestRunMockTestWithFlags(
-			t, "messages", "send",
+			t,
 			"--api-key", "string",
+			"messages", "send",
 			"--to", "+56912345678",
 			"--channel", "auto",
 			"--content.buttons", "[{id: id, title: title}]",
@@ -166,8 +172,9 @@ func TestMessagesSend(t *testing.T) {
 			"text: Your verification code is 123456\n" +
 			"voiceLanguage: es-ES\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "messages", "send",
+			t, pipeData,
 			"--api-key", "string",
+			"messages", "send",
 			"--zavu-sender", "sender_12345",
 		)
 	})

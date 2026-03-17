@@ -12,8 +12,9 @@ func TestIntrospectValidatePhone(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "introspect", "validate-phone",
+			t,
 			"--api-key", "string",
+			"introspect", "validate-phone",
 			"--phone-number", "+56912345678",
 		)
 	})
@@ -22,8 +23,9 @@ func TestIntrospectValidatePhone(t *testing.T) {
 		// Test piping YAML data over stdin
 		pipeData := []byte("phoneNumber: '+56912345678'")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "introspect", "validate-phone",
+			t, pipeData,
 			"--api-key", "string",
+			"introspect", "validate-phone",
 		)
 	})
 }
