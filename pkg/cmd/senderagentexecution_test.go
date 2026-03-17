@@ -12,8 +12,9 @@ func TestSendersAgentExecutionsList(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:executions", "list",
+			t,
 			"--api-key", "string",
+			"senders:agent:executions", "list",
 			"--max-items", "10",
 			"--sender-id", "senderId",
 			"--cursor", "cursor",
