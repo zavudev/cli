@@ -70,6 +70,7 @@ var phoneNumbersList = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:      "status",
+			Usage:     `Allowed values: "active", "suspended", "pending".`,
 			QueryPath: "status",
 		},
 		&requestflag.Flag[int64]{
@@ -129,6 +130,7 @@ var phoneNumbersRequirements = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:      "type",
+			Usage:     `Allowed values: "local", "mobile", "tollFree".`,
 			QueryPath: "type",
 		},
 	},
@@ -160,6 +162,7 @@ var phoneNumbersSearchAvailable = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:      "type",
+			Usage:     `Allowed values: "local", "mobile", "tollFree".`,
 			QueryPath: "type",
 		},
 	},

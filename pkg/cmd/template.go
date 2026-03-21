@@ -71,6 +71,7 @@ var templatesCreate = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.InnerFlag[string]{
 			Name:       "button.type",
+			Usage:      `Allowed values: "quick_reply", "url", "phone", "otp".`,
 			InnerField: "type",
 		},
 		&requestflag.InnerFlag[string]{
