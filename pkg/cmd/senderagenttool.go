@@ -70,6 +70,7 @@ var sendersAgentToolsCreate = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.InnerFlag[string]{
 			Name:       "parameters.type",
+			Usage:      `Allowed values: "object".`,
 			InnerField: "type",
 		},
 	},
@@ -145,6 +146,7 @@ var sendersAgentToolsUpdate = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.InnerFlag[string]{
 			Name:       "parameters.type",
+			Usage:      `Allowed values: "object".`,
 			InnerField: "type",
 		},
 	},

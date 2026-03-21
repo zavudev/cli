@@ -22,6 +22,7 @@ var regulatoryDocumentsCreate = cli.Command{
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
 			Name:     "document-type",
+			Usage:    `Allowed values: "passport", "national_id", "drivers_license", "utility_bill", "tax_id", "business_registration", "proof_of_address", "other".`,
 			Required: true,
 			BodyPath: "documentType",
 		},

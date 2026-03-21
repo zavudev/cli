@@ -50,6 +50,7 @@ var messagesList = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:      "status",
+			Usage:     `Allowed values: "queued", "sending", "sent", "delivered", "failed", "received", "pending_url_verification".`,
 			QueryPath: "status",
 		},
 		&requestflag.Flag[string]{
