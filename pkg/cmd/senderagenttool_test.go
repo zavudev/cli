@@ -5,16 +5,17 @@ package cmd
 import (
 	"testing"
 
-	"github.com/stainless-sdks/zavudev-cli/internal/mocktest"
-	"github.com/stainless-sdks/zavudev-cli/internal/requestflag"
+	"github.com/zavudev/cli/internal/mocktest"
+	"github.com/zavudev/cli/internal/requestflag"
 )
 
 func TestSendersAgentToolsCreate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:tools", "create",
+			t,
 			"--api-key", "string",
+			"senders:agent:tools", "create",
 			"--sender-id", "senderId",
 			"--description", "Get the status of a customer order",
 			"--name", "get_order_status",
@@ -31,8 +32,9 @@ func TestSendersAgentToolsCreate(t *testing.T) {
 
 		// Alternative argument passing style using inner flags
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:tools", "create",
+			t,
 			"--api-key", "string",
+			"senders:agent:tools", "create",
 			"--sender-id", "senderId",
 			"--description", "Get the status of a customer order",
 			"--name", "get_order_status",
@@ -62,8 +64,9 @@ func TestSendersAgentToolsCreate(t *testing.T) {
 			"enabled: true\n" +
 			"webhookSecret: whsec_...\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "senders:agent:tools", "create",
+			t, pipeData,
 			"--api-key", "string",
+			"senders:agent:tools", "create",
 			"--sender-id", "senderId",
 		)
 	})
@@ -73,8 +76,9 @@ func TestSendersAgentToolsRetrieve(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:tools", "retrieve",
+			t,
 			"--api-key", "string",
+			"senders:agent:tools", "retrieve",
 			"--sender-id", "senderId",
 			"--tool-id", "toolId",
 		)
@@ -85,8 +89,9 @@ func TestSendersAgentToolsUpdate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:tools", "update",
+			t,
 			"--api-key", "string",
+			"senders:agent:tools", "update",
 			"--sender-id", "senderId",
 			"--tool-id", "toolId",
 			"--description", "description",
@@ -104,8 +109,9 @@ func TestSendersAgentToolsUpdate(t *testing.T) {
 
 		// Alternative argument passing style using inner flags
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:tools", "update",
+			t,
 			"--api-key", "string",
+			"senders:agent:tools", "update",
 			"--sender-id", "senderId",
 			"--tool-id", "toolId",
 			"--description", "description",
@@ -136,8 +142,9 @@ func TestSendersAgentToolsUpdate(t *testing.T) {
 			"webhookSecret: webhookSecret\n" +
 			"webhookUrl: https://example.com\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "senders:agent:tools", "update",
+			t, pipeData,
 			"--api-key", "string",
+			"senders:agent:tools", "update",
 			"--sender-id", "senderId",
 			"--tool-id", "toolId",
 		)
@@ -148,8 +155,9 @@ func TestSendersAgentToolsList(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:tools", "list",
+			t,
 			"--api-key", "string",
+			"senders:agent:tools", "list",
 			"--max-items", "10",
 			"--sender-id", "senderId",
 			"--cursor", "cursor",
@@ -163,8 +171,9 @@ func TestSendersAgentToolsDelete(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:tools", "delete",
+			t,
 			"--api-key", "string",
+			"senders:agent:tools", "delete",
 			"--sender-id", "senderId",
 			"--tool-id", "toolId",
 		)
@@ -175,8 +184,9 @@ func TestSendersAgentToolsTest(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:tools", "test",
+			t,
 			"--api-key", "string",
+			"senders:agent:tools", "test",
 			"--sender-id", "senderId",
 			"--tool-id", "toolId",
 			"--test-params", "{order_id: bar}",
@@ -189,8 +199,9 @@ func TestSendersAgentToolsTest(t *testing.T) {
 			"testParams:\n" +
 			"  order_id: bar\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "senders:agent:tools", "test",
+			t, pipeData,
 			"--api-key", "string",
+			"senders:agent:tools", "test",
 			"--sender-id", "senderId",
 			"--tool-id", "toolId",
 		)

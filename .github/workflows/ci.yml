@@ -1,24 +1,28 @@
 name: CI
 on:
   push:
-    branches-ignore:
-      - 'generated'
-      - 'codegen/**'
-      - 'integrated/**'
-      - 'stl-preview-head/**'
-      - 'stl-preview-base/**'
+    branches:
+      - '**'
+      - '!integrated/**'
+      - '!stl-preview-head/**'
+      - '!stl-preview-base/**'
+      - '!generated'
+      - '!codegen/**'
+      - 'codegen/stl/**'
   pull_request:
     branches-ignore:
       - 'stl-preview-head/**'
       - 'stl-preview-base/**'
+
 env:
-  GOPRIVATE: github.com/stainless-sdks/zavudev-go
+  GOPRIVATE: github.com/zavudev/sdk-go,github.com/stainless-sdks/zavudev-go
+
 jobs:
   lint:
     timeout-minutes: 10
     name: lint
     runs-on: ${{ github.repository == 'stainless-sdks/zavudev-cli' && 'depot-ubuntu-24.04' || 'ubuntu-latest' }}
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.fork
+    if: (github.event_name == 'push' || github.event.pull_request.head.repo.fork) && (github.event_name != 'push' || github.event.head_commit.message != 'codegen metadata')
 
     steps:
       - uses: actions/checkout@v6
@@ -26,6 +30,14 @@ jobs:
       - uses: ./.github/actions/setup-go
         with:
           stainless-api-key: ${{ secrets.STAINLESS_API_KEY }}
+
+      - name: Link staging branch
+        if: github.repository == 'stainless-sdks/zavudev-cli'
+        run: |
+          ./scripts/link 'github.com/stainless-sdks/zavudev-go@${{ github.ref_name }}' || true
+
+      - name: Bootstrap
+        run: ./scripts/bootstrap
 
       - name: Run lints
         run: ./scripts/lint
@@ -37,13 +49,21 @@ jobs:
       contents: read
       id-token: write
     runs-on: ${{ github.repository == 'stainless-sdks/zavudev-cli' && 'depot-ubuntu-24.04' || 'ubuntu-latest' }}
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.fork
+    if: (github.event_name == 'push' || github.event.pull_request.head.repo.fork) && (github.event_name != 'push' || github.event.head_commit.message != 'codegen metadata')
     steps:
       - uses: actions/checkout@v6
 
       - uses: ./.github/actions/setup-go
         with:
           stainless-api-key: ${{ secrets.STAINLESS_API_KEY }}
+
+      - name: Link staging branch
+        if: github.repository == 'stainless-sdks/zavudev-cli'
+        run: |
+          ./scripts/link 'github.com/stainless-sdks/zavudev-go@${{ github.ref_name }}' || true
+
+      - name: Bootstrap
+        run: ./scripts/bootstrap
 
       - name: Run goreleaser
         uses: goreleaser/goreleaser-action@v6.1.0
@@ -83,6 +103,14 @@ jobs:
       - uses: ./.github/actions/setup-go
         with:
           stainless-api-key: ${{ secrets.STAINLESS_API_KEY }}
+
+      - name: Link staging branch
+        if: github.repository == 'stainless-sdks/zavudev-cli'
+        run: |
+          ./scripts/link 'github.com/stainless-sdks/zavudev-go@${{ github.ref_name }}' || true
+
+      - name: Bootstrap
+        run: ./scripts/bootstrap
 
       - name: Run tests
         run: ./scripts/test

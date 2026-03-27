@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/stainless-sdks/zavudev-cli/internal/apiquery"
-	"github.com/stainless-sdks/zavudev-cli/internal/requestflag"
-	"github.com/stainless-sdks/zavudev-go"
-	"github.com/stainless-sdks/zavudev-go/option"
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
+	"github.com/zavudev/cli/internal/apiquery"
+	"github.com/zavudev/cli/internal/requestflag"
+	"github.com/zavudev/sdk-go"
+	"github.com/zavudev/sdk-go/option"
 )
 
 var templatesCreate = requestflag.WithInnerFlags(cli.Command{
@@ -71,6 +71,7 @@ var templatesCreate = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.InnerFlag[string]{
 			Name:       "button.type",
+			Usage:      `Allowed values: "quick_reply", "url", "phone", "otp".`,
 			InnerField: "type",
 		},
 		&requestflag.InnerFlag[string]{

@@ -5,16 +5,17 @@ package cmd
 import (
 	"testing"
 
-	"github.com/stainless-sdks/zavudev-cli/internal/mocktest"
-	"github.com/stainless-sdks/zavudev-cli/internal/requestflag"
+	"github.com/zavudev/cli/internal/mocktest"
+	"github.com/zavudev/cli/internal/requestflag"
 )
 
 func TestBroadcastsCreate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "broadcasts", "create",
+			t,
 			"--api-key", "string",
+			"broadcasts", "create",
 			"--channel", "sms",
 			"--name", "Black Friday Sale",
 			"--content", "{filename: filename, mediaId: mediaId, mediaUrl: mediaUrl, mimeType: mimeType, templateId: templateId, templateVariables: {foo: string}}",
@@ -35,8 +36,9 @@ func TestBroadcastsCreate(t *testing.T) {
 
 		// Alternative argument passing style using inner flags
 		mocktest.TestRunMockTestWithFlags(
-			t, "broadcasts", "create",
+			t,
 			"--api-key", "string",
+			"broadcasts", "create",
 			"--channel", "sms",
 			"--name", "Black Friday Sale",
 			"--content.filename", "filename",
@@ -79,8 +81,9 @@ func TestBroadcastsCreate(t *testing.T) {
 			"senderId: senderId\n" +
 			"text: Hi {{name}}, check out our Black Friday deals! Use code FRIDAY20 for 20% off.\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "broadcasts", "create",
+			t, pipeData,
 			"--api-key", "string",
+			"broadcasts", "create",
 		)
 	})
 }
@@ -89,8 +92,9 @@ func TestBroadcastsRetrieve(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "broadcasts", "retrieve",
+			t,
 			"--api-key", "string",
+			"broadcasts", "retrieve",
 			"--broadcast-id", "broadcastId",
 		)
 	})
@@ -100,8 +104,9 @@ func TestBroadcastsUpdate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "broadcasts", "update",
+			t,
 			"--api-key", "string",
+			"broadcasts", "update",
 			"--broadcast-id", "broadcastId",
 			"--content", "{filename: filename, mediaId: mediaId, mediaUrl: mediaUrl, mimeType: mimeType, templateId: templateId, templateVariables: {foo: string}}",
 			"--email-html-body", "emailHtmlBody",
@@ -118,8 +123,9 @@ func TestBroadcastsUpdate(t *testing.T) {
 
 		// Alternative argument passing style using inner flags
 		mocktest.TestRunMockTestWithFlags(
-			t, "broadcasts", "update",
+			t,
 			"--api-key", "string",
+			"broadcasts", "update",
 			"--broadcast-id", "broadcastId",
 			"--content.filename", "filename",
 			"--content.media-id", "mediaId",
@@ -153,8 +159,9 @@ func TestBroadcastsUpdate(t *testing.T) {
 			"name: name\n" +
 			"text: text\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "broadcasts", "update",
+			t, pipeData,
 			"--api-key", "string",
+			"broadcasts", "update",
 			"--broadcast-id", "broadcastId",
 		)
 	})
@@ -164,8 +171,9 @@ func TestBroadcastsList(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "broadcasts", "list",
+			t,
 			"--api-key", "string",
+			"broadcasts", "list",
 			"--max-items", "10",
 			"--cursor", "cursor",
 			"--limit", "100",
@@ -178,8 +186,9 @@ func TestBroadcastsDelete(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "broadcasts", "delete",
+			t,
 			"--api-key", "string",
+			"broadcasts", "delete",
 			"--broadcast-id", "broadcastId",
 		)
 	})
@@ -189,8 +198,9 @@ func TestBroadcastsCancel(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "broadcasts", "cancel",
+			t,
 			"--api-key", "string",
+			"broadcasts", "cancel",
 			"--broadcast-id", "broadcastId",
 		)
 	})
@@ -200,8 +210,9 @@ func TestBroadcastsProgress(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "broadcasts", "progress",
+			t,
 			"--api-key", "string",
+			"broadcasts", "progress",
 			"--broadcast-id", "broadcastId",
 		)
 	})
@@ -211,8 +222,9 @@ func TestBroadcastsReschedule(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "broadcasts", "reschedule",
+			t,
 			"--api-key", "string",
+			"broadcasts", "reschedule",
 			"--broadcast-id", "broadcastId",
 			"--scheduled-at", "'2024-01-15T14:00:00Z'",
 		)
@@ -222,8 +234,9 @@ func TestBroadcastsReschedule(t *testing.T) {
 		// Test piping YAML data over stdin
 		pipeData := []byte("scheduledAt: '2024-01-15T14:00:00Z'")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "broadcasts", "reschedule",
+			t, pipeData,
 			"--api-key", "string",
+			"broadcasts", "reschedule",
 			"--broadcast-id", "broadcastId",
 		)
 	})
@@ -233,8 +246,9 @@ func TestBroadcastsSend(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "broadcasts", "send",
+			t,
 			"--api-key", "string",
+			"broadcasts", "send",
 			"--broadcast-id", "broadcastId",
 			"--scheduled-at", "'2019-12-27T18:11:19.117Z'",
 		)
@@ -244,8 +258,9 @@ func TestBroadcastsSend(t *testing.T) {
 		// Test piping YAML data over stdin
 		pipeData := []byte("scheduledAt: '2019-12-27T18:11:19.117Z'")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "broadcasts", "send",
+			t, pipeData,
 			"--api-key", "string",
+			"broadcasts", "send",
 			"--broadcast-id", "broadcastId",
 		)
 	})

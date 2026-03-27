@@ -5,15 +5,16 @@ package cmd
 import (
 	"testing"
 
-	"github.com/stainless-sdks/zavudev-cli/internal/mocktest"
+	"github.com/zavudev/cli/internal/mocktest"
 )
 
 func TestSendersAgentCreate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent", "create",
+			t,
 			"--api-key", "string",
+			"senders:agent", "create",
 			"--sender-id", "senderId",
 			"--model", "gpt-4o-mini",
 			"--name", "Customer Support",
@@ -46,8 +47,9 @@ func TestSendersAgentCreate(t *testing.T) {
 			"triggerOnMessageTypes:\n" +
 			"  - string\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "senders:agent", "create",
+			t, pipeData,
 			"--api-key", "string",
+			"senders:agent", "create",
 			"--sender-id", "senderId",
 		)
 	})
@@ -57,8 +59,9 @@ func TestSendersAgentRetrieve(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent", "retrieve",
+			t,
 			"--api-key", "string",
+			"senders:agent", "retrieve",
 			"--sender-id", "senderId",
 		)
 	})
@@ -68,8 +71,9 @@ func TestSendersAgentUpdate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent", "update",
+			t,
 			"--api-key", "string",
+			"senders:agent", "update",
 			"--sender-id", "senderId",
 			"--api-key", "apiKey",
 			"--context-window-messages", "1",
@@ -104,8 +108,9 @@ func TestSendersAgentUpdate(t *testing.T) {
 			"triggerOnMessageTypes:\n" +
 			"  - string\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "senders:agent", "update",
+			t, pipeData,
 			"--api-key", "string",
+			"senders:agent", "update",
 			"--sender-id", "senderId",
 		)
 	})
@@ -115,8 +120,9 @@ func TestSendersAgentDelete(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent", "delete",
+			t,
 			"--api-key", "string",
+			"senders:agent", "delete",
 			"--sender-id", "senderId",
 		)
 	})
@@ -126,8 +132,9 @@ func TestSendersAgentStats(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent", "stats",
+			t,
 			"--api-key", "string",
+			"senders:agent", "stats",
 			"--sender-id", "senderId",
 		)
 	})

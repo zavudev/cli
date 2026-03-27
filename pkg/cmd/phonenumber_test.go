@@ -5,15 +5,16 @@ package cmd
 import (
 	"testing"
 
-	"github.com/stainless-sdks/zavudev-cli/internal/mocktest"
+	"github.com/zavudev/cli/internal/mocktest"
 )
 
 func TestPhoneNumbersRetrieve(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "phone-numbers", "retrieve",
+			t,
 			"--api-key", "string",
+			"phone-numbers", "retrieve",
 			"--phone-number-id", "phoneNumberId",
 		)
 	})
@@ -23,8 +24,9 @@ func TestPhoneNumbersUpdate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "phone-numbers", "update",
+			t,
 			"--api-key", "string",
+			"phone-numbers", "update",
 			"--phone-number-id", "phoneNumberId",
 			"--name", "Support Line",
 			"--sender-id", "senderId",
@@ -37,8 +39,9 @@ func TestPhoneNumbersUpdate(t *testing.T) {
 			"name: Support Line\n" +
 			"senderId: senderId\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "phone-numbers", "update",
+			t, pipeData,
 			"--api-key", "string",
+			"phone-numbers", "update",
 			"--phone-number-id", "phoneNumberId",
 		)
 	})
@@ -48,8 +51,9 @@ func TestPhoneNumbersList(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "phone-numbers", "list",
+			t,
 			"--api-key", "string",
+			"phone-numbers", "list",
 			"--max-items", "10",
 			"--cursor", "cursor",
 			"--limit", "100",
@@ -62,8 +66,9 @@ func TestPhoneNumbersPurchase(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "phone-numbers", "purchase",
+			t,
 			"--api-key", "string",
+			"phone-numbers", "purchase",
 			"--phone-number", "+15551234567",
 			"--name", "Primary Line",
 		)
@@ -75,8 +80,9 @@ func TestPhoneNumbersPurchase(t *testing.T) {
 			"phoneNumber: '+15551234567'\n" +
 			"name: Primary Line\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "phone-numbers", "purchase",
+			t, pipeData,
 			"--api-key", "string",
+			"phone-numbers", "purchase",
 		)
 	})
 }
@@ -85,8 +91,9 @@ func TestPhoneNumbersRelease(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "phone-numbers", "release",
+			t,
 			"--api-key", "string",
+			"phone-numbers", "release",
 			"--phone-number-id", "phoneNumberId",
 		)
 	})
@@ -96,8 +103,9 @@ func TestPhoneNumbersRequirements(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "phone-numbers", "requirements",
+			t,
 			"--api-key", "string",
+			"phone-numbers", "requirements",
 			"--country-code", "xx",
 			"--type", "local",
 		)
@@ -108,8 +116,9 @@ func TestPhoneNumbersSearchAvailable(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "phone-numbers", "search-available",
+			t,
 			"--api-key", "string",
+			"phone-numbers", "search-available",
 			"--country-code", "xx",
 			"--contains", "contains",
 			"--limit", "50",

@@ -5,15 +5,16 @@ package cmd
 import (
 	"testing"
 
-	"github.com/stainless-sdks/zavudev-cli/internal/mocktest"
+	"github.com/zavudev/cli/internal/mocktest"
 )
 
 func TestSendersCreate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders", "create",
+			t,
 			"--api-key", "string",
+			"senders", "create",
 			"--name", "name",
 			"--phone-number", "phoneNumber",
 			"--set-as-default=true",
@@ -32,8 +33,9 @@ func TestSendersCreate(t *testing.T) {
 			"  - message.queued\n" +
 			"webhookUrl: https://example.com\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "senders", "create",
+			t, pipeData,
 			"--api-key", "string",
+			"senders", "create",
 		)
 	})
 }
@@ -42,8 +44,9 @@ func TestSendersRetrieve(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders", "retrieve",
+			t,
 			"--api-key", "string",
+			"senders", "retrieve",
 			"--sender-id", "senderId",
 		)
 	})
@@ -53,8 +56,9 @@ func TestSendersUpdate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders", "update",
+			t,
 			"--api-key", "string",
+			"senders", "update",
 			"--sender-id", "senderId",
 			"--email-receiving-enabled=true",
 			"--name", "name",
@@ -76,8 +80,9 @@ func TestSendersUpdate(t *testing.T) {
 			"  - message.queued\n" +
 			"webhookUrl: https://example.com\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "senders", "update",
+			t, pipeData,
 			"--api-key", "string",
+			"senders", "update",
 			"--sender-id", "senderId",
 		)
 	})
@@ -87,8 +92,9 @@ func TestSendersList(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders", "list",
+			t,
 			"--api-key", "string",
+			"senders", "list",
 			"--max-items", "10",
 			"--cursor", "cursor",
 			"--limit", "100",
@@ -100,8 +106,9 @@ func TestSendersDelete(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders", "delete",
+			t,
 			"--api-key", "string",
+			"senders", "delete",
 			"--sender-id", "senderId",
 		)
 	})
@@ -111,8 +118,9 @@ func TestSendersGetProfile(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders", "get-profile",
+			t,
 			"--api-key", "string",
+			"senders", "get-profile",
 			"--sender-id", "senderId",
 		)
 	})
@@ -122,8 +130,9 @@ func TestSendersRegenerateWebhookSecret(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders", "regenerate-webhook-secret",
+			t,
 			"--api-key", "string",
+			"senders", "regenerate-webhook-secret",
 			"--sender-id", "senderId",
 		)
 	})
@@ -133,8 +142,9 @@ func TestSendersUpdateProfile(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders", "update-profile",
+			t,
 			"--api-key", "string",
+			"senders", "update-profile",
 			"--sender-id", "senderId",
 			"--about", "Succulent specialists!",
 			"--address", "address",
@@ -156,8 +166,9 @@ func TestSendersUpdateProfile(t *testing.T) {
 			"websites:\n" +
 			"  - https://www.example.com\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "senders", "update-profile",
+			t, pipeData,
 			"--api-key", "string",
+			"senders", "update-profile",
 			"--sender-id", "senderId",
 		)
 	})
@@ -167,8 +178,9 @@ func TestSendersUploadProfilePicture(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders", "upload-profile-picture",
+			t,
 			"--api-key", "string",
+			"senders", "upload-profile-picture",
 			"--sender-id", "senderId",
 			"--image-url", "https://example.com/profile.jpg",
 			"--mime-type", "image/jpeg",
@@ -181,8 +193,9 @@ func TestSendersUploadProfilePicture(t *testing.T) {
 			"imageUrl: https://example.com/profile.jpg\n" +
 			"mimeType: image/jpeg\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "senders", "upload-profile-picture",
+			t, pipeData,
 			"--api-key", "string",
+			"senders", "upload-profile-picture",
 			"--sender-id", "senderId",
 		)
 	})

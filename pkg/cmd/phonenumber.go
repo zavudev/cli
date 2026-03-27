@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/stainless-sdks/zavudev-cli/internal/apiquery"
-	"github.com/stainless-sdks/zavudev-cli/internal/requestflag"
-	"github.com/stainless-sdks/zavudev-go"
-	"github.com/stainless-sdks/zavudev-go/option"
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
+	"github.com/zavudev/cli/internal/apiquery"
+	"github.com/zavudev/cli/internal/requestflag"
+	"github.com/zavudev/sdk-go"
+	"github.com/zavudev/sdk-go/option"
 )
 
 var phoneNumbersRetrieve = cli.Command{
@@ -70,6 +70,7 @@ var phoneNumbersList = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:      "status",
+			Usage:     `Allowed values: "active", "suspended", "pending".`,
 			QueryPath: "status",
 		},
 		&requestflag.Flag[int64]{
@@ -129,6 +130,7 @@ var phoneNumbersRequirements = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:      "type",
+			Usage:     `Allowed values: "local", "mobile", "tollFree".`,
 			QueryPath: "type",
 		},
 	},
@@ -160,6 +162,7 @@ var phoneNumbersSearchAvailable = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:      "type",
+			Usage:     `Allowed values: "local", "mobile", "tollFree".`,
 			QueryPath: "type",
 		},
 	},

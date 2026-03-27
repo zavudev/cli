@@ -10,10 +10,10 @@ import (
 	"os"
 	"slices"
 
-	"github.com/stainless-sdks/zavudev-cli/pkg/cmd"
-	"github.com/stainless-sdks/zavudev-go"
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
+	"github.com/zavudev/cli/pkg/cmd"
+	"github.com/zavudev/sdk-go"
 )
 
 func main() {

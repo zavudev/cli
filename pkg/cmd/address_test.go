@@ -5,15 +5,16 @@ package cmd
 import (
 	"testing"
 
-	"github.com/stainless-sdks/zavudev-cli/internal/mocktest"
+	"github.com/zavudev/cli/internal/mocktest"
 )
 
 func TestAddressesCreate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "addresses", "create",
+			t,
 			"--api-key", "string",
+			"addresses", "create",
 			"--country-code", "DE",
 			"--locality", "Berlin",
 			"--postal-code", "10115",
@@ -39,8 +40,9 @@ func TestAddressesCreate(t *testing.T) {
 			"firstName: John\n" +
 			"lastName: Doe\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "addresses", "create",
+			t, pipeData,
 			"--api-key", "string",
+			"addresses", "create",
 		)
 	})
 }
@@ -49,8 +51,9 @@ func TestAddressesRetrieve(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "addresses", "retrieve",
+			t,
 			"--api-key", "string",
+			"addresses", "retrieve",
 			"--address-id", "addressId",
 		)
 	})
@@ -60,8 +63,9 @@ func TestAddressesList(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "addresses", "list",
+			t,
 			"--api-key", "string",
+			"addresses", "list",
 			"--max-items", "10",
 			"--cursor", "cursor",
 			"--limit", "100",
@@ -73,8 +77,9 @@ func TestAddressesDelete(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "addresses", "delete",
+			t,
 			"--api-key", "string",
+			"addresses", "delete",
 			"--address-id", "addressId",
 		)
 	})

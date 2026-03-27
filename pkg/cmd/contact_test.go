@@ -5,15 +5,16 @@ package cmd
 import (
 	"testing"
 
-	"github.com/stainless-sdks/zavudev-cli/internal/mocktest"
+	"github.com/zavudev/cli/internal/mocktest"
 )
 
 func TestContactsRetrieve(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "contacts", "retrieve",
+			t,
 			"--api-key", "string",
+			"contacts", "retrieve",
 			"--contact-id", "contactId",
 		)
 	})
@@ -23,8 +24,9 @@ func TestContactsUpdate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "contacts", "update",
+			t,
 			"--api-key", "string",
+			"contacts", "update",
 			"--contact-id", "contactId",
 			"--default-channel", "sms",
 			"--metadata", "{foo: string}",
@@ -38,8 +40,9 @@ func TestContactsUpdate(t *testing.T) {
 			"metadata:\n" +
 			"  foo: string\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "contacts", "update",
+			t, pipeData,
 			"--api-key", "string",
+			"contacts", "update",
 			"--contact-id", "contactId",
 		)
 	})
@@ -49,8 +52,9 @@ func TestContactsList(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "contacts", "list",
+			t,
 			"--api-key", "string",
+			"contacts", "list",
 			"--max-items", "10",
 			"--cursor", "cursor",
 			"--limit", "100",
@@ -63,8 +67,9 @@ func TestContactsRetrieveByPhone(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "contacts", "retrieve-by-phone",
+			t,
 			"--api-key", "string",
+			"contacts", "retrieve-by-phone",
 			"--phone-number", "phoneNumber",
 		)
 	})

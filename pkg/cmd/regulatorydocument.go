@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/stainless-sdks/zavudev-cli/internal/apiquery"
-	"github.com/stainless-sdks/zavudev-cli/internal/requestflag"
-	"github.com/stainless-sdks/zavudev-go"
-	"github.com/stainless-sdks/zavudev-go/option"
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
+	"github.com/zavudev/cli/internal/apiquery"
+	"github.com/zavudev/cli/internal/requestflag"
+	"github.com/zavudev/sdk-go"
+	"github.com/zavudev/sdk-go/option"
 )
 
 var regulatoryDocumentsCreate = cli.Command{
@@ -22,6 +22,7 @@ var regulatoryDocumentsCreate = cli.Command{
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
 			Name:     "document-type",
+			Usage:    `Allowed values: "passport", "national_id", "drivers_license", "utility_bill", "tax_id", "business_registration", "proof_of_address", "other".`,
 			Required: true,
 			BodyPath: "documentType",
 		},

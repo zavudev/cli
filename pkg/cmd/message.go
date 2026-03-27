@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/stainless-sdks/zavudev-cli/internal/apiquery"
-	"github.com/stainless-sdks/zavudev-cli/internal/requestflag"
-	"github.com/stainless-sdks/zavudev-go"
-	"github.com/stainless-sdks/zavudev-go/option"
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
+	"github.com/zavudev/cli/internal/apiquery"
+	"github.com/zavudev/cli/internal/requestflag"
+	"github.com/zavudev/sdk-go"
+	"github.com/zavudev/sdk-go/option"
 )
 
 var messagesRetrieve = cli.Command{
@@ -50,6 +50,7 @@ var messagesList = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:      "status",
+			Usage:     `Allowed values: "queued", "sending", "sent", "delivered", "read", "failed", "received", "pending_url_verification".`,
 			QueryPath: "status",
 		},
 		&requestflag.Flag[string]{
@@ -96,7 +97,7 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
 			Name:     "to",
-			Usage:    "Recipient phone number in E.164 format or email address.",
+			Usage:    "Recipient phone number in E.164 format, email address, or numeric chat ID (for Telegram/Instagram).",
 			Required: true,
 			BodyPath: "to",
 		},

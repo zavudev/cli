@@ -5,15 +5,16 @@ package cmd
 import (
 	"testing"
 
-	"github.com/stainless-sdks/zavudev-cli/internal/mocktest"
+	"github.com/zavudev/cli/internal/mocktest"
 )
 
 func TestSendersAgentKnowledgeBasesCreate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:knowledge-bases", "create",
+			t,
 			"--api-key", "string",
+			"senders:agent:knowledge-bases", "create",
 			"--sender-id", "senderId",
 			"--name", "Product FAQ",
 			"--description", "Frequently asked questions about our products",
@@ -26,8 +27,9 @@ func TestSendersAgentKnowledgeBasesCreate(t *testing.T) {
 			"name: Product FAQ\n" +
 			"description: Frequently asked questions about our products\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "senders:agent:knowledge-bases", "create",
+			t, pipeData,
 			"--api-key", "string",
+			"senders:agent:knowledge-bases", "create",
 			"--sender-id", "senderId",
 		)
 	})
@@ -37,8 +39,9 @@ func TestSendersAgentKnowledgeBasesRetrieve(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:knowledge-bases", "retrieve",
+			t,
 			"--api-key", "string",
+			"senders:agent:knowledge-bases", "retrieve",
 			"--sender-id", "senderId",
 			"--kb-id", "kbId",
 		)
@@ -49,8 +52,9 @@ func TestSendersAgentKnowledgeBasesUpdate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:knowledge-bases", "update",
+			t,
 			"--api-key", "string",
+			"senders:agent:knowledge-bases", "update",
 			"--sender-id", "senderId",
 			"--kb-id", "kbId",
 			"--description", "description",
@@ -64,8 +68,9 @@ func TestSendersAgentKnowledgeBasesUpdate(t *testing.T) {
 			"description: description\n" +
 			"name: name\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "senders:agent:knowledge-bases", "update",
+			t, pipeData,
 			"--api-key", "string",
+			"senders:agent:knowledge-bases", "update",
 			"--sender-id", "senderId",
 			"--kb-id", "kbId",
 		)
@@ -76,8 +81,9 @@ func TestSendersAgentKnowledgeBasesList(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:knowledge-bases", "list",
+			t,
 			"--api-key", "string",
+			"senders:agent:knowledge-bases", "list",
 			"--max-items", "10",
 			"--sender-id", "senderId",
 			"--cursor", "cursor",
@@ -90,8 +96,9 @@ func TestSendersAgentKnowledgeBasesDelete(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:knowledge-bases", "delete",
+			t,
 			"--api-key", "string",
+			"senders:agent:knowledge-bases", "delete",
 			"--sender-id", "senderId",
 			"--kb-id", "kbId",
 		)

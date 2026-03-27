@@ -5,15 +5,16 @@ package cmd
 import (
 	"testing"
 
-	"github.com/stainless-sdks/zavudev-cli/internal/mocktest"
+	"github.com/zavudev/cli/internal/mocktest"
 )
 
 func TestRegulatoryDocumentsCreate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "regulatory-documents", "create",
+			t,
 			"--api-key", "string",
+			"regulatory-documents", "create",
 			"--document-type", "passport",
 			"--file-size", "102400",
 			"--mime-type", "image/jpeg",
@@ -31,8 +32,9 @@ func TestRegulatoryDocumentsCreate(t *testing.T) {
 			"name: Passport Scan\n" +
 			"storageId: kg2abc123...\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "regulatory-documents", "create",
+			t, pipeData,
 			"--api-key", "string",
+			"regulatory-documents", "create",
 		)
 	})
 }
@@ -41,8 +43,9 @@ func TestRegulatoryDocumentsRetrieve(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "regulatory-documents", "retrieve",
+			t,
 			"--api-key", "string",
+			"regulatory-documents", "retrieve",
 			"--document-id", "documentId",
 		)
 	})
@@ -52,8 +55,9 @@ func TestRegulatoryDocumentsList(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "regulatory-documents", "list",
+			t,
 			"--api-key", "string",
+			"regulatory-documents", "list",
 			"--max-items", "10",
 			"--cursor", "cursor",
 			"--limit", "100",
@@ -65,8 +69,9 @@ func TestRegulatoryDocumentsDelete(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "regulatory-documents", "delete",
+			t,
 			"--api-key", "string",
+			"regulatory-documents", "delete",
 			"--document-id", "documentId",
 		)
 	})
@@ -76,8 +81,9 @@ func TestRegulatoryDocumentsUploadURL(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "regulatory-documents", "upload-url",
+			t,
 			"--api-key", "string",
+			"regulatory-documents", "upload-url",
 		)
 	})
 }

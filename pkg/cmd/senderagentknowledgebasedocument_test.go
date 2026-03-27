@@ -5,15 +5,16 @@ package cmd
 import (
 	"testing"
 
-	"github.com/stainless-sdks/zavudev-cli/internal/mocktest"
+	"github.com/zavudev/cli/internal/mocktest"
 )
 
 func TestSendersAgentKnowledgeBasesDocumentsCreate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:knowledge-bases:documents", "create",
+			t,
 			"--api-key", "string",
+			"senders:agent:knowledge-bases:documents", "create",
 			"--sender-id", "senderId",
 			"--kb-id", "kbId",
 			"--content", "Our return policy allows returns within 30 days of purchase...",
@@ -27,8 +28,9 @@ func TestSendersAgentKnowledgeBasesDocumentsCreate(t *testing.T) {
 			"content: Our return policy allows returns within 30 days of purchase...\n" +
 			"title: Return Policy\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "senders:agent:knowledge-bases:documents", "create",
+			t, pipeData,
 			"--api-key", "string",
+			"senders:agent:knowledge-bases:documents", "create",
 			"--sender-id", "senderId",
 			"--kb-id", "kbId",
 		)
@@ -39,8 +41,9 @@ func TestSendersAgentKnowledgeBasesDocumentsList(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:knowledge-bases:documents", "list",
+			t,
 			"--api-key", "string",
+			"senders:agent:knowledge-bases:documents", "list",
 			"--max-items", "10",
 			"--sender-id", "senderId",
 			"--kb-id", "kbId",
@@ -54,8 +57,9 @@ func TestSendersAgentKnowledgeBasesDocumentsDelete(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "senders:agent:knowledge-bases:documents", "delete",
+			t,
 			"--api-key", "string",
+			"senders:agent:knowledge-bases:documents", "delete",
 			"--sender-id", "senderId",
 			"--kb-id", "kbId",
 			"--doc-id", "docId",

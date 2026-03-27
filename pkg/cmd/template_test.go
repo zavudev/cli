@@ -5,16 +5,17 @@ package cmd
 import (
 	"testing"
 
-	"github.com/stainless-sdks/zavudev-cli/internal/mocktest"
-	"github.com/stainless-sdks/zavudev-cli/internal/requestflag"
+	"github.com/zavudev/cli/internal/mocktest"
+	"github.com/zavudev/cli/internal/requestflag"
 )
 
 func TestTemplatesCreate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "templates", "create",
+			t,
 			"--api-key", "string",
+			"templates", "create",
 			"--body", "Hi {{1}}, your order {{2}} has been confirmed and will ship within 24 hours.",
 			"--language", "en",
 			"--name", "order_confirmation",
@@ -33,8 +34,9 @@ func TestTemplatesCreate(t *testing.T) {
 
 		// Alternative argument passing style using inner flags
 		mocktest.TestRunMockTestWithFlags(
-			t, "templates", "create",
+			t,
 			"--api-key", "string",
+			"templates", "create",
 			"--body", "Hi {{1}}, your order {{2}} has been confirmed and will ship within 24 hours.",
 			"--language", "en",
 			"--name", "order_confirmation",
@@ -74,8 +76,9 @@ func TestTemplatesCreate(t *testing.T) {
 			"  - order_id\n" +
 			"whatsappCategory: UTILITY\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "templates", "create",
+			t, pipeData,
 			"--api-key", "string",
+			"templates", "create",
 		)
 	})
 }
@@ -84,8 +87,9 @@ func TestTemplatesRetrieve(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "templates", "retrieve",
+			t,
 			"--api-key", "string",
+			"templates", "retrieve",
 			"--template-id", "templateId",
 		)
 	})
@@ -95,8 +99,9 @@ func TestTemplatesList(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "templates", "list",
+			t,
 			"--api-key", "string",
+			"templates", "list",
 			"--max-items", "10",
 			"--cursor", "cursor",
 			"--limit", "100",
@@ -108,8 +113,9 @@ func TestTemplatesDelete(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "templates", "delete",
+			t,
 			"--api-key", "string",
+			"templates", "delete",
 			"--template-id", "templateId",
 		)
 	})
@@ -119,8 +125,9 @@ func TestTemplatesSubmit(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
-			t, "templates", "submit",
+			t,
 			"--api-key", "string",
+			"templates", "submit",
 			"--template-id", "templateId",
 			"--sender-id", "sender_abc123",
 			"--category", "UTILITY",
@@ -133,8 +140,9 @@ func TestTemplatesSubmit(t *testing.T) {
 			"senderId: sender_abc123\n" +
 			"category: UTILITY\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData, "templates", "submit",
+			t, pipeData,
 			"--api-key", "string",
+			"templates", "submit",
 			"--template-id", "templateId",
 		)
 	})
