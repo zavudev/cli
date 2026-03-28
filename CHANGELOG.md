@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.2.0 (2026-03-28)
+
+Full Changelog: [v0.1.0...v0.2.0](https://github.com/zavudev/cli/compare/v0.1.0...v0.2.0)
+
+### Features
+
+* set CLI flag constant values automatically where `x-stainless-const` is set ([b684b6d](https://github.com/zavudev/cli/commit/b684b6d9a959a0c26d6fd2460a5de6ef8a8a5de6))
+
+
+### Bug Fixes
+
+* fix for off-by-one error in pagination logic ([fa6a1e1](https://github.com/zavudev/cli/commit/fa6a1e13c61969a77cd4efd20bc393beead3dbf7))
+
+
+### Chores
+
+* omit full usage information when missing required CLI parameters ([5b162ac](https://github.com/zavudev/cli/commit/5b162ac682d194e419e67ffe569080986c71642b))
+
 ## 0.1.0 (2026-03-27)
 
 Full Changelog: [v0.0.1...v0.1.0](https://github.com/zavudev/cli/compare/v0.0.1...v0.1.0)
