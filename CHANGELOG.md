@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.2.0 (2026-04-07)
+
+Full Changelog: [v0.1.0...v0.2.0](https://github.com/zavudev/cli/compare/v0.1.0...v0.2.0)
+
+### Features
+
+* allow `-` as value representing stdin to binary-only file parameters in CLIs ([0a374cd](https://github.com/zavudev/cli/commit/0a374cd5a6f48d846f88b6ec7a959a8746217387))
+* **api:** api update ([639a685](https://github.com/zavudev/cli/commit/639a685199ce4abc12d80dcfc70e7283384ed6c7))
+* better error message if scheme forgotten in CLI `*_BASE_URL`/`--base-url` ([d063382](https://github.com/zavudev/cli/commit/d063382073fd01452d325f6fcf66e30662049b28))
+* binary-only parameters become CLI flags that take filenames only ([6331844](https://github.com/zavudev/cli/commit/63318441188ef6e625d7e3ec93572625d26acec4))
+* set CLI flag constant values automatically where `x-stainless-const` is set ([b684b6d](https://github.com/zavudev/cli/commit/b684b6d9a959a0c26d6fd2460a5de6ef8a8a5de6))
+
+
+### Bug Fixes
+
+* fall back to main branch if linking fails in CI ([beddccf](https://github.com/zavudev/cli/commit/beddccf98406903f6658ffe1be8cc5f6bbd4a333))
+* fix for off-by-one error in pagination logic ([fa6a1e1](https://github.com/zavudev/cli/commit/fa6a1e13c61969a77cd4efd20bc393beead3dbf7))
+* fix quoting typo ([c49dac8](https://github.com/zavudev/cli/commit/c49dac8f9bea1c7634ff188ceb3b842635a64bb2))
+* handle empty data set using `--format explore` ([b05d221](https://github.com/zavudev/cli/commit/b05d221fc141ddb84cdbafb6415c27b21a8ce855))
+* use `RawJSON` when iterating items with `--format explore` in the CLI ([3063e5b](https://github.com/zavudev/cli/commit/3063e5bfe65a2e4c6a35ef9fa9e1f91f7855fb82))
+
+
+### Chores
+
+* mark all CLI-related tests in Go with `t.Parallel()` ([bb98431](https://github.com/zavudev/cli/commit/bb98431d96a944ef8c0f521ecd3d4f27a699663f))
+* modify CLI tests to inject stdout so mutating `os.Stdout` isn't necessary ([8e3dd42](https://github.com/zavudev/cli/commit/8e3dd420527897288802a3d70b964abdb1c75a02))
+* omit full usage information when missing required CLI parameters ([5b162ac](https://github.com/zavudev/cli/commit/5b162ac682d194e419e67ffe569080986c71642b))
+* switch some CLI Go tests from `os.Chdir` to `t.Chdir` ([17e4d2c](https://github.com/zavudev/cli/commit/17e4d2c67716786540c6ec23a718e280b55f84c2))
+
 ## 0.1.0 (2026-03-27)
 
 Full Changelog: [v0.0.1...v0.1.0](https://github.com/zavudev/cli/compare/v0.0.1...v0.1.0)
