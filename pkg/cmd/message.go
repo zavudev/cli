@@ -101,6 +101,11 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 			Required: true,
 			BodyPath: "to",
 		},
+		&requestflag.Flag[[]map[string]any]{
+			Name:     "attachment",
+			Usage:    "Email attachments. Only supported when channel is 'email'. Maximum 40MB total size.",
+			BodyPath: "attachments",
+		},
 		&requestflag.Flag[string]{
 			Name:     "channel",
 			Usage:    "Delivery channel. Use 'auto' for intelligent routing.",
@@ -165,6 +170,33 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 	Action:          handleMessagesSend,
 	HideHelpCommand: true,
 }, map[string][]requestflag.HasOuterFlag{
+	"attachment": {
+		&requestflag.InnerFlag[string]{
+			Name:       "attachment.filename",
+			Usage:      "Name of the attached file.",
+			InnerField: "filename",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "attachment.content",
+			Usage:      "Content of the attached file as a Base64-encoded string.",
+			InnerField: "content",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "attachment.content-id",
+			Usage:      "Content ID for inline images. Reference in HTML as `<img src=\"cid:your_content_id\">`.",
+			InnerField: "content_id",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "attachment.content-type",
+			Usage:      "MIME type of the attachment. If not set, will be derived from the filename.",
+			InnerField: "content_type",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "attachment.path",
+			Usage:      "URL where the attachment file is hosted. The server will fetch the file.",
+			InnerField: "path",
+		},
+	},
 	"content": {
 		&requestflag.InnerFlag[[]map[string]any]{
 			Name:       "content.buttons",

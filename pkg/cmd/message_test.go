@@ -72,6 +72,7 @@ func TestMessagesSend(t *testing.T) {
 			"--api-key", "string",
 			"messages", "send",
 			"--to", "+56912345678",
+			"--attachment", "{filename: invoice.pdf, content: content, content_id: logo, content_type: application/pdf, path: https://example.com}",
 			"--channel", "auto",
 			"--content", "{buttons: [{id: id, title: title}], contacts: [{name: name, phones: [string]}], emoji: emoji, filename: invoice.pdf, latitude: 0, listButton: listButton, locationAddress: locationAddress, locationName: locationName, longitude: 0, mediaId: mediaId, mediaUrl: https://example.com/image.jpg, mimeType: image/jpeg, reactToMessageId: reactToMessageId, sections: [{rows: [{id: id, title: title, description: description}], title: title}], templateId: templateId, templateVariables: {'1': John, '2': ORD-12345}}",
 			"--fallback-enabled=true",
@@ -97,6 +98,11 @@ func TestMessagesSend(t *testing.T) {
 			"--api-key", "string",
 			"messages", "send",
 			"--to", "+56912345678",
+			"--attachment.filename", "invoice.pdf",
+			"--attachment.content", "content",
+			"--attachment.content-id", "logo",
+			"--attachment.content-type", "application/pdf",
+			"--attachment.path", "https://example.com",
 			"--channel", "auto",
 			"--content.buttons", "[{id: id, title: title}]",
 			"--content.contacts", "[{name: name, phones: [string]}]",
@@ -131,6 +137,12 @@ func TestMessagesSend(t *testing.T) {
 		// Test piping YAML data over stdin
 		pipeData := []byte("" +
 			"to: '+56912345678'\n" +
+			"attachments:\n" +
+			"  - filename: invoice.pdf\n" +
+			"    content: content\n" +
+			"    content_id: logo\n" +
+			"    content_type: application/pdf\n" +
+			"    path: https://example.com\n" +
 			"channel: auto\n" +
 			"content:\n" +
 			"  buttons:\n" +
