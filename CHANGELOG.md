@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.3.0 (2026-04-12)
+
+Full Changelog: [v0.2.0...v0.3.0](https://github.com/zavudev/cli/compare/v0.2.0...v0.3.0)
+
+### Features
+
+* **api:** api update ([dc7d30f](https://github.com/zavudev/cli/commit/dc7d30f02c58d9d69f6c12e8d963e33f55b48bf9))
+
+
+### Bug Fixes
+
+* fix for failing to drop invalid module replace in link script ([fc6113e](https://github.com/zavudev/cli/commit/fc6113e2f868775e64288e4716e812faff08b924))
+
+
+### Chores
+
+* **cli:** additional test cases for `ShowJSONIterator` ([8c8aadb](https://github.com/zavudev/cli/commit/8c8aadb90efed1c30f597d638f219aef1d1b7eb8))
+* **cli:** let `--format raw` be used in conjunction with `--transform` ([95966e4](https://github.com/zavudev/cli/commit/95966e4a90d431fd3d1a60adcd93d289f7a674df))
+
 ## 0.2.0 (2026-04-07)
 
 Full Changelog: [v0.1.0...v0.2.0](https://github.com/zavudev/cli/compare/v0.1.0...v0.2.0)
