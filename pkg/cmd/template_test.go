@@ -22,6 +22,9 @@ func TestTemplatesCreate(t *testing.T) {
 			"--add-security-recommendation=true",
 			"--button", "{text: text, type: quick_reply, otpType: COPY_CODE, packageName: packageName, phoneNumber: phoneNumber, signatureHash: signatureHash, url: https://example.com}",
 			"--code-expiration-minutes", "1",
+			"--instagram-body", "instagramBody",
+			"--sms-body", "smsBody",
+			"--telegram-body", "telegramBody",
 			"--variable", "customer_name",
 			"--variable", "order_id",
 			"--whatsapp-category", "UTILITY",
@@ -49,6 +52,9 @@ func TestTemplatesCreate(t *testing.T) {
 			"--button.signature-hash", "signatureHash",
 			"--button.url", "https://example.com",
 			"--code-expiration-minutes", "1",
+			"--instagram-body", "instagramBody",
+			"--sms-body", "smsBody",
+			"--telegram-body", "telegramBody",
 			"--variable", "customer_name",
 			"--variable", "order_id",
 			"--whatsapp-category", "UTILITY",
@@ -71,6 +77,9 @@ func TestTemplatesCreate(t *testing.T) {
 			"    signatureHash: signatureHash\n" +
 			"    url: https://example.com\n" +
 			"codeExpirationMinutes: 1\n" +
+			"instagramBody: instagramBody\n" +
+			"smsBody: smsBody\n" +
+			"telegramBody: telegramBody\n" +
 			"variables:\n" +
 			"  - customer_name\n" +
 			"  - order_id\n" +

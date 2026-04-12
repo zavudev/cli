@@ -22,6 +22,7 @@ var templatesCreate = requestflag.WithInnerFlags(cli.Command{
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
 			Name:     "body",
+			Usage:    "Default template body. Used when no channel-specific body is set.",
 			Required: true,
 			BodyPath: "body",
 		},
@@ -50,6 +51,21 @@ var templatesCreate = requestflag.WithInnerFlags(cli.Command{
 			Name:     "code-expiration-minutes",
 			Usage:    "Code expiration time in minutes. Only for AUTHENTICATION templates.",
 			BodyPath: "codeExpirationMinutes",
+		},
+		&requestflag.Flag[string]{
+			Name:     "instagram-body",
+			Usage:    "Channel-specific body for Instagram. Falls back to `body` if not set.",
+			BodyPath: "instagramBody",
+		},
+		&requestflag.Flag[string]{
+			Name:     "sms-body",
+			Usage:    "Channel-specific body for SMS. Falls back to `body` if not set.",
+			BodyPath: "smsBody",
+		},
+		&requestflag.Flag[string]{
+			Name:     "telegram-body",
+			Usage:    "Channel-specific body for Telegram. Falls back to `body` if not set.",
+			BodyPath: "telegramBody",
 		},
 		&requestflag.Flag[[]string]{
 			Name:     "variable",
