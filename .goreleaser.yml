@@ -78,3 +78,19 @@ nfpms:
     contents:
       - src: man/man1/*.1.gz
         dst: /usr/share/man/man1/
+homebrew_casks:
+  - name: zavudev
+    repository:
+      owner: zavudev
+      name: homebrew-tools
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    homepage: https://github.com/zavudev/cli
+    description: The official CLI for Zavu.dev
+    license: Apache-2.0
+    binary: "zavudev"
+    completions:
+      bash: "completions/zavudev.bash"
+      zsh: "completions/zavudev.zsh"
+      fish: "completions/zavudev.fish"
+    manpages:
+    - man/man1/zavudev.1.gz
