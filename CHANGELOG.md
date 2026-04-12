@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 (2026-04-12)
+
+Full Changelog: [v0.3.0...v0.4.0](https://github.com/zavudev/cli/compare/v0.3.0...v0.4.0)
+
+### Features
+
+* **api:** cli tap build ([1d5807e](https://github.com/zavudev/cli/commit/1d5807e5454e32d74fb3c90df99382d50b6a4fa4))
+
 ## 0.3.0 (2026-04-12)
 
 Full Changelog: [v0.2.0...v0.3.0](https://github.com/zavudev/cli/compare/v0.2.0...v0.3.0)
