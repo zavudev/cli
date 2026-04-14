@@ -15,6 +15,60 @@ import (
 	"github.com/zavudev/sdk-go/option"
 )
 
+var contactsCreate = requestflag.WithInnerFlags(cli.Command{
+	Name:    "create",
+	Usage:   "Create a new contact with one or more communication channels.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[[]map[string]any]{
+			Name:     "channel",
+			Usage:    "Communication channels for the contact.",
+			Required: true,
+			BodyPath: "channels",
+		},
+		&requestflag.Flag[string]{
+			Name:     "display-name",
+			Usage:    "Display name for the contact.",
+			BodyPath: "displayName",
+		},
+		&requestflag.Flag[map[string]any]{
+			Name:     "metadata",
+			Usage:    "Arbitrary metadata to associate with the contact.",
+			BodyPath: "metadata",
+		},
+	},
+	Action:          handleContactsCreate,
+	HideHelpCommand: true,
+}, map[string][]requestflag.HasOuterFlag{
+	"channel": {
+		&requestflag.InnerFlag[string]{
+			Name:       "channel.channel",
+			Usage:      "Channel type.",
+			InnerField: "channel",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "channel.identifier",
+			Usage:      "Channel identifier (phone number in E.164 format or email address).",
+			InnerField: "identifier",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "channel.country-code",
+			Usage:      "ISO country code for phone numbers.",
+			InnerField: "countryCode",
+		},
+		&requestflag.InnerFlag[bool]{
+			Name:       "channel.is-primary",
+			Usage:      "Whether this should be the primary channel for its type.",
+			InnerField: "isPrimary",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "channel.label",
+			Usage:      "Optional label for the channel.",
+			InnerField: "label",
+		},
+	},
+})
+
 var contactsRetrieve = cli.Command{
 	Name:    "retrieve",
 	Usage:   "Get contact",
@@ -79,6 +133,40 @@ var contactsList = cli.Command{
 	HideHelpCommand: true,
 }
 
+var contactsDismissMergeSuggestion = cli.Command{
+	Name:    "dismiss-merge-suggestion",
+	Usage:   "Dismiss the merge suggestion for a contact.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:     "contact-id",
+			Required: true,
+		},
+	},
+	Action:          handleContactsDismissMergeSuggestion,
+	HideHelpCommand: true,
+}
+
+var contactsMerge = cli.Command{
+	Name:    "merge",
+	Usage:   "Merge a source contact into this contact. All channels from the source contact\nwill be moved to the target contact, and the source contact will be marked as\nmerged.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:     "contact-id",
+			Required: true,
+		},
+		&requestflag.Flag[string]{
+			Name:     "source-contact-id",
+			Usage:    "ID of the contact to merge into the target contact. The source contact will be marked as merged.",
+			Required: true,
+			BodyPath: "sourceContactId",
+		},
+	},
+	Action:          handleContactsMerge,
+	HideHelpCommand: true,
+}
+
 var contactsRetrieveByPhone = cli.Command{
 	Name:    "retrieve-by-phone",
 	Usage:   "Get contact by phone number",
@@ -91,6 +179,40 @@ var contactsRetrieveByPhone = cli.Command{
 	},
 	Action:          handleContactsRetrieveByPhone,
 	HideHelpCommand: true,
+}
+
+func handleContactsCreate(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	params := zavudev.ContactNewParams{}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		ApplicationJSON,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Contacts.New(ctx, params, options...)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(os.Stdout, "contacts create", obj, format, transform)
 }
 
 func handleContactsRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -210,6 +332,73 @@ func handleContactsList(ctx context.Context, cmd *cli.Command) error {
 		}
 		return ShowJSONIterator(os.Stdout, "contacts list", iter, format, transform, maxItems)
 	}
+}
+
+func handleContactsDismissMergeSuggestion(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("contact-id") && len(unusedArgs) > 0 {
+		cmd.Set("contact-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	return client.Contacts.DismissMergeSuggestion(ctx, cmd.Value("contact-id").(string), options...)
+}
+
+func handleContactsMerge(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("contact-id") && len(unusedArgs) > 0 {
+		cmd.Set("contact-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	params := zavudev.ContactMergeParams{}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		ApplicationJSON,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Contacts.Merge(
+		ctx,
+		cmd.Value("contact-id").(string),
+		params,
+		options...,
+	)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(os.Stdout, "contacts merge", obj, format, transform)
 }
 
 func handleContactsRetrieveByPhone(ctx context.Context, cmd *cli.Command) error {

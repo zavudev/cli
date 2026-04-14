@@ -206,6 +206,18 @@ func TestBroadcastsCancel(t *testing.T) {
 	})
 }
 
+func TestBroadcastsEscalateReview(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"broadcasts", "escalate-review",
+			"--broadcast-id", "broadcastId",
+		)
+	})
+}
+
 func TestBroadcastsProgress(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
@@ -237,6 +249,18 @@ func TestBroadcastsReschedule(t *testing.T) {
 			t, pipeData,
 			"--api-key", "string",
 			"broadcasts", "reschedule",
+			"--broadcast-id", "broadcastId",
+		)
+	})
+}
+
+func TestBroadcastsRetryReview(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"broadcasts", "retry-review",
 			"--broadcast-id", "broadcastId",
 		)
 	})
