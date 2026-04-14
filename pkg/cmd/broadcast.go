@@ -256,6 +256,20 @@ var broadcastsCancel = cli.Command{
 	HideHelpCommand: true,
 }
 
+var broadcastsEscalateReview = cli.Command{
+	Name:    "escalate-review",
+	Usage:   "Request manual review by the Zavu team for a rejected broadcast. Use this after\nautomated review rejection if you believe the content is legitimate.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:     "broadcast-id",
+			Required: true,
+		},
+	},
+	Action:          handleBroadcastsEscalateReview,
+	HideHelpCommand: true,
+}
+
 var broadcastsProgress = cli.Command{
 	Name:    "progress",
 	Usage:   "Get real-time progress of a broadcast including delivery counts and estimated\ncompletion time.",
@@ -287,6 +301,20 @@ var broadcastsReschedule = cli.Command{
 		},
 	},
 	Action:          handleBroadcastsReschedule,
+	HideHelpCommand: true,
+}
+
+var broadcastsRetryReview = cli.Command{
+	Name:    "retry-review",
+	Usage:   "Resubmit a rejected broadcast for AI review after editing content. Maximum 3\nreview attempts allowed per broadcast.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:     "broadcast-id",
+			Required: true,
+		},
+	},
+	Action:          handleBroadcastsRetryReview,
 	HideHelpCommand: true,
 }
 
@@ -522,6 +550,41 @@ func handleBroadcastsCancel(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(os.Stdout, "broadcasts cancel", obj, format, transform)
 }
 
+func handleBroadcastsEscalateReview(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("broadcast-id") && len(unusedArgs) > 0 {
+		cmd.Set("broadcast-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Broadcasts.EscalateReview(ctx, cmd.Value("broadcast-id").(string), options...)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(os.Stdout, "broadcasts escalate-review", obj, format, transform)
+}
+
 func handleBroadcastsProgress(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
@@ -597,6 +660,41 @@ func handleBroadcastsReschedule(ctx context.Context, cmd *cli.Command) error {
 	format := cmd.Root().String("format")
 	transform := cmd.Root().String("transform")
 	return ShowJSON(os.Stdout, "broadcasts reschedule", obj, format, transform)
+}
+
+func handleBroadcastsRetryReview(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("broadcast-id") && len(unusedArgs) > 0 {
+		cmd.Set("broadcast-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Broadcasts.RetryReview(ctx, cmd.Value("broadcast-id").(string), options...)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(os.Stdout, "broadcasts retry-review", obj, format, transform)
 }
 
 func handleBroadcastsSend(ctx context.Context, cmd *cli.Command) error {
