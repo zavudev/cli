@@ -53,6 +53,21 @@ var templatesCreate = requestflag.WithInnerFlags(cli.Command{
 			BodyPath: "codeExpirationMinutes",
 		},
 		&requestflag.Flag[string]{
+			Name:     "footer",
+			Usage:    "Footer text for the template.",
+			BodyPath: "footer",
+		},
+		&requestflag.Flag[string]{
+			Name:     "header-content",
+			Usage:    "Header content (text string or media URL).",
+			BodyPath: "headerContent",
+		},
+		&requestflag.Flag[string]{
+			Name:     "header-type",
+			Usage:    "Type of header for the template.",
+			BodyPath: "headerType",
+		},
+		&requestflag.Flag[string]{
 			Name:     "instagram-body",
 			Usage:    "Channel-specific body for Instagram. Falls back to `body` if not set.",
 			BodyPath: "instagramBody",
