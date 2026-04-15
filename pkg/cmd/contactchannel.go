@@ -165,8 +165,9 @@ func handleContactsChannelsUpdate(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "contacts:channels update", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "contacts:channels update", obj, format, explicitFormat, transform)
 }
 
 func handleContactsChannelsAdd(ctx context.Context, cmd *cli.Command) error {
@@ -207,8 +208,9 @@ func handleContactsChannelsAdd(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "contacts:channels add", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "contacts:channels add", obj, format, explicitFormat, transform)
 }
 
 func handleContactsChannelsRemove(ctx context.Context, cmd *cli.Command) error {
@@ -285,6 +287,7 @@ func handleContactsChannelsSetPrimary(ctx context.Context, cmd *cli.Command) err
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "contacts:channels set-primary", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "contacts:channels set-primary", obj, format, explicitFormat, transform)
 }

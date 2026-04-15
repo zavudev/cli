@@ -123,6 +123,7 @@ func handleBroadcastsContactsList(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -137,7 +138,7 @@ func handleBroadcastsContactsList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "broadcasts:contacts list", obj, format, transform)
+		return ShowJSON(os.Stdout, os.Stderr, "broadcasts:contacts list", obj, format, explicitFormat, transform)
 	} else {
 		iter := client.Broadcasts.Contacts.ListAutoPaging(
 			ctx,
@@ -149,7 +150,7 @@ func handleBroadcastsContactsList(ctx context.Context, cmd *cli.Command) error {
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "broadcasts:contacts list", iter, format, transform, maxItems)
+		return ShowJSONIterator(os.Stdout, os.Stderr, "broadcasts:contacts list", iter, format, explicitFormat, transform, maxItems)
 	}
 }
 
@@ -191,8 +192,9 @@ func handleBroadcastsContactsAdd(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "broadcasts:contacts add", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "broadcasts:contacts add", obj, format, explicitFormat, transform)
 }
 
 func handleBroadcastsContactsRemove(ctx context.Context, cmd *cli.Command) error {

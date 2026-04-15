@@ -51,6 +51,7 @@ func handlePlanRetrieve(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "plan retrieve", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "plan retrieve", obj, format, explicitFormat, transform)
 }

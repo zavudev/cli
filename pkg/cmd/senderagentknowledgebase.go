@@ -165,8 +165,9 @@ func handleSendersAgentKnowledgeBasesCreate(ctx context.Context, cmd *cli.Comman
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent:knowledge-bases create", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders:agent:knowledge-bases create", obj, format, explicitFormat, transform)
 }
 
 func handleSendersAgentKnowledgeBasesRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -209,8 +210,9 @@ func handleSendersAgentKnowledgeBasesRetrieve(ctx context.Context, cmd *cli.Comm
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent:knowledge-bases retrieve", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders:agent:knowledge-bases retrieve", obj, format, explicitFormat, transform)
 }
 
 func handleSendersAgentKnowledgeBasesUpdate(ctx context.Context, cmd *cli.Command) error {
@@ -253,8 +255,9 @@ func handleSendersAgentKnowledgeBasesUpdate(ctx context.Context, cmd *cli.Comman
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent:knowledge-bases update", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders:agent:knowledge-bases update", obj, format, explicitFormat, transform)
 }
 
 func handleSendersAgentKnowledgeBasesList(ctx context.Context, cmd *cli.Command) error {
@@ -282,6 +285,7 @@ func handleSendersAgentKnowledgeBasesList(ctx context.Context, cmd *cli.Command)
 	}
 
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -296,7 +300,7 @@ func handleSendersAgentKnowledgeBasesList(ctx context.Context, cmd *cli.Command)
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "senders:agent:knowledge-bases list", obj, format, transform)
+		return ShowJSON(os.Stdout, os.Stderr, "senders:agent:knowledge-bases list", obj, format, explicitFormat, transform)
 	} else {
 		iter := client.Senders.Agent.KnowledgeBases.ListAutoPaging(
 			ctx,
@@ -308,7 +312,7 @@ func handleSendersAgentKnowledgeBasesList(ctx context.Context, cmd *cli.Command)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "senders:agent:knowledge-bases list", iter, format, transform, maxItems)
+		return ShowJSONIterator(os.Stdout, os.Stderr, "senders:agent:knowledge-bases list", iter, format, explicitFormat, transform, maxItems)
 	}
 }
 

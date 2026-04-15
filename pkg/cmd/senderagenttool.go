@@ -263,8 +263,9 @@ func handleSendersAgentToolsCreate(ctx context.Context, cmd *cli.Command) error 
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent:tools create", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders:agent:tools create", obj, format, explicitFormat, transform)
 }
 
 func handleSendersAgentToolsRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -307,8 +308,9 @@ func handleSendersAgentToolsRetrieve(ctx context.Context, cmd *cli.Command) erro
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent:tools retrieve", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders:agent:tools retrieve", obj, format, explicitFormat, transform)
 }
 
 func handleSendersAgentToolsUpdate(ctx context.Context, cmd *cli.Command) error {
@@ -351,8 +353,9 @@ func handleSendersAgentToolsUpdate(ctx context.Context, cmd *cli.Command) error 
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent:tools update", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders:agent:tools update", obj, format, explicitFormat, transform)
 }
 
 func handleSendersAgentToolsList(ctx context.Context, cmd *cli.Command) error {
@@ -380,6 +383,7 @@ func handleSendersAgentToolsList(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -394,7 +398,7 @@ func handleSendersAgentToolsList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "senders:agent:tools list", obj, format, transform)
+		return ShowJSON(os.Stdout, os.Stderr, "senders:agent:tools list", obj, format, explicitFormat, transform)
 	} else {
 		iter := client.Senders.Agent.Tools.ListAutoPaging(
 			ctx,
@@ -406,7 +410,7 @@ func handleSendersAgentToolsList(ctx context.Context, cmd *cli.Command) error {
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "senders:agent:tools list", iter, format, transform, maxItems)
+		return ShowJSONIterator(os.Stdout, os.Stderr, "senders:agent:tools list", iter, format, explicitFormat, transform, maxItems)
 	}
 }
 
@@ -484,6 +488,7 @@ func handleSendersAgentToolsTest(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent:tools test", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders:agent:tools test", obj, format, explicitFormat, transform)
 }

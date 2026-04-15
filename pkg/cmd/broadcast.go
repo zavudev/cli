@@ -367,8 +367,9 @@ func handleBroadcastsCreate(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "broadcasts create", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "broadcasts create", obj, format, explicitFormat, transform)
 }
 
 func handleBroadcastsRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -402,8 +403,9 @@ func handleBroadcastsRetrieve(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "broadcasts retrieve", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "broadcasts retrieve", obj, format, explicitFormat, transform)
 }
 
 func handleBroadcastsUpdate(ctx context.Context, cmd *cli.Command) error {
@@ -444,8 +446,9 @@ func handleBroadcastsUpdate(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "broadcasts update", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "broadcasts update", obj, format, explicitFormat, transform)
 }
 
 func handleBroadcastsList(ctx context.Context, cmd *cli.Command) error {
@@ -470,6 +473,7 @@ func handleBroadcastsList(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -479,14 +483,14 @@ func handleBroadcastsList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "broadcasts list", obj, format, transform)
+		return ShowJSON(os.Stdout, os.Stderr, "broadcasts list", obj, format, explicitFormat, transform)
 	} else {
 		iter := client.Broadcasts.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "broadcasts list", iter, format, transform, maxItems)
+		return ShowJSONIterator(os.Stdout, os.Stderr, "broadcasts list", iter, format, explicitFormat, transform, maxItems)
 	}
 }
 
@@ -546,8 +550,9 @@ func handleBroadcastsCancel(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "broadcasts cancel", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "broadcasts cancel", obj, format, explicitFormat, transform)
 }
 
 func handleBroadcastsEscalateReview(ctx context.Context, cmd *cli.Command) error {
@@ -581,8 +586,9 @@ func handleBroadcastsEscalateReview(ctx context.Context, cmd *cli.Command) error
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "broadcasts escalate-review", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "broadcasts escalate-review", obj, format, explicitFormat, transform)
 }
 
 func handleBroadcastsProgress(ctx context.Context, cmd *cli.Command) error {
@@ -616,8 +622,9 @@ func handleBroadcastsProgress(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "broadcasts progress", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "broadcasts progress", obj, format, explicitFormat, transform)
 }
 
 func handleBroadcastsReschedule(ctx context.Context, cmd *cli.Command) error {
@@ -658,8 +665,9 @@ func handleBroadcastsReschedule(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "broadcasts reschedule", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "broadcasts reschedule", obj, format, explicitFormat, transform)
 }
 
 func handleBroadcastsRetryReview(ctx context.Context, cmd *cli.Command) error {
@@ -693,8 +701,9 @@ func handleBroadcastsRetryReview(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "broadcasts retry-review", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "broadcasts retry-review", obj, format, explicitFormat, transform)
 }
 
 func handleBroadcastsSend(ctx context.Context, cmd *cli.Command) error {
@@ -735,6 +744,7 @@ func handleBroadcastsSend(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "broadcasts send", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "broadcasts send", obj, format, explicitFormat, transform)
 }

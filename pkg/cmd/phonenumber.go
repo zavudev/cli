@@ -201,8 +201,9 @@ func handlePhoneNumbersRetrieve(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "phone-numbers retrieve", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "phone-numbers retrieve", obj, format, explicitFormat, transform)
 }
 
 func handlePhoneNumbersUpdate(ctx context.Context, cmd *cli.Command) error {
@@ -243,8 +244,9 @@ func handlePhoneNumbersUpdate(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "phone-numbers update", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "phone-numbers update", obj, format, explicitFormat, transform)
 }
 
 func handlePhoneNumbersList(ctx context.Context, cmd *cli.Command) error {
@@ -269,6 +271,7 @@ func handlePhoneNumbersList(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -278,14 +281,14 @@ func handlePhoneNumbersList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "phone-numbers list", obj, format, transform)
+		return ShowJSON(os.Stdout, os.Stderr, "phone-numbers list", obj, format, explicitFormat, transform)
 	} else {
 		iter := client.PhoneNumbers.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "phone-numbers list", iter, format, transform, maxItems)
+		return ShowJSONIterator(os.Stdout, os.Stderr, "phone-numbers list", iter, format, explicitFormat, transform, maxItems)
 	}
 }
 
@@ -319,8 +322,9 @@ func handlePhoneNumbersPurchase(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "phone-numbers purchase", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "phone-numbers purchase", obj, format, explicitFormat, transform)
 }
 
 func handlePhoneNumbersRelease(ctx context.Context, cmd *cli.Command) error {
@@ -378,8 +382,9 @@ func handlePhoneNumbersRequirements(ctx context.Context, cmd *cli.Command) error
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "phone-numbers requirements", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "phone-numbers requirements", obj, format, explicitFormat, transform)
 }
 
 func handlePhoneNumbersSearchAvailable(ctx context.Context, cmd *cli.Command) error {
@@ -412,6 +417,7 @@ func handlePhoneNumbersSearchAvailable(ctx context.Context, cmd *cli.Command) er
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "phone-numbers search-available", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "phone-numbers search-available", obj, format, explicitFormat, transform)
 }

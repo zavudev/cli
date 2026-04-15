@@ -226,8 +226,9 @@ func handleSendersAgentCreate(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent create", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders:agent create", obj, format, explicitFormat, transform)
 }
 
 func handleSendersAgentRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -261,8 +262,9 @@ func handleSendersAgentRetrieve(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent retrieve", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders:agent retrieve", obj, format, explicitFormat, transform)
 }
 
 func handleSendersAgentUpdate(ctx context.Context, cmd *cli.Command) error {
@@ -303,8 +305,9 @@ func handleSendersAgentUpdate(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent update", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders:agent update", obj, format, explicitFormat, transform)
 }
 
 func handleSendersAgentDelete(ctx context.Context, cmd *cli.Command) error {
@@ -363,6 +366,7 @@ func handleSendersAgentStats(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent stats", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders:agent stats", obj, format, explicitFormat, transform)
 }
