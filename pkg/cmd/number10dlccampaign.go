@@ -273,8 +273,9 @@ func handleNumber10dlcCampaignsCreate(ctx context.Context, cmd *cli.Command) err
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "number-10dlc:campaigns create", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:campaigns create", obj, format, explicitFormat, transform)
 }
 
 func handleNumber10dlcCampaignsRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -308,8 +309,9 @@ func handleNumber10dlcCampaignsRetrieve(ctx context.Context, cmd *cli.Command) e
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "number-10dlc:campaigns retrieve", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:campaigns retrieve", obj, format, explicitFormat, transform)
 }
 
 func handleNumber10dlcCampaignsUpdate(ctx context.Context, cmd *cli.Command) error {
@@ -350,8 +352,9 @@ func handleNumber10dlcCampaignsUpdate(ctx context.Context, cmd *cli.Command) err
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "number-10dlc:campaigns update", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:campaigns update", obj, format, explicitFormat, transform)
 }
 
 func handleNumber10dlcCampaignsList(ctx context.Context, cmd *cli.Command) error {
@@ -376,6 +379,7 @@ func handleNumber10dlcCampaignsList(ctx context.Context, cmd *cli.Command) error
 	}
 
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -385,14 +389,14 @@ func handleNumber10dlcCampaignsList(ctx context.Context, cmd *cli.Command) error
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "number-10dlc:campaigns list", obj, format, transform)
+		return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:campaigns list", obj, format, explicitFormat, transform)
 	} else {
 		iter := client.Number10dlc.Campaigns.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "number-10dlc:campaigns list", iter, format, transform, maxItems)
+		return ShowJSONIterator(os.Stdout, os.Stderr, "number-10dlc:campaigns list", iter, format, explicitFormat, transform, maxItems)
 	}
 }
 
@@ -452,8 +456,9 @@ func handleNumber10dlcCampaignsSubmit(ctx context.Context, cmd *cli.Command) err
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "number-10dlc:campaigns submit", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:campaigns submit", obj, format, explicitFormat, transform)
 }
 
 func handleNumber10dlcCampaignsSyncStatus(ctx context.Context, cmd *cli.Command) error {
@@ -487,6 +492,7 @@ func handleNumber10dlcCampaignsSyncStatus(ctx context.Context, cmd *cli.Command)
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "number-10dlc:campaigns sync-status", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:campaigns sync-status", obj, format, explicitFormat, transform)
 }

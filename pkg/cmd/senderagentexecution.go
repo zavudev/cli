@@ -72,6 +72,7 @@ func handleSendersAgentExecutionsList(ctx context.Context, cmd *cli.Command) err
 	}
 
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -86,7 +87,7 @@ func handleSendersAgentExecutionsList(ctx context.Context, cmd *cli.Command) err
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "senders:agent:executions list", obj, format, transform)
+		return ShowJSON(os.Stdout, os.Stderr, "senders:agent:executions list", obj, format, explicitFormat, transform)
 	} else {
 		iter := client.Senders.Agent.Executions.ListAutoPaging(
 			ctx,
@@ -98,6 +99,6 @@ func handleSendersAgentExecutionsList(ctx context.Context, cmd *cli.Command) err
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "senders:agent:executions list", iter, format, transform, maxItems)
+		return ShowJSONIterator(os.Stdout, os.Stderr, "senders:agent:executions list", iter, format, explicitFormat, transform, maxItems)
 	}
 }

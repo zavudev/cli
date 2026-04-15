@@ -142,8 +142,9 @@ func handleRegulatoryDocumentsCreate(ctx context.Context, cmd *cli.Command) erro
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "regulatory-documents create", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "regulatory-documents create", obj, format, explicitFormat, transform)
 }
 
 func handleRegulatoryDocumentsRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -177,8 +178,9 @@ func handleRegulatoryDocumentsRetrieve(ctx context.Context, cmd *cli.Command) er
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "regulatory-documents retrieve", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "regulatory-documents retrieve", obj, format, explicitFormat, transform)
 }
 
 func handleRegulatoryDocumentsList(ctx context.Context, cmd *cli.Command) error {
@@ -203,6 +205,7 @@ func handleRegulatoryDocumentsList(ctx context.Context, cmd *cli.Command) error 
 	}
 
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -212,14 +215,14 @@ func handleRegulatoryDocumentsList(ctx context.Context, cmd *cli.Command) error 
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "regulatory-documents list", obj, format, transform)
+		return ShowJSON(os.Stdout, os.Stderr, "regulatory-documents list", obj, format, explicitFormat, transform)
 	} else {
 		iter := client.RegulatoryDocuments.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "regulatory-documents list", iter, format, transform, maxItems)
+		return ShowJSONIterator(os.Stdout, os.Stderr, "regulatory-documents list", iter, format, explicitFormat, transform, maxItems)
 	}
 }
 
@@ -276,6 +279,7 @@ func handleRegulatoryDocumentsUploadURL(ctx context.Context, cmd *cli.Command) e
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "regulatory-documents upload-url", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "regulatory-documents upload-url", obj, format, explicitFormat, transform)
 }

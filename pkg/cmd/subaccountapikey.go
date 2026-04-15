@@ -114,8 +114,9 @@ func handleSubAccountsAPIKeysCreate(ctx context.Context, cmd *cli.Command) error
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "sub-accounts:api-keys create", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "sub-accounts:api-keys create", obj, format, explicitFormat, transform)
 }
 
 func handleSubAccountsAPIKeysList(ctx context.Context, cmd *cli.Command) error {
@@ -149,8 +150,9 @@ func handleSubAccountsAPIKeysList(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "sub-accounts:api-keys list", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "sub-accounts:api-keys list", obj, format, explicitFormat, transform)
 }
 
 func handleSubAccountsAPIKeysRevoke(ctx context.Context, cmd *cli.Command) error {

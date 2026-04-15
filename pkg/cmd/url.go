@@ -95,6 +95,7 @@ func handleURLsListVerified(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -104,14 +105,14 @@ func handleURLsListVerified(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "urls list-verified", obj, format, transform)
+		return ShowJSON(os.Stdout, os.Stderr, "urls list-verified", obj, format, explicitFormat, transform)
 	} else {
 		iter := client.URLs.ListVerifiedAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "urls list-verified", iter, format, transform, maxItems)
+		return ShowJSONIterator(os.Stdout, os.Stderr, "urls list-verified", iter, format, explicitFormat, transform, maxItems)
 	}
 }
 
@@ -146,8 +147,9 @@ func handleURLsRetrieveDetails(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "urls retrieve-details", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "urls retrieve-details", obj, format, explicitFormat, transform)
 }
 
 func handleURLsSubmitForVerification(ctx context.Context, cmd *cli.Command) error {
@@ -180,6 +182,7 @@ func handleURLsSubmitForVerification(ctx context.Context, cmd *cli.Command) erro
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "urls submit-for-verification", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "urls submit-for-verification", obj, format, explicitFormat, transform)
 }

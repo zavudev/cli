@@ -271,8 +271,9 @@ func handleSendersCreate(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders create", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders create", obj, format, explicitFormat, transform)
 }
 
 func handleSendersRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -306,8 +307,9 @@ func handleSendersRetrieve(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders retrieve", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders retrieve", obj, format, explicitFormat, transform)
 }
 
 func handleSendersUpdate(ctx context.Context, cmd *cli.Command) error {
@@ -348,8 +350,9 @@ func handleSendersUpdate(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders update", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders update", obj, format, explicitFormat, transform)
 }
 
 func handleSendersList(ctx context.Context, cmd *cli.Command) error {
@@ -374,6 +377,7 @@ func handleSendersList(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -383,14 +387,14 @@ func handleSendersList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "senders list", obj, format, transform)
+		return ShowJSON(os.Stdout, os.Stderr, "senders list", obj, format, explicitFormat, transform)
 	} else {
 		iter := client.Senders.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "senders list", iter, format, transform, maxItems)
+		return ShowJSONIterator(os.Stdout, os.Stderr, "senders list", iter, format, explicitFormat, transform, maxItems)
 	}
 }
 
@@ -450,8 +454,9 @@ func handleSendersGetProfile(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders get-profile", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders get-profile", obj, format, explicitFormat, transform)
 }
 
 func handleSendersRegenerateWebhookSecret(ctx context.Context, cmd *cli.Command) error {
@@ -485,8 +490,9 @@ func handleSendersRegenerateWebhookSecret(ctx context.Context, cmd *cli.Command)
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders regenerate-webhook-secret", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders regenerate-webhook-secret", obj, format, explicitFormat, transform)
 }
 
 func handleSendersUpdateProfile(ctx context.Context, cmd *cli.Command) error {
@@ -527,8 +533,9 @@ func handleSendersUpdateProfile(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders update-profile", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders update-profile", obj, format, explicitFormat, transform)
 }
 
 func handleSendersUploadProfilePicture(ctx context.Context, cmd *cli.Command) error {
@@ -569,6 +576,7 @@ func handleSendersUploadProfilePicture(ctx context.Context, cmd *cli.Command) er
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders upload-profile-picture", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders upload-profile-picture", obj, format, explicitFormat, transform)
 }

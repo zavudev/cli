@@ -311,8 +311,9 @@ func handleNumber10dlcBrandsCreate(ctx context.Context, cmd *cli.Command) error 
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "number-10dlc:brands create", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:brands create", obj, format, explicitFormat, transform)
 }
 
 func handleNumber10dlcBrandsRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -346,8 +347,9 @@ func handleNumber10dlcBrandsRetrieve(ctx context.Context, cmd *cli.Command) erro
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "number-10dlc:brands retrieve", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:brands retrieve", obj, format, explicitFormat, transform)
 }
 
 func handleNumber10dlcBrandsUpdate(ctx context.Context, cmd *cli.Command) error {
@@ -388,8 +390,9 @@ func handleNumber10dlcBrandsUpdate(ctx context.Context, cmd *cli.Command) error 
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "number-10dlc:brands update", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:brands update", obj, format, explicitFormat, transform)
 }
 
 func handleNumber10dlcBrandsList(ctx context.Context, cmd *cli.Command) error {
@@ -414,6 +417,7 @@ func handleNumber10dlcBrandsList(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -423,14 +427,14 @@ func handleNumber10dlcBrandsList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "number-10dlc:brands list", obj, format, transform)
+		return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:brands list", obj, format, explicitFormat, transform)
 	} else {
 		iter := client.Number10dlc.Brands.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "number-10dlc:brands list", iter, format, transform, maxItems)
+		return ShowJSONIterator(os.Stdout, os.Stderr, "number-10dlc:brands list", iter, format, explicitFormat, transform, maxItems)
 	}
 }
 
@@ -487,8 +491,9 @@ func handleNumber10dlcBrandsListUseCases(ctx context.Context, cmd *cli.Command) 
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "number-10dlc:brands list-use-cases", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:brands list-use-cases", obj, format, explicitFormat, transform)
 }
 
 func handleNumber10dlcBrandsSubmit(ctx context.Context, cmd *cli.Command) error {
@@ -522,8 +527,9 @@ func handleNumber10dlcBrandsSubmit(ctx context.Context, cmd *cli.Command) error 
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "number-10dlc:brands submit", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:brands submit", obj, format, explicitFormat, transform)
 }
 
 func handleNumber10dlcBrandsSyncStatus(ctx context.Context, cmd *cli.Command) error {
@@ -557,6 +563,7 @@ func handleNumber10dlcBrandsSyncStatus(ctx context.Context, cmd *cli.Command) er
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "number-10dlc:brands sync-status", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:brands sync-status", obj, format, explicitFormat, transform)
 }

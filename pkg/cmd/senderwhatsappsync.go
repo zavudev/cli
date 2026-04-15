@@ -88,8 +88,9 @@ func handleSendersWhatsappSyncRetrieve(ctx context.Context, cmd *cli.Command) er
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:whatsapp-sync retrieve", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders:whatsapp-sync retrieve", obj, format, explicitFormat, transform)
 }
 
 func handleSendersWhatsappSyncStartContactsSync(ctx context.Context, cmd *cli.Command) error {
@@ -123,8 +124,9 @@ func handleSendersWhatsappSyncStartContactsSync(ctx context.Context, cmd *cli.Co
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:whatsapp-sync start-contacts-sync", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders:whatsapp-sync start-contacts-sync", obj, format, explicitFormat, transform)
 }
 
 func handleSendersWhatsappSyncStartHistorySync(ctx context.Context, cmd *cli.Command) error {
@@ -158,6 +160,7 @@ func handleSendersWhatsappSyncStartHistorySync(ctx context.Context, cmd *cli.Com
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:whatsapp-sync start-history-sync", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "senders:whatsapp-sync start-history-sync", obj, format, explicitFormat, transform)
 }

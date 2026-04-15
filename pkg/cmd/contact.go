@@ -211,8 +211,9 @@ func handleContactsCreate(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "contacts create", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "contacts create", obj, format, explicitFormat, transform)
 }
 
 func handleContactsRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -246,8 +247,9 @@ func handleContactsRetrieve(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "contacts retrieve", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "contacts retrieve", obj, format, explicitFormat, transform)
 }
 
 func handleContactsUpdate(ctx context.Context, cmd *cli.Command) error {
@@ -288,8 +290,9 @@ func handleContactsUpdate(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "contacts update", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "contacts update", obj, format, explicitFormat, transform)
 }
 
 func handleContactsList(ctx context.Context, cmd *cli.Command) error {
@@ -314,6 +317,7 @@ func handleContactsList(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -323,14 +327,14 @@ func handleContactsList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "contacts list", obj, format, transform)
+		return ShowJSON(os.Stdout, os.Stderr, "contacts list", obj, format, explicitFormat, transform)
 	} else {
 		iter := client.Contacts.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "contacts list", iter, format, transform, maxItems)
+		return ShowJSONIterator(os.Stdout, os.Stderr, "contacts list", iter, format, explicitFormat, transform, maxItems)
 	}
 }
 
@@ -397,8 +401,9 @@ func handleContactsMerge(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "contacts merge", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "contacts merge", obj, format, explicitFormat, transform)
 }
 
 func handleContactsRetrieveByPhone(ctx context.Context, cmd *cli.Command) error {
@@ -432,6 +437,7 @@ func handleContactsRetrieveByPhone(ctx context.Context, cmd *cli.Command) error 
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "contacts retrieve-by-phone", obj, format, transform)
+	return ShowJSON(os.Stdout, os.Stderr, "contacts retrieve-by-phone", obj, format, explicitFormat, transform)
 }
