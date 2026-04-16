@@ -208,6 +208,31 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 			InnerField: "contacts",
 		},
 		&requestflag.InnerFlag[string]{
+			Name:       "content.cta-display-text",
+			Usage:      "Button label for cta_url messages.",
+			InnerField: "ctaDisplayText",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.cta-header-media-url",
+			Usage:      "Public URL of the header media when ctaHeaderType is 'image', 'video', or 'document'.",
+			InnerField: "ctaHeaderMediaUrl",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.cta-header-text",
+			Usage:      "Header text when ctaHeaderType is 'text'.",
+			InnerField: "ctaHeaderText",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.cta-header-type",
+			Usage:      "Optional header type for cta_url messages.",
+			InnerField: "ctaHeaderType",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.cta-url",
+			Usage:      "Destination URL opened in the device's default browser when the button is tapped. Used with messageType=cta_url.",
+			InnerField: "ctaUrl",
+		},
+		&requestflag.InnerFlag[string]{
 			Name:       "content.emoji",
 			Usage:      "Emoji for reaction messages.",
 			InnerField: "emoji",
@@ -216,6 +241,11 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 			Name:       "content.filename",
 			Usage:      "Filename for documents.",
 			InnerField: "filename",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.footer-text",
+			Usage:      "Optional footer text for cta_url messages.",
+			InnerField: "footerText",
 		},
 		&requestflag.InnerFlag[float64]{
 			Name:       "content.latitude",
