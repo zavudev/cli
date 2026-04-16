@@ -214,7 +214,7 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.InnerFlag[string]{
 			Name:       "content.cta-header-media-url",
-			Usage:      "Public URL of the header media when ctaHeaderType is 'image', 'video', or 'document'.",
+			Usage:      "Public HTTPS URL of the header media when ctaHeaderType is 'image', 'video', or 'document'. WhatsApp fetches this URL — it must be publicly reachable and return the declared content type.",
 			InnerField: "ctaHeaderMediaUrl",
 		},
 		&requestflag.InnerFlag[string]{
@@ -229,7 +229,7 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.InnerFlag[string]{
 			Name:       "content.cta-url",
-			Usage:      "Destination URL opened in the device's default browser when the button is tapped. Used with messageType=cta_url.",
+			Usage:      "Destination URL opened in the device's default browser when the button is tapped. Used with messageType=cta_url. WhatsApp requires HTTPS in production.",
 			InnerField: "ctaUrl",
 		},
 		&requestflag.InnerFlag[string]{
