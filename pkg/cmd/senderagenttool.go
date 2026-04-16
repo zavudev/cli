@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -265,7 +264,12 @@ func handleSendersAgentToolsCreate(ctx context.Context, cmd *cli.Command) error 
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "senders:agent:tools create", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "senders:agent:tools create",
+		Transform:      transform,
+	})
 }
 
 func handleSendersAgentToolsRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -310,7 +314,12 @@ func handleSendersAgentToolsRetrieve(ctx context.Context, cmd *cli.Command) erro
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "senders:agent:tools retrieve", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "senders:agent:tools retrieve",
+		Transform:      transform,
+	})
 }
 
 func handleSendersAgentToolsUpdate(ctx context.Context, cmd *cli.Command) error {
@@ -355,7 +364,12 @@ func handleSendersAgentToolsUpdate(ctx context.Context, cmd *cli.Command) error 
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "senders:agent:tools update", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "senders:agent:tools update",
+		Transform:      transform,
+	})
 }
 
 func handleSendersAgentToolsList(ctx context.Context, cmd *cli.Command) error {
@@ -398,7 +412,12 @@ func handleSendersAgentToolsList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, os.Stderr, "senders:agent:tools list", obj, format, explicitFormat, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			Title:          "senders:agent:tools list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.Senders.Agent.Tools.ListAutoPaging(
 			ctx,
@@ -410,7 +429,12 @@ func handleSendersAgentToolsList(ctx context.Context, cmd *cli.Command) error {
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, os.Stderr, "senders:agent:tools list", iter, format, explicitFormat, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			Title:          "senders:agent:tools list",
+			Transform:      transform,
+		})
 	}
 }
 
@@ -490,5 +514,10 @@ func handleSendersAgentToolsTest(ctx context.Context, cmd *cli.Command) error {
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "senders:agent:tools test", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "senders:agent:tools test",
+		Transform:      transform,
+	})
 }

@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -90,7 +89,12 @@ func handleSendersWhatsappSyncRetrieve(ctx context.Context, cmd *cli.Command) er
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "senders:whatsapp-sync retrieve", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "senders:whatsapp-sync retrieve",
+		Transform:      transform,
+	})
 }
 
 func handleSendersWhatsappSyncStartContactsSync(ctx context.Context, cmd *cli.Command) error {
@@ -126,7 +130,12 @@ func handleSendersWhatsappSyncStartContactsSync(ctx context.Context, cmd *cli.Co
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "senders:whatsapp-sync start-contacts-sync", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "senders:whatsapp-sync start-contacts-sync",
+		Transform:      transform,
+	})
 }
 
 func handleSendersWhatsappSyncStartHistorySync(ctx context.Context, cmd *cli.Command) error {
@@ -162,5 +171,10 @@ func handleSendersWhatsappSyncStartHistorySync(ctx context.Context, cmd *cli.Com
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "senders:whatsapp-sync start-history-sync", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "senders:whatsapp-sync start-history-sync",
+		Transform:      transform,
+	})
 }

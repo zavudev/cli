@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -116,7 +115,12 @@ func handleSubAccountsAPIKeysCreate(ctx context.Context, cmd *cli.Command) error
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "sub-accounts:api-keys create", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "sub-accounts:api-keys create",
+		Transform:      transform,
+	})
 }
 
 func handleSubAccountsAPIKeysList(ctx context.Context, cmd *cli.Command) error {
@@ -152,7 +156,12 @@ func handleSubAccountsAPIKeysList(ctx context.Context, cmd *cli.Command) error {
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "sub-accounts:api-keys list", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "sub-accounts:api-keys list",
+		Transform:      transform,
+	})
 }
 
 func handleSubAccountsAPIKeysRevoke(ctx context.Context, cmd *cli.Command) error {

@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -100,7 +99,12 @@ func handleNumber10dlcCampaignsPhoneNumbersList(ctx context.Context, cmd *cli.Co
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:campaigns:phone-numbers list", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "number-10dlc:campaigns:phone-numbers list",
+		Transform:      transform,
+	})
 }
 
 func handleNumber10dlcCampaignsPhoneNumbersAssign(ctx context.Context, cmd *cli.Command) error {
@@ -143,7 +147,12 @@ func handleNumber10dlcCampaignsPhoneNumbersAssign(ctx context.Context, cmd *cli.
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:campaigns:phone-numbers assign", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "number-10dlc:campaigns:phone-numbers assign",
+		Transform:      transform,
+	})
 }
 
 func handleNumber10dlcCampaignsPhoneNumbersUnassign(ctx context.Context, cmd *cli.Command) error {
