@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -275,7 +274,12 @@ func handleNumber10dlcCampaignsCreate(ctx context.Context, cmd *cli.Command) err
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:campaigns create", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "number-10dlc:campaigns create",
+		Transform:      transform,
+	})
 }
 
 func handleNumber10dlcCampaignsRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -311,7 +315,12 @@ func handleNumber10dlcCampaignsRetrieve(ctx context.Context, cmd *cli.Command) e
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:campaigns retrieve", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "number-10dlc:campaigns retrieve",
+		Transform:      transform,
+	})
 }
 
 func handleNumber10dlcCampaignsUpdate(ctx context.Context, cmd *cli.Command) error {
@@ -354,7 +363,12 @@ func handleNumber10dlcCampaignsUpdate(ctx context.Context, cmd *cli.Command) err
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:campaigns update", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "number-10dlc:campaigns update",
+		Transform:      transform,
+	})
 }
 
 func handleNumber10dlcCampaignsList(ctx context.Context, cmd *cli.Command) error {
@@ -389,14 +403,24 @@ func handleNumber10dlcCampaignsList(ctx context.Context, cmd *cli.Command) error
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:campaigns list", obj, format, explicitFormat, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			Title:          "number-10dlc:campaigns list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.Number10dlc.Campaigns.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, os.Stderr, "number-10dlc:campaigns list", iter, format, explicitFormat, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			Title:          "number-10dlc:campaigns list",
+			Transform:      transform,
+		})
 	}
 }
 
@@ -458,7 +482,12 @@ func handleNumber10dlcCampaignsSubmit(ctx context.Context, cmd *cli.Command) err
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:campaigns submit", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "number-10dlc:campaigns submit",
+		Transform:      transform,
+	})
 }
 
 func handleNumber10dlcCampaignsSyncStatus(ctx context.Context, cmd *cli.Command) error {
@@ -494,5 +523,10 @@ func handleNumber10dlcCampaignsSyncStatus(ctx context.Context, cmd *cli.Command)
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:campaigns sync-status", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "number-10dlc:campaigns sync-status",
+		Transform:      transform,
+	})
 }

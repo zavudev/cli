@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -138,7 +137,12 @@ func handleSendersAgentKnowledgeBasesDocumentsCreate(ctx context.Context, cmd *c
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "senders:agent:knowledge-bases:documents create", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "senders:agent:knowledge-bases:documents create",
+		Transform:      transform,
+	})
 }
 
 func handleSendersAgentKnowledgeBasesDocumentsList(ctx context.Context, cmd *cli.Command) error {
@@ -183,7 +187,12 @@ func handleSendersAgentKnowledgeBasesDocumentsList(ctx context.Context, cmd *cli
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, os.Stderr, "senders:agent:knowledge-bases:documents list", obj, format, explicitFormat, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			Title:          "senders:agent:knowledge-bases:documents list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.Senders.Agent.KnowledgeBases.Documents.ListAutoPaging(
 			ctx,
@@ -195,7 +204,12 @@ func handleSendersAgentKnowledgeBasesDocumentsList(ctx context.Context, cmd *cli
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, os.Stderr, "senders:agent:knowledge-bases:documents list", iter, format, explicitFormat, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			Title:          "senders:agent:knowledge-bases:documents list",
+			Transform:      transform,
+		})
 	}
 }
 

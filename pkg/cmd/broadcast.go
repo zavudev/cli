@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -369,7 +368,12 @@ func handleBroadcastsCreate(ctx context.Context, cmd *cli.Command) error {
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "broadcasts create", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "broadcasts create",
+		Transform:      transform,
+	})
 }
 
 func handleBroadcastsRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -405,7 +409,12 @@ func handleBroadcastsRetrieve(ctx context.Context, cmd *cli.Command) error {
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "broadcasts retrieve", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "broadcasts retrieve",
+		Transform:      transform,
+	})
 }
 
 func handleBroadcastsUpdate(ctx context.Context, cmd *cli.Command) error {
@@ -448,7 +457,12 @@ func handleBroadcastsUpdate(ctx context.Context, cmd *cli.Command) error {
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "broadcasts update", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "broadcasts update",
+		Transform:      transform,
+	})
 }
 
 func handleBroadcastsList(ctx context.Context, cmd *cli.Command) error {
@@ -483,14 +497,24 @@ func handleBroadcastsList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, os.Stderr, "broadcasts list", obj, format, explicitFormat, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			Title:          "broadcasts list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.Broadcasts.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, os.Stderr, "broadcasts list", iter, format, explicitFormat, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			Title:          "broadcasts list",
+			Transform:      transform,
+		})
 	}
 }
 
@@ -552,7 +576,12 @@ func handleBroadcastsCancel(ctx context.Context, cmd *cli.Command) error {
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "broadcasts cancel", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "broadcasts cancel",
+		Transform:      transform,
+	})
 }
 
 func handleBroadcastsEscalateReview(ctx context.Context, cmd *cli.Command) error {
@@ -588,7 +617,12 @@ func handleBroadcastsEscalateReview(ctx context.Context, cmd *cli.Command) error
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "broadcasts escalate-review", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "broadcasts escalate-review",
+		Transform:      transform,
+	})
 }
 
 func handleBroadcastsProgress(ctx context.Context, cmd *cli.Command) error {
@@ -624,7 +658,12 @@ func handleBroadcastsProgress(ctx context.Context, cmd *cli.Command) error {
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "broadcasts progress", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "broadcasts progress",
+		Transform:      transform,
+	})
 }
 
 func handleBroadcastsReschedule(ctx context.Context, cmd *cli.Command) error {
@@ -667,7 +706,12 @@ func handleBroadcastsReschedule(ctx context.Context, cmd *cli.Command) error {
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "broadcasts reschedule", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "broadcasts reschedule",
+		Transform:      transform,
+	})
 }
 
 func handleBroadcastsRetryReview(ctx context.Context, cmd *cli.Command) error {
@@ -703,7 +747,12 @@ func handleBroadcastsRetryReview(ctx context.Context, cmd *cli.Command) error {
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "broadcasts retry-review", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "broadcasts retry-review",
+		Transform:      transform,
+	})
 }
 
 func handleBroadcastsSend(ctx context.Context, cmd *cli.Command) error {
@@ -746,5 +795,10 @@ func handleBroadcastsSend(ctx context.Context, cmd *cli.Command) error {
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "broadcasts send", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "broadcasts send",
+		Transform:      transform,
+	})
 }

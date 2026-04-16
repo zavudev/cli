@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -313,7 +312,12 @@ func handleNumber10dlcBrandsCreate(ctx context.Context, cmd *cli.Command) error 
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:brands create", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "number-10dlc:brands create",
+		Transform:      transform,
+	})
 }
 
 func handleNumber10dlcBrandsRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -349,7 +353,12 @@ func handleNumber10dlcBrandsRetrieve(ctx context.Context, cmd *cli.Command) erro
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:brands retrieve", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "number-10dlc:brands retrieve",
+		Transform:      transform,
+	})
 }
 
 func handleNumber10dlcBrandsUpdate(ctx context.Context, cmd *cli.Command) error {
@@ -392,7 +401,12 @@ func handleNumber10dlcBrandsUpdate(ctx context.Context, cmd *cli.Command) error 
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:brands update", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "number-10dlc:brands update",
+		Transform:      transform,
+	})
 }
 
 func handleNumber10dlcBrandsList(ctx context.Context, cmd *cli.Command) error {
@@ -427,14 +441,24 @@ func handleNumber10dlcBrandsList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:brands list", obj, format, explicitFormat, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			Title:          "number-10dlc:brands list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.Number10dlc.Brands.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, os.Stderr, "number-10dlc:brands list", iter, format, explicitFormat, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			Title:          "number-10dlc:brands list",
+			Transform:      transform,
+		})
 	}
 }
 
@@ -493,7 +517,12 @@ func handleNumber10dlcBrandsListUseCases(ctx context.Context, cmd *cli.Command) 
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:brands list-use-cases", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "number-10dlc:brands list-use-cases",
+		Transform:      transform,
+	})
 }
 
 func handleNumber10dlcBrandsSubmit(ctx context.Context, cmd *cli.Command) error {
@@ -529,7 +558,12 @@ func handleNumber10dlcBrandsSubmit(ctx context.Context, cmd *cli.Command) error 
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:brands submit", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "number-10dlc:brands submit",
+		Transform:      transform,
+	})
 }
 
 func handleNumber10dlcBrandsSyncStatus(ctx context.Context, cmd *cli.Command) error {
@@ -565,5 +599,10 @@ func handleNumber10dlcBrandsSyncStatus(ctx context.Context, cmd *cli.Command) er
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "number-10dlc:brands sync-status", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "number-10dlc:brands sync-status",
+		Transform:      transform,
+	})
 }
