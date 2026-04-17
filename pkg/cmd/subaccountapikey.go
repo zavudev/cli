@@ -118,6 +118,7 @@ func handleSubAccountsAPIKeysCreate(ctx context.Context, cmd *cli.Command) error
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "sub-accounts:api-keys create",
 		Transform:      transform,
 	})
@@ -159,6 +160,7 @@ func handleSubAccountsAPIKeysList(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "sub-accounts:api-keys list",
 		Transform:      transform,
 	})

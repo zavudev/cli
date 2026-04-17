@@ -102,6 +102,7 @@ func handleNumber10dlcCampaignsPhoneNumbersList(ctx context.Context, cmd *cli.Co
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "number-10dlc:campaigns:phone-numbers list",
 		Transform:      transform,
 	})
@@ -150,6 +151,7 @@ func handleNumber10dlcCampaignsPhoneNumbersAssign(ctx context.Context, cmd *cli.
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "number-10dlc:campaigns:phone-numbers assign",
 		Transform:      transform,
 	})

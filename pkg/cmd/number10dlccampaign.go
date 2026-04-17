@@ -277,6 +277,7 @@ func handleNumber10dlcCampaignsCreate(ctx context.Context, cmd *cli.Command) err
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "number-10dlc:campaigns create",
 		Transform:      transform,
 	})
@@ -318,6 +319,7 @@ func handleNumber10dlcCampaignsRetrieve(ctx context.Context, cmd *cli.Command) e
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "number-10dlc:campaigns retrieve",
 		Transform:      transform,
 	})
@@ -366,6 +368,7 @@ func handleNumber10dlcCampaignsUpdate(ctx context.Context, cmd *cli.Command) err
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "number-10dlc:campaigns update",
 		Transform:      transform,
 	})
@@ -406,6 +409,7 @@ func handleNumber10dlcCampaignsList(ctx context.Context, cmd *cli.Command) error
 		return ShowJSON(obj, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "number-10dlc:campaigns list",
 			Transform:      transform,
 		})
@@ -418,6 +422,7 @@ func handleNumber10dlcCampaignsList(ctx context.Context, cmd *cli.Command) error
 		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "number-10dlc:campaigns list",
 			Transform:      transform,
 		})
@@ -485,6 +490,7 @@ func handleNumber10dlcCampaignsSubmit(ctx context.Context, cmd *cli.Command) err
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "number-10dlc:campaigns submit",
 		Transform:      transform,
 	})
@@ -526,6 +532,7 @@ func handleNumber10dlcCampaignsSyncStatus(ctx context.Context, cmd *cli.Command)
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "number-10dlc:campaigns sync-status",
 		Transform:      transform,
 	})

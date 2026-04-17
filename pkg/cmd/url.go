@@ -107,6 +107,7 @@ func handleURLsListVerified(ctx context.Context, cmd *cli.Command) error {
 		return ShowJSON(obj, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "urls list-verified",
 			Transform:      transform,
 		})
@@ -119,6 +120,7 @@ func handleURLsListVerified(ctx context.Context, cmd *cli.Command) error {
 		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "urls list-verified",
 			Transform:      transform,
 		})
@@ -161,6 +163,7 @@ func handleURLsRetrieveDetails(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "urls retrieve-details",
 		Transform:      transform,
 	})
@@ -201,6 +204,7 @@ func handleURLsSubmitForVerification(ctx context.Context, cmd *cli.Command) erro
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "urls submit-for-verification",
 		Transform:      transform,
 	})

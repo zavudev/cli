@@ -89,6 +89,7 @@ func handleSendersAgentExecutionsList(ctx context.Context, cmd *cli.Command) err
 		return ShowJSON(obj, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "senders:agent:executions list",
 			Transform:      transform,
 		})
@@ -106,6 +107,7 @@ func handleSendersAgentExecutionsList(ctx context.Context, cmd *cli.Command) err
 		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "senders:agent:executions list",
 			Transform:      transform,
 		})

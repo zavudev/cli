@@ -315,6 +315,7 @@ func handleNumber10dlcBrandsCreate(ctx context.Context, cmd *cli.Command) error 
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "number-10dlc:brands create",
 		Transform:      transform,
 	})
@@ -356,6 +357,7 @@ func handleNumber10dlcBrandsRetrieve(ctx context.Context, cmd *cli.Command) erro
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "number-10dlc:brands retrieve",
 		Transform:      transform,
 	})
@@ -404,6 +406,7 @@ func handleNumber10dlcBrandsUpdate(ctx context.Context, cmd *cli.Command) error 
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "number-10dlc:brands update",
 		Transform:      transform,
 	})
@@ -444,6 +447,7 @@ func handleNumber10dlcBrandsList(ctx context.Context, cmd *cli.Command) error {
 		return ShowJSON(obj, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "number-10dlc:brands list",
 			Transform:      transform,
 		})
@@ -456,6 +460,7 @@ func handleNumber10dlcBrandsList(ctx context.Context, cmd *cli.Command) error {
 		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "number-10dlc:brands list",
 			Transform:      transform,
 		})
@@ -520,6 +525,7 @@ func handleNumber10dlcBrandsListUseCases(ctx context.Context, cmd *cli.Command) 
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "number-10dlc:brands list-use-cases",
 		Transform:      transform,
 	})
@@ -561,6 +567,7 @@ func handleNumber10dlcBrandsSubmit(ctx context.Context, cmd *cli.Command) error 
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "number-10dlc:brands submit",
 		Transform:      transform,
 	})
@@ -602,6 +609,7 @@ func handleNumber10dlcBrandsSyncStatus(ctx context.Context, cmd *cli.Command) er
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "number-10dlc:brands sync-status",
 		Transform:      transform,
 	})

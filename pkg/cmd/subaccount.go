@@ -179,6 +179,7 @@ func handleSubAccountsCreate(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "sub-accounts create",
 		Transform:      transform,
 	})
@@ -220,6 +221,7 @@ func handleSubAccountsRetrieve(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "sub-accounts retrieve",
 		Transform:      transform,
 	})
@@ -268,6 +270,7 @@ func handleSubAccountsUpdate(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "sub-accounts update",
 		Transform:      transform,
 	})
@@ -308,6 +311,7 @@ func handleSubAccountsList(ctx context.Context, cmd *cli.Command) error {
 		return ShowJSON(obj, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "sub-accounts list",
 			Transform:      transform,
 		})
@@ -320,6 +324,7 @@ func handleSubAccountsList(ctx context.Context, cmd *cli.Command) error {
 		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "sub-accounts list",
 			Transform:      transform,
 		})
@@ -362,6 +367,7 @@ func handleSubAccountsDeactivate(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "sub-accounts deactivate",
 		Transform:      transform,
 	})
@@ -403,6 +409,7 @@ func handleSubAccountsGetBalance(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "sub-accounts get-balance",
 		Transform:      transform,
 	})

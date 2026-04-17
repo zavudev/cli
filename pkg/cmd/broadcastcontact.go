@@ -140,6 +140,7 @@ func handleBroadcastsContactsList(ctx context.Context, cmd *cli.Command) error {
 		return ShowJSON(obj, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "broadcasts:contacts list",
 			Transform:      transform,
 		})
@@ -157,6 +158,7 @@ func handleBroadcastsContactsList(ctx context.Context, cmd *cli.Command) error {
 		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "broadcasts:contacts list",
 			Transform:      transform,
 		})
@@ -206,6 +208,7 @@ func handleBroadcastsContactsAdd(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "broadcasts:contacts add",
 		Transform:      transform,
 	})
