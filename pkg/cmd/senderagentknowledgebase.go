@@ -169,6 +169,7 @@ func handleSendersAgentKnowledgeBasesCreate(ctx context.Context, cmd *cli.Comman
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders:agent:knowledge-bases create",
 		Transform:      transform,
 	})
@@ -219,6 +220,7 @@ func handleSendersAgentKnowledgeBasesRetrieve(ctx context.Context, cmd *cli.Comm
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders:agent:knowledge-bases retrieve",
 		Transform:      transform,
 	})
@@ -269,6 +271,7 @@ func handleSendersAgentKnowledgeBasesUpdate(ctx context.Context, cmd *cli.Comman
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders:agent:knowledge-bases update",
 		Transform:      transform,
 	})
@@ -317,6 +320,7 @@ func handleSendersAgentKnowledgeBasesList(ctx context.Context, cmd *cli.Command)
 		return ShowJSON(obj, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "senders:agent:knowledge-bases list",
 			Transform:      transform,
 		})
@@ -334,6 +338,7 @@ func handleSendersAgentKnowledgeBasesList(ctx context.Context, cmd *cli.Command)
 		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "senders:agent:knowledge-bases list",
 			Transform:      transform,
 		})

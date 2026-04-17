@@ -275,6 +275,7 @@ func handleSendersCreate(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders create",
 		Transform:      transform,
 	})
@@ -316,6 +317,7 @@ func handleSendersRetrieve(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders retrieve",
 		Transform:      transform,
 	})
@@ -364,6 +366,7 @@ func handleSendersUpdate(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders update",
 		Transform:      transform,
 	})
@@ -404,6 +407,7 @@ func handleSendersList(ctx context.Context, cmd *cli.Command) error {
 		return ShowJSON(obj, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "senders list",
 			Transform:      transform,
 		})
@@ -416,6 +420,7 @@ func handleSendersList(ctx context.Context, cmd *cli.Command) error {
 		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "senders list",
 			Transform:      transform,
 		})
@@ -483,6 +488,7 @@ func handleSendersGetProfile(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders get-profile",
 		Transform:      transform,
 	})
@@ -524,6 +530,7 @@ func handleSendersRegenerateWebhookSecret(ctx context.Context, cmd *cli.Command)
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders regenerate-webhook-secret",
 		Transform:      transform,
 	})
@@ -572,6 +579,7 @@ func handleSendersUpdateProfile(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders update-profile",
 		Transform:      transform,
 	})
@@ -620,6 +628,7 @@ func handleSendersUploadProfilePicture(ctx context.Context, cmd *cli.Command) er
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders upload-profile-picture",
 		Transform:      transform,
 	})

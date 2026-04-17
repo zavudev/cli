@@ -312,6 +312,7 @@ func handleSendersAgentFlowsCreate(ctx context.Context, cmd *cli.Command) error 
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders:agent:flows create",
 		Transform:      transform,
 	})
@@ -362,6 +363,7 @@ func handleSendersAgentFlowsRetrieve(ctx context.Context, cmd *cli.Command) erro
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders:agent:flows retrieve",
 		Transform:      transform,
 	})
@@ -412,6 +414,7 @@ func handleSendersAgentFlowsUpdate(ctx context.Context, cmd *cli.Command) error 
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders:agent:flows update",
 		Transform:      transform,
 	})
@@ -460,6 +463,7 @@ func handleSendersAgentFlowsList(ctx context.Context, cmd *cli.Command) error {
 		return ShowJSON(obj, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "senders:agent:flows list",
 			Transform:      transform,
 		})
@@ -477,6 +481,7 @@ func handleSendersAgentFlowsList(ctx context.Context, cmd *cli.Command) error {
 		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "senders:agent:flows list",
 			Transform:      transform,
 		})
@@ -562,6 +567,7 @@ func handleSendersAgentFlowsDuplicate(ctx context.Context, cmd *cli.Command) err
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders:agent:flows duplicate",
 		Transform:      transform,
 	})

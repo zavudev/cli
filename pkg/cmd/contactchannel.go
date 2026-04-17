@@ -169,6 +169,7 @@ func handleContactsChannelsUpdate(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "contacts:channels update",
 		Transform:      transform,
 	})
@@ -217,6 +218,7 @@ func handleContactsChannelsAdd(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "contacts:channels add",
 		Transform:      transform,
 	})
@@ -301,6 +303,7 @@ func handleContactsChannelsSetPrimary(ctx context.Context, cmd *cli.Command) err
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "contacts:channels set-primary",
 		Transform:      transform,
 	})

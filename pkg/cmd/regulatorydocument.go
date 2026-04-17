@@ -146,6 +146,7 @@ func handleRegulatoryDocumentsCreate(ctx context.Context, cmd *cli.Command) erro
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "regulatory-documents create",
 		Transform:      transform,
 	})
@@ -187,6 +188,7 @@ func handleRegulatoryDocumentsRetrieve(ctx context.Context, cmd *cli.Command) er
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "regulatory-documents retrieve",
 		Transform:      transform,
 	})
@@ -227,6 +229,7 @@ func handleRegulatoryDocumentsList(ctx context.Context, cmd *cli.Command) error 
 		return ShowJSON(obj, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "regulatory-documents list",
 			Transform:      transform,
 		})
@@ -239,6 +242,7 @@ func handleRegulatoryDocumentsList(ctx context.Context, cmd *cli.Command) error 
 		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "regulatory-documents list",
 			Transform:      transform,
 		})
@@ -303,6 +307,7 @@ func handleRegulatoryDocumentsUploadURL(ctx context.Context, cmd *cli.Command) e
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "regulatory-documents upload-url",
 		Transform:      transform,
 	})

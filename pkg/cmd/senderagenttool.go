@@ -267,6 +267,7 @@ func handleSendersAgentToolsCreate(ctx context.Context, cmd *cli.Command) error 
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders:agent:tools create",
 		Transform:      transform,
 	})
@@ -317,6 +318,7 @@ func handleSendersAgentToolsRetrieve(ctx context.Context, cmd *cli.Command) erro
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders:agent:tools retrieve",
 		Transform:      transform,
 	})
@@ -367,6 +369,7 @@ func handleSendersAgentToolsUpdate(ctx context.Context, cmd *cli.Command) error 
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders:agent:tools update",
 		Transform:      transform,
 	})
@@ -415,6 +418,7 @@ func handleSendersAgentToolsList(ctx context.Context, cmd *cli.Command) error {
 		return ShowJSON(obj, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "senders:agent:tools list",
 			Transform:      transform,
 		})
@@ -432,6 +436,7 @@ func handleSendersAgentToolsList(ctx context.Context, cmd *cli.Command) error {
 		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "senders:agent:tools list",
 			Transform:      transform,
 		})
@@ -517,6 +522,7 @@ func handleSendersAgentToolsTest(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders:agent:tools test",
 		Transform:      transform,
 	})

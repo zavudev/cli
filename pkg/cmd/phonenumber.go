@@ -205,6 +205,7 @@ func handlePhoneNumbersRetrieve(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "phone-numbers retrieve",
 		Transform:      transform,
 	})
@@ -253,6 +254,7 @@ func handlePhoneNumbersUpdate(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "phone-numbers update",
 		Transform:      transform,
 	})
@@ -293,6 +295,7 @@ func handlePhoneNumbersList(ctx context.Context, cmd *cli.Command) error {
 		return ShowJSON(obj, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "phone-numbers list",
 			Transform:      transform,
 		})
@@ -305,6 +308,7 @@ func handlePhoneNumbersList(ctx context.Context, cmd *cli.Command) error {
 		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "phone-numbers list",
 			Transform:      transform,
 		})
@@ -346,6 +350,7 @@ func handlePhoneNumbersPurchase(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "phone-numbers purchase",
 		Transform:      transform,
 	})
@@ -411,6 +416,7 @@ func handlePhoneNumbersRequirements(ctx context.Context, cmd *cli.Command) error
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "phone-numbers requirements",
 		Transform:      transform,
 	})
@@ -451,6 +457,7 @@ func handlePhoneNumbersSearchAvailable(ctx context.Context, cmd *cli.Command) er
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "phone-numbers search-available",
 		Transform:      transform,
 	})

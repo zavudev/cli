@@ -92,6 +92,7 @@ func handleSendersWhatsappSyncRetrieve(ctx context.Context, cmd *cli.Command) er
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders:whatsapp-sync retrieve",
 		Transform:      transform,
 	})
@@ -133,6 +134,7 @@ func handleSendersWhatsappSyncStartContactsSync(ctx context.Context, cmd *cli.Co
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders:whatsapp-sync start-contacts-sync",
 		Transform:      transform,
 	})
@@ -174,6 +176,7 @@ func handleSendersWhatsappSyncStartHistorySync(ctx context.Context, cmd *cli.Com
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "senders:whatsapp-sync start-history-sync",
 		Transform:      transform,
 	})

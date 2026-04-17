@@ -371,6 +371,7 @@ func handleBroadcastsCreate(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "broadcasts create",
 		Transform:      transform,
 	})
@@ -412,6 +413,7 @@ func handleBroadcastsRetrieve(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "broadcasts retrieve",
 		Transform:      transform,
 	})
@@ -460,6 +462,7 @@ func handleBroadcastsUpdate(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "broadcasts update",
 		Transform:      transform,
 	})
@@ -500,6 +503,7 @@ func handleBroadcastsList(ctx context.Context, cmd *cli.Command) error {
 		return ShowJSON(obj, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "broadcasts list",
 			Transform:      transform,
 		})
@@ -512,6 +516,7 @@ func handleBroadcastsList(ctx context.Context, cmd *cli.Command) error {
 		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
 			ExplicitFormat: explicitFormat,
 			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
 			Title:          "broadcasts list",
 			Transform:      transform,
 		})
@@ -579,6 +584,7 @@ func handleBroadcastsCancel(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "broadcasts cancel",
 		Transform:      transform,
 	})
@@ -620,6 +626,7 @@ func handleBroadcastsEscalateReview(ctx context.Context, cmd *cli.Command) error
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "broadcasts escalate-review",
 		Transform:      transform,
 	})
@@ -661,6 +668,7 @@ func handleBroadcastsProgress(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "broadcasts progress",
 		Transform:      transform,
 	})
@@ -709,6 +717,7 @@ func handleBroadcastsReschedule(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "broadcasts reschedule",
 		Transform:      transform,
 	})
@@ -750,6 +759,7 @@ func handleBroadcastsRetryReview(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "broadcasts retry-review",
 		Transform:      transform,
 	})
@@ -798,6 +808,7 @@ func handleBroadcastsSend(ctx context.Context, cmd *cli.Command) error {
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "broadcasts send",
 		Transform:      transform,
 	})
