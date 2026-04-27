@@ -299,7 +299,7 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.InnerFlag[map[string]any]{
 			Name:       "content.template-button-variables",
-			Usage:      "Variables for dynamic button placeholders (URL buttons and OTP buttons). Keys are the button index (0, 1, 2) in the template's `buttons` array. Values substitute the single placeholder allowed inside that button's URL.\n\n**WhatsApp constraints:**\n- Each URL button supports at most one placeholder, numeric (`{{1}}`) or named (`{{order_id}}`).\n- A template may have at most three buttons.\n- Static URL buttons (no placeholder) are not included here.",
+			Usage:      "Variables for dynamic button placeholders (URL buttons and OTP buttons). Keys are the button index (0, 1, 2) in the template's `buttons` array — not the placeholder name. Values substitute the `{{1}}` placeholder inside that button's URL.\n\n**WhatsApp constraints:**\n- URL buttons only accept `{{1}}` — positional, numeric, no whitespace, no name. Named placeholders like `{{token}}` are stored as literal URL text by Meta and cannot be substituted.\n- At most one placeholder per URL button.\n- A template may have at most three buttons.\n- Static URL buttons (no placeholder) and `quick_reply` buttons are not included here.",
 			InnerField: "templateButtonVariables",
 		},
 		&requestflag.InnerFlag[string]{
