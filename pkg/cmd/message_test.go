@@ -74,7 +74,7 @@ func TestMessagesSend(t *testing.T) {
 			"--to", "+56912345678",
 			"--attachment", "{filename: invoice.pdf, content: content, content_id: logo, content_type: application/pdf, path: https://example.com}",
 			"--channel", "auto",
-			"--content", "{buttons: [{id: id, title: title}], contacts: [{name: name, phones: [string]}], ctaDisplayText: See Dates, ctaHeaderMediaUrl: https://example.com, ctaHeaderText: ctaHeaderText, ctaHeaderType: text, ctaUrl: https://example.com/schedule, emoji: emoji, filename: invoice.pdf, footerText: Dates subject to change., latitude: 0, listButton: listButton, locationAddress: locationAddress, locationName: locationName, longitude: 0, mediaId: mediaId, mediaUrl: https://example.com/image.jpg, mimeType: image/jpeg, reactToMessageId: reactToMessageId, sections: [{rows: [{id: id, title: title, description: description}], title: title}], templateId: templateId, templateVariables: {'1': John, '2': ORD-12345}}",
+			"--content", "{buttons: [{id: id, title: title}], contacts: [{name: name, phones: [string]}], ctaDisplayText: See Dates, ctaHeaderMediaUrl: https://example.com, ctaHeaderText: ctaHeaderText, ctaHeaderType: text, ctaUrl: https://example.com/schedule, emoji: emoji, filename: invoice.pdf, footerText: Dates subject to change., latitude: 0, listButton: listButton, locationAddress: locationAddress, locationName: locationName, longitude: 0, mediaId: mediaId, mediaUrl: https://example.com/image.jpg, mimeType: image/jpeg, reactToMessageId: reactToMessageId, sections: [{rows: [{id: id, title: title, description: description}], title: title}], templateButtonVariables: {'0': abc-report-token}, templateId: templateId, templateVariables: {'1': John, '2': ORD-12345}}",
 			"--fallback-enabled=true",
 			"--html-body", "htmlBody",
 			"--idempotency-key", "msg_01HZY4ZP7VQY2J3BRW7Z6G0QGE",
@@ -124,6 +124,7 @@ func TestMessagesSend(t *testing.T) {
 			"--content.mime-type", "image/jpeg",
 			"--content.react-to-message-id", "reactToMessageId",
 			"--content.sections", "[{rows: [{id: id, title: title, description: description}], title: title}]",
+			"--content.template-button-variables", "{'0': abc-report-token}",
 			"--content.template-id", "templateId",
 			"--content.template-variables", "{'1': John, '2': ORD-12345}",
 			"--fallback-enabled=true",
@@ -181,6 +182,8 @@ func TestMessagesSend(t *testing.T) {
 			"          title: title\n" +
 			"          description: description\n" +
 			"      title: title\n" +
+			"  templateButtonVariables:\n" +
+			"    '0': abc-report-token\n" +
 			"  templateId: templateId\n" +
 			"  templateVariables:\n" +
 			"    '1': John\n" +

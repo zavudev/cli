@@ -100,6 +100,11 @@ var broadcastsCreate = requestflag.WithInnerFlags(cli.Command{
 			Usage:      "MIME type of the media.",
 			InnerField: "mimeType",
 		},
+		&requestflag.InnerFlag[map[string]any]{
+			Name:       "content.template-button-variables",
+			Usage:      "Default button variables for dynamic URL/OTP buttons. Keys are the button index (0, 1, 2). Per-contact values override these.",
+			InnerField: "templateButtonVariables",
+		},
 		&requestflag.InnerFlag[string]{
 			Name:       "content.template-id",
 			Usage:      "Template ID for template messages.",
@@ -107,7 +112,7 @@ var broadcastsCreate = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.InnerFlag[map[string]any]{
 			Name:       "content.template-variables",
-			Usage:      "Default template variables (can be overridden per contact).",
+			Usage:      "Default body variables (can be overridden per contact). Keys are positions (1, 2, ...).",
 			InnerField: "templateVariables",
 		},
 	},
@@ -186,6 +191,11 @@ var broadcastsUpdate = requestflag.WithInnerFlags(cli.Command{
 			Usage:      "MIME type of the media.",
 			InnerField: "mimeType",
 		},
+		&requestflag.InnerFlag[map[string]any]{
+			Name:       "content.template-button-variables",
+			Usage:      "Default button variables for dynamic URL/OTP buttons. Keys are the button index (0, 1, 2). Per-contact values override these.",
+			InnerField: "templateButtonVariables",
+		},
 		&requestflag.InnerFlag[string]{
 			Name:       "content.template-id",
 			Usage:      "Template ID for template messages.",
@@ -193,7 +203,7 @@ var broadcastsUpdate = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.InnerFlag[map[string]any]{
 			Name:       "content.template-variables",
-			Usage:      "Default template variables (can be overridden per contact).",
+			Usage:      "Default body variables (can be overridden per contact). Keys are positions (1, 2, ...).",
 			InnerField: "templateVariables",
 		},
 	},
