@@ -105,6 +105,11 @@ var templatesCreate = requestflag.WithInnerFlags(cli.Command{
 			InnerField: "type",
 		},
 		&requestflag.InnerFlag[string]{
+			Name:       "button.example",
+			Usage:      "Sample value Meta uses to review templates with a dynamic URL button. Substituted into `{{1}}` of the URL when the template is submitted to Meta. Only meaningful when `url` contains `{{1}}`; ignored for static URLs.",
+			InnerField: "example",
+		},
+		&requestflag.InnerFlag[string]{
 			Name:       "button.otp-type",
 			Usage:      "Required when type is 'otp'. COPY_CODE shows copy button, ONE_TAP enables Android autofill.",
 			InnerField: "otpType",
@@ -125,6 +130,7 @@ var templatesCreate = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.InnerFlag[string]{
 			Name:       "button.url",
+			Usage:      "Button destination. Use `{{1}}` exactly once for a dynamic URL (e.g. `https://example.com/orders/{{1}}`); WhatsApp only accepts the strict `{{1}}` form. Static URLs must not contain any `{{...}}` placeholder.",
 			InnerField: "url",
 		},
 	},
