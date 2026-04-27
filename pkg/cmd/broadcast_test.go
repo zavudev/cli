@@ -18,7 +18,7 @@ func TestBroadcastsCreate(t *testing.T) {
 			"broadcasts", "create",
 			"--channel", "sms",
 			"--name", "Black Friday Sale",
-			"--content", "{filename: filename, mediaId: mediaId, mediaUrl: mediaUrl, mimeType: mimeType, templateId: templateId, templateVariables: {foo: string}}",
+			"--content", "{filename: filename, mediaId: mediaId, mediaUrl: mediaUrl, mimeType: mimeType, templateButtonVariables: {foo: string}, templateId: templateId, templateVariables: {foo: string}}",
 			"--email-html-body", "emailHtmlBody",
 			"--email-subject", "emailSubject",
 			"--idempotency-key", "idempotencyKey",
@@ -45,6 +45,7 @@ func TestBroadcastsCreate(t *testing.T) {
 			"--content.media-id", "mediaId",
 			"--content.media-url", "mediaUrl",
 			"--content.mime-type", "mimeType",
+			"--content.template-button-variables", "{foo: string}",
 			"--content.template-id", "templateId",
 			"--content.template-variables", "{foo: string}",
 			"--email-html-body", "emailHtmlBody",
@@ -68,6 +69,8 @@ func TestBroadcastsCreate(t *testing.T) {
 			"  mediaId: mediaId\n" +
 			"  mediaUrl: mediaUrl\n" +
 			"  mimeType: mimeType\n" +
+			"  templateButtonVariables:\n" +
+			"    foo: string\n" +
 			"  templateId: templateId\n" +
 			"  templateVariables:\n" +
 			"    foo: string\n" +
@@ -108,7 +111,7 @@ func TestBroadcastsUpdate(t *testing.T) {
 			"--api-key", "string",
 			"broadcasts", "update",
 			"--broadcast-id", "broadcastId",
-			"--content", "{filename: filename, mediaId: mediaId, mediaUrl: mediaUrl, mimeType: mimeType, templateId: templateId, templateVariables: {foo: string}}",
+			"--content", "{filename: filename, mediaId: mediaId, mediaUrl: mediaUrl, mimeType: mimeType, templateButtonVariables: {foo: string}, templateId: templateId, templateVariables: {foo: string}}",
 			"--email-html-body", "emailHtmlBody",
 			"--email-subject", "emailSubject",
 			"--metadata", "{foo: string}",
@@ -131,6 +134,7 @@ func TestBroadcastsUpdate(t *testing.T) {
 			"--content.media-id", "mediaId",
 			"--content.media-url", "mediaUrl",
 			"--content.mime-type", "mimeType",
+			"--content.template-button-variables", "{foo: string}",
 			"--content.template-id", "templateId",
 			"--content.template-variables", "{foo: string}",
 			"--email-html-body", "emailHtmlBody",
@@ -149,6 +153,8 @@ func TestBroadcastsUpdate(t *testing.T) {
 			"  mediaId: mediaId\n" +
 			"  mediaUrl: mediaUrl\n" +
 			"  mimeType: mimeType\n" +
+			"  templateButtonVariables:\n" +
+			"    foo: string\n" +
 			"  templateId: templateId\n" +
 			"  templateVariables:\n" +
 			"    foo: string\n" +

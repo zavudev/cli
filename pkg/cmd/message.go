@@ -297,6 +297,11 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 			Usage:      "Sections for list messages.",
 			InnerField: "sections",
 		},
+		&requestflag.InnerFlag[map[string]any]{
+			Name:       "content.template-button-variables",
+			Usage:      "Variables for dynamic button placeholders (URL buttons and OTP buttons). Keys are the button index (0, 1, 2) in the template's `buttons` array. Values substitute the single placeholder allowed inside that button's URL.\n\n**WhatsApp constraints:**\n- Each URL button supports at most one placeholder, numeric (`{{1}}`) or named (`{{order_id}}`).\n- A template may have at most three buttons.\n- Static URL buttons (no placeholder) are not included here.",
+			InnerField: "templateButtonVariables",
+		},
 		&requestflag.InnerFlag[string]{
 			Name:       "content.template-id",
 			Usage:      "Template ID for template messages.",
@@ -304,7 +309,7 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.InnerFlag[map[string]any]{
 			Name:       "content.template-variables",
-			Usage:      "Variables for template rendering. Keys are variable positions (1, 2, 3...).",
+			Usage:      "Variables for body placeholders. Keys are positions (1, 2, 3, ...) matching the order placeholders appear in the template body.",
 			InnerField: "templateVariables",
 		},
 	},

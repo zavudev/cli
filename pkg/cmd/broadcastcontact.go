@@ -72,8 +72,13 @@ var broadcastsContactsAdd = requestflag.WithInnerFlags(cli.Command{
 			InnerField: "recipient",
 		},
 		&requestflag.InnerFlag[map[string]any]{
+			Name:       "contact.template-button-variables",
+			Usage:      "Per-contact button variables for dynamic URL/OTP buttons. Keys are the button index (0, 1, 2).",
+			InnerField: "templateButtonVariables",
+		},
+		&requestflag.InnerFlag[map[string]any]{
 			Name:       "contact.template-variables",
-			Usage:      "Per-contact template variables to personalize the message.",
+			Usage:      "Per-contact body variables. Keys are positions (1, 2, ...) matching the order placeholders appear in the template body.",
 			InnerField: "templateVariables",
 		},
 	},
