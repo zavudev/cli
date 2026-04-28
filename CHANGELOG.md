@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.5.0 (2026-04-28)
+
+Full Changelog: [v0.4.0...v0.5.0](https://github.com/zavudev/cli/compare/v0.4.0...v0.5.0)
+
+### Features
+
+* **api:** api update ([d9200b0](https://github.com/zavudev/cli/commit/d9200b09fa86ca1c86f2ae140a2b2f22554840a9))
+* **api:** api update ([0a0f73f](https://github.com/zavudev/cli/commit/0a0f73f9f8a329e1370c2787c27904752e6ef801))
+* **api:** api update ([771f45e](https://github.com/zavudev/cli/commit/771f45e52871e2e8499b5477b9f19c04e4167a1d))
+* **api:** api update ([ace0081](https://github.com/zavudev/cli/commit/ace00816df72353a38c8d9427988c61b21631528))
+* **api:** api update ([00f5deb](https://github.com/zavudev/cli/commit/00f5deb659ce9dca56f617f547d31ef461bb0f7f))
+* **api:** api update ([6126b7e](https://github.com/zavudev/cli/commit/6126b7ed48909667c2f3b2979332602b7b5b154c))
+* **api:** api update ([bcb63ef](https://github.com/zavudev/cli/commit/bcb63ef6b1b4e3f5fad06d07650c34f8bd3450d3))
+* **api:** manual updates ([c40c4cb](https://github.com/zavudev/cli/commit/c40c4cb409948540bb7feef81b0ae11de056e7f5))
+* **cli:** add `--raw-output`/`-r` option to print raw (non-JSON) strings ([d764186](https://github.com/zavudev/cli/commit/d76418669cafbae10aedd4c7e7d42f3fa356cf20))
+* **cli:** alias parameters in data with `x-stainless-cli-data-alias` ([3711e06](https://github.com/zavudev/cli/commit/3711e0654e91a0345effe9b901f8b8635fbe0c62))
+* **cli:** send filename and content type when reading input from files ([82faa3c](https://github.com/zavudev/cli/commit/82faa3cc225b7e931602af05d49a1482d42d0fcd))
+
+
+### Chores
+
+* add documentation for ./scripts/link ([df7e71b](https://github.com/zavudev/cli/commit/df7e71b731758877a22074668862d865d71603eb))
+* **ci:** support manually triggering release workflow ([0c7441d](https://github.com/zavudev/cli/commit/0c7441d9ef8c2da629a88ba8fc750319ca4e6225))
+* **cli:** fall back to JSON when using default "explore" with non-TTY ([b9b7c60](https://github.com/zavudev/cli/commit/b9b7c6049f69268590f059883babc559076e5945))
+* **cli:** switch long lists of positional args over to param structs ([c97dd87](https://github.com/zavudev/cli/commit/c97dd8703f6ca089d3c29307eab81e23bec7c1d4))
+* **cli:** use `ShowJSONOpts` as argument to `formatJSON` instead of many positionals ([c0c6221](https://github.com/zavudev/cli/commit/c0c62210622f72686086063f315649eb8bc35ec4))
+* **internal:** more robust bootstrap script ([873650f](https://github.com/zavudev/cli/commit/873650f94169cc8ee552d5dab9e426b6b1007fa8))
+
 ## 0.4.0 (2026-04-12)
 
 Full Changelog: [v0.3.0...v0.4.0](https://github.com/zavudev/cli/compare/v0.3.0...v0.4.0)
