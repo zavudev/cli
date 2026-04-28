@@ -16,7 +16,7 @@ import (
 
 var subAccountsAPIKeysCreate = cli.Command{
 	Name:    "create",
-	Usage:   "Create sub-account API key",
+	Usage:   "Create sub-account API key. Requires a parent project API key; sub-account API\nkeys receive HTTP 403.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
@@ -45,7 +45,7 @@ var subAccountsAPIKeysCreate = cli.Command{
 
 var subAccountsAPIKeysList = cli.Command{
 	Name:    "list",
-	Usage:   "List sub-account API keys",
+	Usage:   "List sub-account API keys. Requires a parent project API key; sub-account API\nkeys receive HTTP 403.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
@@ -59,7 +59,7 @@ var subAccountsAPIKeysList = cli.Command{
 
 var subAccountsAPIKeysRevoke = cli.Command{
 	Name:    "revoke",
-	Usage:   "Revoke sub-account API key",
+	Usage:   "Revoke sub-account API key. Requires a parent project API key; sub-account API\nkeys receive HTTP 403.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{

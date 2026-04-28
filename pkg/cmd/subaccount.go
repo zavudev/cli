@@ -16,7 +16,7 @@ import (
 
 var subAccountsCreate = cli.Command{
 	Name:    "create",
-	Usage:   "Create a new sub-account (project) with its own API key. All charges are billed\nto the parent team's balance. Use creditLimit to set a spending cap. The\nsub-account's API key is returned only in the creation response.",
+	Usage:   "Create a new sub-account (project) with its own API key. All charges are billed\nto the parent team's balance. Use creditLimit to set a spending cap. The\nsub-account's API key is returned only in the creation response. Requires a\nparent project API key; sub-account API keys receive HTTP 403.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
@@ -46,7 +46,7 @@ var subAccountsCreate = cli.Command{
 
 var subAccountsRetrieve = cli.Command{
 	Name:    "retrieve",
-	Usage:   "Get sub-account",
+	Usage:   "Get sub-account. Requires a parent project API key; sub-account API keys receive\nHTTP 403.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
@@ -60,7 +60,7 @@ var subAccountsRetrieve = cli.Command{
 
 var subAccountsUpdate = cli.Command{
 	Name:    "update",
-	Usage:   "Update sub-account",
+	Usage:   "Update sub-account. Requires a parent project API key; sub-account API keys\nreceive HTTP 403.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
@@ -95,7 +95,7 @@ var subAccountsUpdate = cli.Command{
 
 var subAccountsList = cli.Command{
 	Name:    "list",
-	Usage:   "List sub-accounts for this team.",
+	Usage:   "List sub-accounts for this team. Requires a parent project API key; sub-account\nAPI keys receive HTTP 403.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
@@ -118,7 +118,7 @@ var subAccountsList = cli.Command{
 
 var subAccountsDeactivate = cli.Command{
 	Name:    "deactivate",
-	Usage:   "Deactivate a sub-account. Remaining balance is returned to the parent team and\nall API keys are revoked.",
+	Usage:   "Deactivate a sub-account. Remaining balance is returned to the parent team and\nall API keys are revoked. Requires a parent project API key; sub-account API\nkeys receive HTTP 403.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
@@ -132,7 +132,7 @@ var subAccountsDeactivate = cli.Command{
 
 var subAccountsGetBalance = cli.Command{
 	Name:    "get-balance",
-	Usage:   "Get spending information for a sub-account. Returns the parent team's balance,\nthe sub-account's total spending, and its credit limit (spending cap).",
+	Usage:   "Get spending information for a sub-account. Returns the parent team's balance,\nthe sub-account's total spending, and its credit limit (spending cap). Requires\na parent project API key; sub-account API keys receive HTTP 403.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
