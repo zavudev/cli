@@ -9,27 +9,20 @@ import (
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
 	"github.com/zavudev/cli/internal/apiquery"
-	"github.com/zavudev/cli/internal/requestflag"
 	"github.com/zavudev/sdk-go"
 	"github.com/zavudev/sdk-go/option"
 )
 
-var introspectValidatePhone = cli.Command{
-	Name:    "validate-phone",
-	Usage:   "Validate a phone number and check if a WhatsApp conversation window is open.",
-	Suggest: true,
-	Flags: []cli.Flag{
-		&requestflag.Flag[string]{
-			Name:     "phone-number",
-			Required: true,
-			BodyPath: "phoneNumber",
-		},
-	},
-	Action:          handleIntrospectValidatePhone,
+var planRetrieve = cli.Command{
+	Name:            "retrieve",
+	Usage:           "Get the current subscription plan for the API key's team, including tier,\nbilling interval, and period dates.",
+	Suggest:         true,
+	Flags:           []cli.Flag{},
+	Action:          handlePlanRetrieve,
 	HideHelpCommand: true,
 }
 
-func handleIntrospectValidatePhone(ctx context.Context, cmd *cli.Command) error {
+func handlePlanRetrieve(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
@@ -37,13 +30,11 @@ func handleIntrospectValidatePhone(ctx context.Context, cmd *cli.Command) error 
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.IntrospectValidatePhoneParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
 		apiquery.ArrayQueryFormatComma,
-		ApplicationJSON,
+		EmptyBody,
 		false,
 	)
 	if err != nil {
@@ -52,7 +43,7 @@ func handleIntrospectValidatePhone(ctx context.Context, cmd *cli.Command) error 
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Introspect.ValidatePhone(ctx, params, options...)
+	_, err = client.Plan.Get(ctx, options...)
 	if err != nil {
 		return err
 	}
@@ -65,7 +56,7 @@ func handleIntrospectValidatePhone(ctx context.Context, cmd *cli.Command) error 
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "introspect validate-phone",
+		Title:          "plan retrieve",
 		Transform:      transform,
 	})
 }

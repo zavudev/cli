@@ -14,159 +14,93 @@ import (
 	"github.com/zavudev/sdk-go/option"
 )
 
-var sendersAgentToolsCreate = requestflag.WithInnerFlags(cli.Command{
+var subAccountsCreate = cli.Command{
 	Name:    "create",
-	Usage:   "Create a new tool for an agent. Tools allow the agent to call external webhooks.",
+	Usage:   "Create a new sub-account (project) with its own API key. All charges are billed\nto the parent team's balance. Use creditLimit to set a spending cap. The\nsub-account's API key is returned only in the creation response. Requires a\nparent project API key; sub-account API keys receive HTTP 403.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
-		},
-		&requestflag.Flag[string]{
-			Name:     "description",
-			Required: true,
-			BodyPath: "description",
-		},
-		&requestflag.Flag[string]{
 			Name:     "name",
+			Usage:    "Name of the sub-account.",
 			Required: true,
 			BodyPath: "name",
 		},
+		&requestflag.Flag[int64]{
+			Name:     "credit-limit",
+			Usage:    "Spending cap in cents. When reached, messages from this sub-account will be blocked. Omit or set to 0 for no limit.",
+			BodyPath: "creditLimit",
+		},
+		&requestflag.Flag[string]{
+			Name:     "external-id",
+			Usage:    "External reference ID for your own tracking.",
+			BodyPath: "externalId",
+		},
 		&requestflag.Flag[map[string]any]{
-			Name:     "parameters",
-			Required: true,
-			BodyPath: "parameters",
-		},
-		&requestflag.Flag[string]{
-			Name:     "webhook-url",
-			Usage:    "Must be HTTPS.",
-			Required: true,
-			BodyPath: "webhookUrl",
-		},
-		&requestflag.Flag[bool]{
-			Name:     "enabled",
-			Default:  true,
-			BodyPath: "enabled",
-		},
-		&requestflag.Flag[string]{
-			Name:     "webhook-secret",
-			Usage:    "Optional secret for webhook signature verification.",
-			BodyPath: "webhookSecret",
+			Name:     "metadata",
+			BodyPath: "metadata",
 		},
 	},
-	Action:          handleSendersAgentToolsCreate,
-	HideHelpCommand: true,
-}, map[string][]requestflag.HasOuterFlag{
-	"parameters": {
-		&requestflag.InnerFlag[map[string]any]{
-			Name:       "parameters.properties",
-			InnerField: "properties",
-		},
-		&requestflag.InnerFlag[[]string]{
-			Name:       "parameters.required",
-			InnerField: "required",
-		},
-		&requestflag.InnerFlag[string]{
-			Name:       "parameters.type",
-			Usage:      `Allowed values: "object".`,
-			InnerField: "type",
-		},
-	},
-})
-
-var sendersAgentToolsRetrieve = cli.Command{
-	Name:    "retrieve",
-	Usage:   "Get a specific tool.",
-	Suggest: true,
-	Flags: []cli.Flag{
-		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
-		},
-		&requestflag.Flag[string]{
-			Name:     "tool-id",
-			Required: true,
-		},
-	},
-	Action:          handleSendersAgentToolsRetrieve,
+	Action:          handleSubAccountsCreate,
 	HideHelpCommand: true,
 }
 
-var sendersAgentToolsUpdate = requestflag.WithInnerFlags(cli.Command{
-	Name:    "update",
-	Usage:   "Update a tool.",
+var subAccountsRetrieve = cli.Command{
+	Name:    "retrieve",
+	Usage:   "Get sub-account. Requires a parent project API key; sub-account API keys receive\nHTTP 403.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
+			Name:     "id",
 			Required: true,
 		},
+	},
+	Action:          handleSubAccountsRetrieve,
+	HideHelpCommand: true,
+}
+
+var subAccountsUpdate = cli.Command{
+	Name:    "update",
+	Usage:   "Update sub-account. Requires a parent project API key; sub-account API keys\nreceive HTTP 403.",
+	Suggest: true,
+	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "tool-id",
+			Name:     "id",
 			Required: true,
 		},
-		&requestflag.Flag[string]{
-			Name:     "description",
-			BodyPath: "description",
+		&requestflag.Flag[any]{
+			Name:     "credit-limit",
+			BodyPath: "creditLimit",
 		},
-		&requestflag.Flag[bool]{
-			Name:     "enabled",
-			BodyPath: "enabled",
+		&requestflag.Flag[string]{
+			Name:     "external-id",
+			BodyPath: "externalId",
+		},
+		&requestflag.Flag[map[string]any]{
+			Name:     "metadata",
+			BodyPath: "metadata",
 		},
 		&requestflag.Flag[string]{
 			Name:     "name",
 			BodyPath: "name",
 		},
-		&requestflag.Flag[map[string]any]{
-			Name:     "parameters",
-			BodyPath: "parameters",
-		},
-		&requestflag.Flag[any]{
-			Name:     "webhook-secret",
-			BodyPath: "webhookSecret",
-		},
 		&requestflag.Flag[string]{
-			Name:     "webhook-url",
-			BodyPath: "webhookUrl",
+			Name:     "status",
+			Usage:    `Allowed values: "active", "inactive".`,
+			BodyPath: "status",
 		},
 	},
-	Action:          handleSendersAgentToolsUpdate,
+	Action:          handleSubAccountsUpdate,
 	HideHelpCommand: true,
-}, map[string][]requestflag.HasOuterFlag{
-	"parameters": {
-		&requestflag.InnerFlag[map[string]any]{
-			Name:       "parameters.properties",
-			InnerField: "properties",
-		},
-		&requestflag.InnerFlag[[]string]{
-			Name:       "parameters.required",
-			InnerField: "required",
-		},
-		&requestflag.InnerFlag[string]{
-			Name:       "parameters.type",
-			Usage:      `Allowed values: "object".`,
-			InnerField: "type",
-		},
-	},
-})
+}
 
-var sendersAgentToolsList = cli.Command{
+var subAccountsList = cli.Command{
 	Name:    "list",
-	Usage:   "List tools for an agent.",
+	Usage:   "List sub-accounts for this team. Requires a parent project API key; sub-account\nAPI keys receive HTTP 403.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
-		},
-		&requestflag.Flag[string]{
 			Name:      "cursor",
 			QueryPath: "cursor",
-		},
-		&requestflag.Flag[bool]{
-			Name:      "enabled",
-			QueryPath: "enabled",
 		},
 		&requestflag.Flag[int64]{
 			Name:      "limit",
@@ -178,64 +112,47 @@ var sendersAgentToolsList = cli.Command{
 			Usage: "The maximum number of items to return (use -1 for unlimited).",
 		},
 	},
-	Action:          handleSendersAgentToolsList,
+	Action:          handleSubAccountsList,
 	HideHelpCommand: true,
 }
 
-var sendersAgentToolsDelete = cli.Command{
-	Name:    "delete",
-	Usage:   "Delete a tool.",
+var subAccountsDeactivate = cli.Command{
+	Name:    "deactivate",
+	Usage:   "Deactivate a sub-account. Remaining balance is returned to the parent team and\nall API keys are revoked. Requires a parent project API key; sub-account API\nkeys receive HTTP 403.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
-		},
-		&requestflag.Flag[string]{
-			Name:     "tool-id",
+			Name:     "id",
 			Required: true,
 		},
 	},
-	Action:          handleSendersAgentToolsDelete,
+	Action:          handleSubAccountsDeactivate,
 	HideHelpCommand: true,
 }
 
-var sendersAgentToolsTest = cli.Command{
-	Name:    "test",
-	Usage:   "Test a tool by triggering its webhook with test parameters.",
+var subAccountsGetBalance = cli.Command{
+	Name:    "get-balance",
+	Usage:   "Get spending information for a sub-account. Returns the parent team's balance,\nthe sub-account's total spending, and its credit limit (spending cap). Requires\na parent project API key; sub-account API keys receive HTTP 403.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
+			Name:     "id",
 			Required: true,
-		},
-		&requestflag.Flag[string]{
-			Name:     "tool-id",
-			Required: true,
-		},
-		&requestflag.Flag[map[string]any]{
-			Name:     "test-params",
-			Usage:    "Parameters to pass to the tool for testing.",
-			Required: true,
-			BodyPath: "testParams",
 		},
 	},
-	Action:          handleSendersAgentToolsTest,
+	Action:          handleSubAccountsGetBalance,
 	HideHelpCommand: true,
 }
 
-func handleSendersAgentToolsCreate(ctx context.Context, cmd *cli.Command) error {
+func handleSubAccountsCreate(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("sender-id") && len(unusedArgs) > 0 {
-		cmd.Set("sender-id", unusedArgs[0])
-		unusedArgs = unusedArgs[1:]
-	}
+
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentToolNewParams{}
+	params := zavudev.SubAccountNewParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -250,12 +167,7 @@ func handleSendersAgentToolsCreate(ctx context.Context, cmd *cli.Command) error 
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Senders.Agent.Tools.New(
-		ctx,
-		cmd.Value("sender-id").(string),
-		params,
-		options...,
-	)
+	_, err = client.SubAccounts.New(ctx, params, options...)
 	if err != nil {
 		return err
 	}
@@ -268,24 +180,20 @@ func handleSendersAgentToolsCreate(ctx context.Context, cmd *cli.Command) error 
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "senders:agent:tools create",
+		Title:          "sub-accounts create",
 		Transform:      transform,
 	})
 }
 
-func handleSendersAgentToolsRetrieve(ctx context.Context, cmd *cli.Command) error {
+func handleSubAccountsRetrieve(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("tool-id") && len(unusedArgs) > 0 {
-		cmd.Set("tool-id", unusedArgs[0])
+	if !cmd.IsSet("id") && len(unusedArgs) > 0 {
+		cmd.Set("id", unusedArgs[0])
 		unusedArgs = unusedArgs[1:]
 	}
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
-	}
-
-	params := zavudev.SenderAgentToolGetParams{
-		SenderID: cmd.Value("sender-id").(string),
 	}
 
 	options, err := flagOptions(
@@ -301,12 +209,7 @@ func handleSendersAgentToolsRetrieve(ctx context.Context, cmd *cli.Command) erro
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Senders.Agent.Tools.Get(
-		ctx,
-		cmd.Value("tool-id").(string),
-		params,
-		options...,
-	)
+	_, err = client.SubAccounts.Get(ctx, cmd.Value("id").(string), options...)
 	if err != nil {
 		return err
 	}
@@ -319,25 +222,23 @@ func handleSendersAgentToolsRetrieve(ctx context.Context, cmd *cli.Command) erro
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "senders:agent:tools retrieve",
+		Title:          "sub-accounts retrieve",
 		Transform:      transform,
 	})
 }
 
-func handleSendersAgentToolsUpdate(ctx context.Context, cmd *cli.Command) error {
+func handleSubAccountsUpdate(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("tool-id") && len(unusedArgs) > 0 {
-		cmd.Set("tool-id", unusedArgs[0])
+	if !cmd.IsSet("id") && len(unusedArgs) > 0 {
+		cmd.Set("id", unusedArgs[0])
 		unusedArgs = unusedArgs[1:]
 	}
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentToolUpdateParams{
-		SenderID: cmd.Value("sender-id").(string),
-	}
+	params := zavudev.SubAccountUpdateParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -352,9 +253,9 @@ func handleSendersAgentToolsUpdate(ctx context.Context, cmd *cli.Command) error 
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Senders.Agent.Tools.Update(
+	_, err = client.SubAccounts.Update(
 		ctx,
-		cmd.Value("tool-id").(string),
+		cmd.Value("id").(string),
 		params,
 		options...,
 	)
@@ -370,23 +271,20 @@ func handleSendersAgentToolsUpdate(ctx context.Context, cmd *cli.Command) error 
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "senders:agent:tools update",
+		Title:          "sub-accounts update",
 		Transform:      transform,
 	})
 }
 
-func handleSendersAgentToolsList(ctx context.Context, cmd *cli.Command) error {
+func handleSubAccountsList(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("sender-id") && len(unusedArgs) > 0 {
-		cmd.Set("sender-id", unusedArgs[0])
-		unusedArgs = unusedArgs[1:]
-	}
+
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentToolListParams{}
+	params := zavudev.SubAccountListParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -405,12 +303,7 @@ func handleSendersAgentToolsList(ctx context.Context, cmd *cli.Command) error {
 	if format == "raw" {
 		var res []byte
 		options = append(options, option.WithResponseBodyInto(&res))
-		_, err = client.Senders.Agent.Tools.List(
-			ctx,
-			cmd.Value("sender-id").(string),
-			params,
-			options...,
-		)
+		_, err = client.SubAccounts.List(ctx, params, options...)
 		if err != nil {
 			return err
 		}
@@ -419,16 +312,11 @@ func handleSendersAgentToolsList(ctx context.Context, cmd *cli.Command) error {
 			ExplicitFormat: explicitFormat,
 			Format:         format,
 			RawOutput:      cmd.Root().Bool("raw-output"),
-			Title:          "senders:agent:tools list",
+			Title:          "sub-accounts list",
 			Transform:      transform,
 		})
 	} else {
-		iter := client.Senders.Agent.Tools.ListAutoPaging(
-			ctx,
-			cmd.Value("sender-id").(string),
-			params,
-			options...,
-		)
+		iter := client.SubAccounts.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
@@ -437,25 +325,21 @@ func handleSendersAgentToolsList(ctx context.Context, cmd *cli.Command) error {
 			ExplicitFormat: explicitFormat,
 			Format:         format,
 			RawOutput:      cmd.Root().Bool("raw-output"),
-			Title:          "senders:agent:tools list",
+			Title:          "sub-accounts list",
 			Transform:      transform,
 		})
 	}
 }
 
-func handleSendersAgentToolsDelete(ctx context.Context, cmd *cli.Command) error {
+func handleSubAccountsDeactivate(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("tool-id") && len(unusedArgs) > 0 {
-		cmd.Set("tool-id", unusedArgs[0])
+	if !cmd.IsSet("id") && len(unusedArgs) > 0 {
+		cmd.Set("id", unusedArgs[0])
 		unusedArgs = unusedArgs[1:]
 	}
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
-	}
-
-	params := zavudev.SenderAgentToolDeleteParams{
-		SenderID: cmd.Value("sender-id").(string),
 	}
 
 	options, err := flagOptions(
@@ -469,48 +353,9 @@ func handleSendersAgentToolsDelete(ctx context.Context, cmd *cli.Command) error 
 		return err
 	}
 
-	return client.Senders.Agent.Tools.Delete(
-		ctx,
-		cmd.Value("tool-id").(string),
-		params,
-		options...,
-	)
-}
-
-func handleSendersAgentToolsTest(ctx context.Context, cmd *cli.Command) error {
-	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
-	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("tool-id") && len(unusedArgs) > 0 {
-		cmd.Set("tool-id", unusedArgs[0])
-		unusedArgs = unusedArgs[1:]
-	}
-	if len(unusedArgs) > 0 {
-		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
-	}
-
-	params := zavudev.SenderAgentToolTestParams{
-		SenderID: cmd.Value("sender-id").(string),
-	}
-
-	options, err := flagOptions(
-		cmd,
-		apiquery.NestedQueryFormatBrackets,
-		apiquery.ArrayQueryFormatComma,
-		ApplicationJSON,
-		false,
-	)
-	if err != nil {
-		return err
-	}
-
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Senders.Agent.Tools.Test(
-		ctx,
-		cmd.Value("tool-id").(string),
-		params,
-		options...,
-	)
+	_, err = client.SubAccounts.Deactivate(ctx, cmd.Value("id").(string), options...)
 	if err != nil {
 		return err
 	}
@@ -523,7 +368,49 @@ func handleSendersAgentToolsTest(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "senders:agent:tools test",
+		Title:          "sub-accounts deactivate",
+		Transform:      transform,
+	})
+}
+
+func handleSubAccountsGetBalance(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("id") && len(unusedArgs) > 0 {
+		cmd.Set("id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.SubAccounts.GetBalance(ctx, cmd.Value("id").(string), options...)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "sub-accounts get-balance",
 		Transform:      transform,
 	})
 }

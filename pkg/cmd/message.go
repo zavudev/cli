@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -209,6 +208,31 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 			InnerField: "contacts",
 		},
 		&requestflag.InnerFlag[string]{
+			Name:       "content.cta-display-text",
+			Usage:      "Button label for cta_url messages.",
+			InnerField: "ctaDisplayText",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.cta-header-media-url",
+			Usage:      "Public HTTPS URL of the header media when ctaHeaderType is 'image', 'video', or 'document'. WhatsApp fetches this URL — it must be publicly reachable and return the declared content type.",
+			InnerField: "ctaHeaderMediaUrl",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.cta-header-text",
+			Usage:      "Header text when ctaHeaderType is 'text'.",
+			InnerField: "ctaHeaderText",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.cta-header-type",
+			Usage:      "Optional header type for cta_url messages.",
+			InnerField: "ctaHeaderType",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.cta-url",
+			Usage:      "Destination URL opened in the device's default browser when the button is tapped. Used with messageType=cta_url. WhatsApp requires HTTPS in production.",
+			InnerField: "ctaUrl",
+		},
+		&requestflag.InnerFlag[string]{
 			Name:       "content.emoji",
 			Usage:      "Emoji for reaction messages.",
 			InnerField: "emoji",
@@ -217,6 +241,11 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 			Name:       "content.filename",
 			Usage:      "Filename for documents.",
 			InnerField: "filename",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.footer-text",
+			Usage:      "Optional footer text for cta_url messages.",
+			InnerField: "footerText",
 		},
 		&requestflag.InnerFlag[float64]{
 			Name:       "content.latitude",
@@ -268,6 +297,11 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 			Usage:      "Sections for list messages.",
 			InnerField: "sections",
 		},
+		&requestflag.InnerFlag[map[string]any]{
+			Name:       "content.template-button-variables",
+			Usage:      "Variables for dynamic button placeholders (URL buttons and OTP buttons). Keys are the button index (0, 1, 2) in the template's `buttons` array — not the placeholder name. Values substitute the `{{1}}` placeholder inside that button's URL.\n\n**WhatsApp constraints:**\n- URL buttons only accept `{{1}}` — positional, numeric, no whitespace, no name. Named placeholders like `{{token}}` are stored as literal URL text by Meta and cannot be substituted.\n- At most one placeholder per URL button.\n- A template may have at most three buttons.\n- Static URL buttons (no placeholder) and `quick_reply` buttons are not included here.",
+			InnerField: "templateButtonVariables",
+		},
 		&requestflag.InnerFlag[string]{
 			Name:       "content.template-id",
 			Usage:      "Template ID for template messages.",
@@ -275,7 +309,7 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.InnerFlag[map[string]any]{
 			Name:       "content.template-variables",
-			Usage:      "Variables for template rendering. Keys are variable positions (1, 2, 3...).",
+			Usage:      "Variables for body placeholders. Keys are positions (1, 2, 3, ...) matching the order placeholders appear in the template body.",
 			InnerField: "templateVariables",
 		},
 	},
@@ -312,8 +346,15 @@ func handleMessagesRetrieve(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "messages retrieve", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "messages retrieve",
+		Transform:      transform,
+	})
 }
 
 func handleMessagesList(ctx context.Context, cmd *cli.Command) error {
@@ -338,6 +379,7 @@ func handleMessagesList(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -347,14 +389,26 @@ func handleMessagesList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "messages list", obj, format, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "messages list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.Messages.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "messages list", iter, format, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "messages list",
+			Transform:      transform,
+		})
 	}
 }
 
@@ -396,8 +450,15 @@ func handleMessagesReact(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "messages react", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "messages react",
+		Transform:      transform,
+	})
 }
 
 func handleMessagesSend(ctx context.Context, cmd *cli.Command) error {
@@ -430,6 +491,13 @@ func handleMessagesSend(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "messages send", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "messages send",
+		Transform:      transform,
+	})
 }

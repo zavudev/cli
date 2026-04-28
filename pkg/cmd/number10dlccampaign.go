@@ -14,102 +14,174 @@ import (
 	"github.com/zavudev/sdk-go/option"
 )
 
-var contactsCreate = requestflag.WithInnerFlags(cli.Command{
+var number10dlcCampaignsCreate = cli.Command{
 	Name:    "create",
-	Usage:   "Create a new contact with one or more communication channels.",
+	Usage:   "Create a 10DLC campaign under an existing brand. The campaign starts in draft\nstatus. Submit it for carrier review using the submit endpoint.",
 	Suggest: true,
 	Flags: []cli.Flag{
-		&requestflag.Flag[[]map[string]any]{
-			Name:     "channel",
-			Usage:    "Communication channels for the contact.",
+		&requestflag.Flag[bool]{
+			Name:     "affiliate-marketing",
 			Required: true,
-			BodyPath: "channels",
+			BodyPath: "affiliateMarketing",
+		},
+		&requestflag.Flag[bool]{
+			Name:     "age-gated",
+			Required: true,
+			BodyPath: "ageGated",
 		},
 		&requestflag.Flag[string]{
-			Name:     "display-name",
-			Usage:    "Display name for the contact.",
-			BodyPath: "displayName",
+			Name:     "brand-id",
+			Usage:    "ID of the brand to create this campaign under.",
+			Required: true,
+			BodyPath: "brandId",
 		},
-		&requestflag.Flag[map[string]any]{
-			Name:     "metadata",
-			Usage:    "Arbitrary metadata to associate with the contact.",
-			BodyPath: "metadata",
+		&requestflag.Flag[string]{
+			Name:     "description",
+			Required: true,
+			BodyPath: "description",
+		},
+		&requestflag.Flag[bool]{
+			Name:     "direct-lending",
+			Required: true,
+			BodyPath: "directLending",
+		},
+		&requestflag.Flag[bool]{
+			Name:     "embedded-link",
+			Required: true,
+			BodyPath: "embeddedLink",
+		},
+		&requestflag.Flag[bool]{
+			Name:     "embedded-phone",
+			Required: true,
+			BodyPath: "embeddedPhone",
+		},
+		&requestflag.Flag[string]{
+			Name:     "name",
+			Required: true,
+			BodyPath: "name",
+		},
+		&requestflag.Flag[bool]{
+			Name:     "number-pooling",
+			Required: true,
+			BodyPath: "numberPooling",
+		},
+		&requestflag.Flag[[]string]{
+			Name:     "sample-message",
+			Required: true,
+			BodyPath: "sampleMessages",
+		},
+		&requestflag.Flag[bool]{
+			Name:     "subscriber-help",
+			Required: true,
+			BodyPath: "subscriberHelp",
+		},
+		&requestflag.Flag[bool]{
+			Name:     "subscriber-opt-in",
+			Required: true,
+			BodyPath: "subscriberOptIn",
+		},
+		&requestflag.Flag[bool]{
+			Name:     "subscriber-opt-out",
+			Required: true,
+			BodyPath: "subscriberOptOut",
+		},
+		&requestflag.Flag[string]{
+			Name:     "use-case",
+			Usage:    "Campaign use case (e.g., ACCOUNT_NOTIFICATION, MARKETING, 2FA).",
+			Required: true,
+			BodyPath: "useCase",
+		},
+		&requestflag.Flag[string]{
+			Name:     "help-message",
+			BodyPath: "helpMessage",
+		},
+		&requestflag.Flag[string]{
+			Name:     "message-flow",
+			BodyPath: "messageFlow",
+		},
+		&requestflag.Flag[[]string]{
+			Name:     "opt-in-keyword",
+			BodyPath: "optInKeywords",
+		},
+		&requestflag.Flag[[]string]{
+			Name:     "opt-out-keyword",
+			BodyPath: "optOutKeywords",
+		},
+		&requestflag.Flag[[]string]{
+			Name:     "sub-use-case",
+			BodyPath: "subUseCases",
 		},
 	},
-	Action:          handleContactsCreate,
+	Action:          handleNumber10dlcCampaignsCreate,
 	HideHelpCommand: true,
-}, map[string][]requestflag.HasOuterFlag{
-	"channel": {
-		&requestflag.InnerFlag[string]{
-			Name:       "channel.channel",
-			Usage:      "Channel type.",
-			InnerField: "channel",
-		},
-		&requestflag.InnerFlag[string]{
-			Name:       "channel.identifier",
-			Usage:      "Channel identifier (phone number in E.164 format or email address).",
-			InnerField: "identifier",
-		},
-		&requestflag.InnerFlag[string]{
-			Name:       "channel.country-code",
-			Usage:      "ISO country code for phone numbers.",
-			InnerField: "countryCode",
-		},
-		&requestflag.InnerFlag[bool]{
-			Name:       "channel.is-primary",
-			Usage:      "Whether this should be the primary channel for its type.",
-			InnerField: "isPrimary",
-		},
-		&requestflag.InnerFlag[string]{
-			Name:       "channel.label",
-			Usage:      "Optional label for the channel.",
-			InnerField: "label",
-		},
-	},
-})
+}
 
-var contactsRetrieve = cli.Command{
+var number10dlcCampaignsRetrieve = cli.Command{
 	Name:    "retrieve",
-	Usage:   "Get contact",
+	Usage:   "Get 10DLC campaign",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "contact-id",
+			Name:     "campaign-id",
 			Required: true,
 		},
 	},
-	Action:          handleContactsRetrieve,
+	Action:          handleNumber10dlcCampaignsRetrieve,
 	HideHelpCommand: true,
 }
 
-var contactsUpdate = cli.Command{
+var number10dlcCampaignsUpdate = cli.Command{
 	Name:    "update",
-	Usage:   "Update contact",
+	Usage:   "Update a 10DLC campaign in draft status. Cannot update after submission.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "contact-id",
+			Name:     "campaign-id",
 			Required: true,
 		},
-		&requestflag.Flag[any]{
-			Name:     "default-channel",
-			Usage:    "Preferred channel for this contact. Set to null to clear.",
-			BodyPath: "defaultChannel",
+		&requestflag.Flag[string]{
+			Name:     "description",
+			BodyPath: "description",
 		},
-		&requestflag.Flag[map[string]any]{
-			Name:     "metadata",
-			BodyPath: "metadata",
+		&requestflag.Flag[string]{
+			Name:     "help-message",
+			BodyPath: "helpMessage",
+		},
+		&requestflag.Flag[string]{
+			Name:     "message-flow",
+			BodyPath: "messageFlow",
+		},
+		&requestflag.Flag[string]{
+			Name:     "name",
+			BodyPath: "name",
+		},
+		&requestflag.Flag[[]string]{
+			Name:     "opt-in-keyword",
+			BodyPath: "optInKeywords",
+		},
+		&requestflag.Flag[[]string]{
+			Name:     "opt-out-keyword",
+			BodyPath: "optOutKeywords",
+		},
+		&requestflag.Flag[[]string]{
+			Name:     "sample-message",
+			BodyPath: "sampleMessages",
 		},
 	},
-	Action:          handleContactsUpdate,
+	Action:          handleNumber10dlcCampaignsUpdate,
 	HideHelpCommand: true,
 }
 
-var contactsList = cli.Command{
+var number10dlcCampaignsList = cli.Command{
 	Name:    "list",
-	Usage:   "List contacts with their communication channels.",
+	Usage:   "List 10DLC campaign registrations for this project.",
 	Suggest: true,
 	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "brand-id",
+			Usage:     "Filter campaigns by brand ID.",
+			QueryPath: "brandId",
+		},
 		&requestflag.Flag[string]{
 			Name:      "cursor",
 			QueryPath: "cursor",
@@ -119,68 +191,58 @@ var contactsList = cli.Command{
 			Default:   50,
 			QueryPath: "limit",
 		},
-		&requestflag.Flag[string]{
-			Name:      "phone-number",
-			QueryPath: "phoneNumber",
-		},
 		&requestflag.Flag[int64]{
 			Name:  "max-items",
 			Usage: "The maximum number of items to return (use -1 for unlimited).",
 		},
 	},
-	Action:          handleContactsList,
+	Action:          handleNumber10dlcCampaignsList,
 	HideHelpCommand: true,
 }
 
-var contactsDismissMergeSuggestion = cli.Command{
-	Name:    "dismiss-merge-suggestion",
-	Usage:   "Dismiss the merge suggestion for a contact.",
+var number10dlcCampaignsDelete = cli.Command{
+	Name:    "delete",
+	Usage:   "Delete 10DLC campaign",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "contact-id",
+			Name:     "campaign-id",
 			Required: true,
 		},
 	},
-	Action:          handleContactsDismissMergeSuggestion,
+	Action:          handleNumber10dlcCampaignsDelete,
 	HideHelpCommand: true,
 }
 
-var contactsMerge = cli.Command{
-	Name:    "merge",
-	Usage:   "Merge a source contact into this contact. All channels from the source contact\nwill be moved to the target contact, and the source contact will be marked as\nmerged.",
+var number10dlcCampaignsSubmit = cli.Command{
+	Name:    "submit",
+	Usage:   "Submit a draft campaign for carrier review. The campaign must be in draft status\nand its brand must be verified.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "contact-id",
+			Name:     "campaign-id",
 			Required: true,
-		},
-		&requestflag.Flag[string]{
-			Name:     "source-contact-id",
-			Usage:    "ID of the contact to merge into the target contact. The source contact will be marked as merged.",
-			Required: true,
-			BodyPath: "sourceContactId",
 		},
 	},
-	Action:          handleContactsMerge,
+	Action:          handleNumber10dlcCampaignsSubmit,
 	HideHelpCommand: true,
 }
 
-var contactsRetrieveByPhone = cli.Command{
-	Name:    "retrieve-by-phone",
-	Usage:   "Get contact by phone number",
+var number10dlcCampaignsSyncStatus = cli.Command{
+	Name:    "sync-status",
+	Usage:   "Sync the campaign status with the registration provider. Use this to check for\napproval updates after submission.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "phone-number",
+			Name:     "campaign-id",
 			Required: true,
 		},
 	},
-	Action:          handleContactsRetrieveByPhone,
+	Action:          handleNumber10dlcCampaignsSyncStatus,
 	HideHelpCommand: true,
 }
 
-func handleContactsCreate(ctx context.Context, cmd *cli.Command) error {
+func handleNumber10dlcCampaignsCreate(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
@@ -188,7 +250,7 @@ func handleContactsCreate(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.ContactNewParams{}
+	params := zavudev.Number10dlcCampaignNewParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -203,7 +265,7 @@ func handleContactsCreate(ctx context.Context, cmd *cli.Command) error {
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Contacts.New(ctx, params, options...)
+	_, err = client.Number10dlc.Campaigns.New(ctx, params, options...)
 	if err != nil {
 		return err
 	}
@@ -216,16 +278,16 @@ func handleContactsCreate(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "contacts create",
+		Title:          "number-10dlc:campaigns create",
 		Transform:      transform,
 	})
 }
 
-func handleContactsRetrieve(ctx context.Context, cmd *cli.Command) error {
+func handleNumber10dlcCampaignsRetrieve(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("contact-id") && len(unusedArgs) > 0 {
-		cmd.Set("contact-id", unusedArgs[0])
+	if !cmd.IsSet("campaign-id") && len(unusedArgs) > 0 {
+		cmd.Set("campaign-id", unusedArgs[0])
 		unusedArgs = unusedArgs[1:]
 	}
 	if len(unusedArgs) > 0 {
@@ -245,7 +307,7 @@ func handleContactsRetrieve(ctx context.Context, cmd *cli.Command) error {
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Contacts.Get(ctx, cmd.Value("contact-id").(string), options...)
+	_, err = client.Number10dlc.Campaigns.Get(ctx, cmd.Value("campaign-id").(string), options...)
 	if err != nil {
 		return err
 	}
@@ -258,23 +320,23 @@ func handleContactsRetrieve(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "contacts retrieve",
+		Title:          "number-10dlc:campaigns retrieve",
 		Transform:      transform,
 	})
 }
 
-func handleContactsUpdate(ctx context.Context, cmd *cli.Command) error {
+func handleNumber10dlcCampaignsUpdate(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("contact-id") && len(unusedArgs) > 0 {
-		cmd.Set("contact-id", unusedArgs[0])
+	if !cmd.IsSet("campaign-id") && len(unusedArgs) > 0 {
+		cmd.Set("campaign-id", unusedArgs[0])
 		unusedArgs = unusedArgs[1:]
 	}
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.ContactUpdateParams{}
+	params := zavudev.Number10dlcCampaignUpdateParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -289,9 +351,9 @@ func handleContactsUpdate(ctx context.Context, cmd *cli.Command) error {
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Contacts.Update(
+	_, err = client.Number10dlc.Campaigns.Update(
 		ctx,
-		cmd.Value("contact-id").(string),
+		cmd.Value("campaign-id").(string),
 		params,
 		options...,
 	)
@@ -307,12 +369,12 @@ func handleContactsUpdate(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "contacts update",
+		Title:          "number-10dlc:campaigns update",
 		Transform:      transform,
 	})
 }
 
-func handleContactsList(ctx context.Context, cmd *cli.Command) error {
+func handleNumber10dlcCampaignsList(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
@@ -320,7 +382,7 @@ func handleContactsList(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.ContactListParams{}
+	params := zavudev.Number10dlcCampaignListParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -339,7 +401,7 @@ func handleContactsList(ctx context.Context, cmd *cli.Command) error {
 	if format == "raw" {
 		var res []byte
 		options = append(options, option.WithResponseBodyInto(&res))
-		_, err = client.Contacts.List(ctx, params, options...)
+		_, err = client.Number10dlc.Campaigns.List(ctx, params, options...)
 		if err != nil {
 			return err
 		}
@@ -348,11 +410,11 @@ func handleContactsList(ctx context.Context, cmd *cli.Command) error {
 			ExplicitFormat: explicitFormat,
 			Format:         format,
 			RawOutput:      cmd.Root().Bool("raw-output"),
-			Title:          "contacts list",
+			Title:          "number-10dlc:campaigns list",
 			Transform:      transform,
 		})
 	} else {
-		iter := client.Contacts.ListAutoPaging(ctx, params, options...)
+		iter := client.Number10dlc.Campaigns.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
@@ -361,17 +423,17 @@ func handleContactsList(ctx context.Context, cmd *cli.Command) error {
 			ExplicitFormat: explicitFormat,
 			Format:         format,
 			RawOutput:      cmd.Root().Bool("raw-output"),
-			Title:          "contacts list",
+			Title:          "number-10dlc:campaigns list",
 			Transform:      transform,
 		})
 	}
 }
 
-func handleContactsDismissMergeSuggestion(ctx context.Context, cmd *cli.Command) error {
+func handleNumber10dlcCampaignsDelete(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("contact-id") && len(unusedArgs) > 0 {
-		cmd.Set("contact-id", unusedArgs[0])
+	if !cmd.IsSet("campaign-id") && len(unusedArgs) > 0 {
+		cmd.Set("campaign-id", unusedArgs[0])
 		unusedArgs = unusedArgs[1:]
 	}
 	if len(unusedArgs) > 0 {
@@ -389,27 +451,25 @@ func handleContactsDismissMergeSuggestion(ctx context.Context, cmd *cli.Command)
 		return err
 	}
 
-	return client.Contacts.DismissMergeSuggestion(ctx, cmd.Value("contact-id").(string), options...)
+	return client.Number10dlc.Campaigns.Delete(ctx, cmd.Value("campaign-id").(string), options...)
 }
 
-func handleContactsMerge(ctx context.Context, cmd *cli.Command) error {
+func handleNumber10dlcCampaignsSubmit(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("contact-id") && len(unusedArgs) > 0 {
-		cmd.Set("contact-id", unusedArgs[0])
+	if !cmd.IsSet("campaign-id") && len(unusedArgs) > 0 {
+		cmd.Set("campaign-id", unusedArgs[0])
 		unusedArgs = unusedArgs[1:]
 	}
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.ContactMergeParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
 		apiquery.ArrayQueryFormatComma,
-		ApplicationJSON,
+		EmptyBody,
 		false,
 	)
 	if err != nil {
@@ -418,12 +478,7 @@ func handleContactsMerge(ctx context.Context, cmd *cli.Command) error {
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Contacts.Merge(
-		ctx,
-		cmd.Value("contact-id").(string),
-		params,
-		options...,
-	)
+	_, err = client.Number10dlc.Campaigns.Submit(ctx, cmd.Value("campaign-id").(string), options...)
 	if err != nil {
 		return err
 	}
@@ -436,16 +491,16 @@ func handleContactsMerge(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "contacts merge",
+		Title:          "number-10dlc:campaigns submit",
 		Transform:      transform,
 	})
 }
 
-func handleContactsRetrieveByPhone(ctx context.Context, cmd *cli.Command) error {
+func handleNumber10dlcCampaignsSyncStatus(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("phone-number") && len(unusedArgs) > 0 {
-		cmd.Set("phone-number", unusedArgs[0])
+	if !cmd.IsSet("campaign-id") && len(unusedArgs) > 0 {
+		cmd.Set("campaign-id", unusedArgs[0])
 		unusedArgs = unusedArgs[1:]
 	}
 	if len(unusedArgs) > 0 {
@@ -465,7 +520,7 @@ func handleContactsRetrieveByPhone(ctx context.Context, cmd *cli.Command) error 
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Contacts.GetByPhone(ctx, cmd.Value("phone-number").(string), options...)
+	_, err = client.Number10dlc.Campaigns.SyncStatus(ctx, cmd.Value("campaign-id").(string), options...)
 	if err != nil {
 		return err
 	}
@@ -478,7 +533,7 @@ func handleContactsRetrieveByPhone(ctx context.Context, cmd *cli.Command) error 
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "contacts retrieve-by-phone",
+		Title:          "number-10dlc:campaigns sync-status",
 		Transform:      transform,
 	})
 }

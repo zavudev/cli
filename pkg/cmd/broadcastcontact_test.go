@@ -33,8 +33,8 @@ func TestBroadcastsContactsAdd(t *testing.T) {
 			"--api-key", "string",
 			"broadcasts:contacts", "add",
 			"--broadcast-id", "broadcastId",
-			"--contact", "{recipient: '+14155551234', templateVariables: {name: John, order_id: ORD-001}}",
-			"--contact", "{recipient: '+14155555678', templateVariables: {name: Jane, order_id: ORD-002}}",
+			"--contact", "{recipient: '+14155551234', templateButtonVariables: {'0': abc-report-token}, templateVariables: {name: John, order_id: ORD-001}}",
+			"--contact", "{recipient: '+14155555678', templateButtonVariables: {'0': abc-report-token}, templateVariables: {name: Jane, order_id: ORD-002}}",
 		)
 	})
 
@@ -49,8 +49,10 @@ func TestBroadcastsContactsAdd(t *testing.T) {
 			"broadcasts:contacts", "add",
 			"--broadcast-id", "broadcastId",
 			"--contact.recipient", "+14155551234",
+			"--contact.template-button-variables", "{'0': abc-report-token}",
 			"--contact.template-variables", "{name: John, order_id: ORD-001}",
 			"--contact.recipient", "+14155555678",
+			"--contact.template-button-variables", "{'0': abc-report-token}",
 			"--contact.template-variables", "{name: Jane, order_id: ORD-002}",
 		)
 	})
@@ -60,10 +62,14 @@ func TestBroadcastsContactsAdd(t *testing.T) {
 		pipeData := []byte("" +
 			"contacts:\n" +
 			"  - recipient: '+14155551234'\n" +
+			"    templateButtonVariables:\n" +
+			"      '0': abc-report-token\n" +
 			"    templateVariables:\n" +
 			"      name: John\n" +
 			"      order_id: ORD-001\n" +
 			"  - recipient: '+14155555678'\n" +
+			"    templateButtonVariables:\n" +
+			"      '0': abc-report-token\n" +
 			"    templateVariables:\n" +
 			"      name: Jane\n" +
 			"      order_id: ORD-002\n")

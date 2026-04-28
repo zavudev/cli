@@ -14,73 +14,64 @@ import (
 	"github.com/zavudev/sdk-go/option"
 )
 
-var addressesCreate = cli.Command{
+var invitationsCreate = cli.Command{
 	Name:    "create",
-	Usage:   "Create a regulatory address for phone number purchases. Some countries require a\nverified address before phone numbers can be activated.",
+	Usage:   "Create a partner invitation link for a client to connect their WhatsApp Business\naccount. The client will complete Meta's embedded signup flow and the resulting\nsender will be created in your project.",
 	Suggest: true,
 	Flags: []cli.Flag{
-		&requestflag.Flag[string]{
-			Name:     "country-code",
-			Required: true,
-			BodyPath: "countryCode",
+		&requestflag.Flag[[]string]{
+			Name:     "allowed-phone-country",
+			Usage:    "ISO country codes for allowed phone numbers.",
+			BodyPath: "allowedPhoneCountries",
 		},
 		&requestflag.Flag[string]{
-			Name:     "locality",
-			Required: true,
-			BodyPath: "locality",
+			Name:     "client-email",
+			Usage:    "Email of the client being invited.",
+			BodyPath: "clientEmail",
 		},
 		&requestflag.Flag[string]{
-			Name:     "postal-code",
-			Required: true,
-			BodyPath: "postalCode",
+			Name:     "client-name",
+			Usage:    "Name of the client being invited.",
+			BodyPath: "clientName",
 		},
 		&requestflag.Flag[string]{
-			Name:     "street-address",
-			Required: true,
-			BodyPath: "streetAddress",
+			Name:     "client-phone",
+			Usage:    "Phone number of the client in E.164 format.",
+			BodyPath: "clientPhone",
+		},
+		&requestflag.Flag[int64]{
+			Name:     "expires-in-days",
+			Usage:    "Number of days until the invitation expires.",
+			Default:  7,
+			BodyPath: "expiresInDays",
 		},
 		&requestflag.Flag[string]{
-			Name:     "administrative-area",
-			BodyPath: "administrativeArea",
-		},
-		&requestflag.Flag[string]{
-			Name:     "business-name",
-			BodyPath: "businessName",
-		},
-		&requestflag.Flag[string]{
-			Name:     "extended-address",
-			BodyPath: "extendedAddress",
-		},
-		&requestflag.Flag[string]{
-			Name:     "first-name",
-			BodyPath: "firstName",
-		},
-		&requestflag.Flag[string]{
-			Name:     "last-name",
-			BodyPath: "lastName",
+			Name:     "phone-number-id",
+			Usage:    "ID of a Zavu phone number to pre-assign for WhatsApp registration. If provided, the client will use this number instead of their own.",
+			BodyPath: "phoneNumberId",
 		},
 	},
-	Action:          handleAddressesCreate,
+	Action:          handleInvitationsCreate,
 	HideHelpCommand: true,
 }
 
-var addressesRetrieve = cli.Command{
+var invitationsRetrieve = cli.Command{
 	Name:    "retrieve",
-	Usage:   "Get a specific regulatory address.",
+	Usage:   "Get invitation",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "address-id",
+			Name:     "invitation-id",
 			Required: true,
 		},
 	},
-	Action:          handleAddressesRetrieve,
+	Action:          handleInvitationsRetrieve,
 	HideHelpCommand: true,
 }
 
-var addressesList = cli.Command{
+var invitationsList = cli.Command{
 	Name:    "list",
-	Usage:   "List regulatory addresses for this project.",
+	Usage:   "List partner invitations for this project.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
@@ -92,30 +83,35 @@ var addressesList = cli.Command{
 			Default:   50,
 			QueryPath: "limit",
 		},
+		&requestflag.Flag[string]{
+			Name:      "status",
+			Usage:     "Current status of the partner invitation.",
+			QueryPath: "status",
+		},
 		&requestflag.Flag[int64]{
 			Name:  "max-items",
 			Usage: "The maximum number of items to return (use -1 for unlimited).",
 		},
 	},
-	Action:          handleAddressesList,
+	Action:          handleInvitationsList,
 	HideHelpCommand: true,
 }
 
-var addressesDelete = cli.Command{
-	Name:    "delete",
-	Usage:   "Delete a regulatory address. Cannot delete addresses that are in use.",
+var invitationsCancel = cli.Command{
+	Name:    "cancel",
+	Usage:   "Cancel an active invitation. The client will no longer be able to use the\ninvitation link.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "address-id",
+			Name:     "invitation-id",
 			Required: true,
 		},
 	},
-	Action:          handleAddressesDelete,
+	Action:          handleInvitationsCancel,
 	HideHelpCommand: true,
 }
 
-func handleAddressesCreate(ctx context.Context, cmd *cli.Command) error {
+func handleInvitationsCreate(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
@@ -123,7 +119,7 @@ func handleAddressesCreate(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.AddressNewParams{}
+	params := zavudev.InvitationNewParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -138,7 +134,7 @@ func handleAddressesCreate(ctx context.Context, cmd *cli.Command) error {
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Addresses.New(ctx, params, options...)
+	_, err = client.Invitations.New(ctx, params, options...)
 	if err != nil {
 		return err
 	}
@@ -151,16 +147,16 @@ func handleAddressesCreate(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "addresses create",
+		Title:          "invitations create",
 		Transform:      transform,
 	})
 }
 
-func handleAddressesRetrieve(ctx context.Context, cmd *cli.Command) error {
+func handleInvitationsRetrieve(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("address-id") && len(unusedArgs) > 0 {
-		cmd.Set("address-id", unusedArgs[0])
+	if !cmd.IsSet("invitation-id") && len(unusedArgs) > 0 {
+		cmd.Set("invitation-id", unusedArgs[0])
 		unusedArgs = unusedArgs[1:]
 	}
 	if len(unusedArgs) > 0 {
@@ -180,7 +176,7 @@ func handleAddressesRetrieve(ctx context.Context, cmd *cli.Command) error {
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Addresses.Get(ctx, cmd.Value("address-id").(string), options...)
+	_, err = client.Invitations.Get(ctx, cmd.Value("invitation-id").(string), options...)
 	if err != nil {
 		return err
 	}
@@ -193,12 +189,12 @@ func handleAddressesRetrieve(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "addresses retrieve",
+		Title:          "invitations retrieve",
 		Transform:      transform,
 	})
 }
 
-func handleAddressesList(ctx context.Context, cmd *cli.Command) error {
+func handleInvitationsList(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
@@ -206,7 +202,7 @@ func handleAddressesList(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.AddressListParams{}
+	params := zavudev.InvitationListParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -225,7 +221,7 @@ func handleAddressesList(ctx context.Context, cmd *cli.Command) error {
 	if format == "raw" {
 		var res []byte
 		options = append(options, option.WithResponseBodyInto(&res))
-		_, err = client.Addresses.List(ctx, params, options...)
+		_, err = client.Invitations.List(ctx, params, options...)
 		if err != nil {
 			return err
 		}
@@ -234,11 +230,11 @@ func handleAddressesList(ctx context.Context, cmd *cli.Command) error {
 			ExplicitFormat: explicitFormat,
 			Format:         format,
 			RawOutput:      cmd.Root().Bool("raw-output"),
-			Title:          "addresses list",
+			Title:          "invitations list",
 			Transform:      transform,
 		})
 	} else {
-		iter := client.Addresses.ListAutoPaging(ctx, params, options...)
+		iter := client.Invitations.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
@@ -247,17 +243,17 @@ func handleAddressesList(ctx context.Context, cmd *cli.Command) error {
 			ExplicitFormat: explicitFormat,
 			Format:         format,
 			RawOutput:      cmd.Root().Bool("raw-output"),
-			Title:          "addresses list",
+			Title:          "invitations list",
 			Transform:      transform,
 		})
 	}
 }
 
-func handleAddressesDelete(ctx context.Context, cmd *cli.Command) error {
+func handleInvitationsCancel(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("address-id") && len(unusedArgs) > 0 {
-		cmd.Set("address-id", unusedArgs[0])
+	if !cmd.IsSet("invitation-id") && len(unusedArgs) > 0 {
+		cmd.Set("invitation-id", unusedArgs[0])
 		unusedArgs = unusedArgs[1:]
 	}
 	if len(unusedArgs) > 0 {
@@ -275,5 +271,22 @@ func handleAddressesDelete(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	return client.Addresses.Delete(ctx, cmd.Value("address-id").(string), options...)
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Invitations.Cancel(ctx, cmd.Value("invitation-id").(string), options...)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "invitations cancel",
+		Transform:      transform,
+	})
 }
