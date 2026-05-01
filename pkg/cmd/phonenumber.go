@@ -20,8 +20,9 @@ var phoneNumbersRetrieve = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "phone-number-id",
-			Required: true,
+			Name:      "phone-number-id",
+			Required:  true,
+			PathParam: "phoneNumberId",
 		},
 	},
 	Action:          handlePhoneNumbersRetrieve,
@@ -34,8 +35,9 @@ var phoneNumbersUpdate = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "phone-number-id",
-			Required: true,
+			Name:      "phone-number-id",
+			Required:  true,
+			PathParam: "phoneNumberId",
 		},
 		&requestflag.Flag[*string]{
 			Name:     "name",
@@ -108,8 +110,9 @@ var phoneNumbersRelease = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "phone-number-id",
-			Required: true,
+			Name:      "phone-number-id",
+			Required:  true,
+			PathParam: "phoneNumberId",
 		},
 	},
 	Action:          handlePhoneNumbersRelease,
@@ -222,8 +225,6 @@ func handlePhoneNumbersUpdate(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.PhoneNumberUpdateParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -234,6 +235,8 @@ func handlePhoneNumbersUpdate(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.PhoneNumberUpdateParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -268,8 +271,6 @@ func handlePhoneNumbersList(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.PhoneNumberListParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -280,6 +281,8 @@ func handlePhoneNumbersList(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.PhoneNumberListParams{}
 
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
@@ -323,8 +326,6 @@ func handlePhoneNumbersPurchase(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.PhoneNumberPurchaseParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -335,6 +336,8 @@ func handlePhoneNumbersPurchase(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.PhoneNumberPurchaseParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -389,8 +392,6 @@ func handlePhoneNumbersRequirements(ctx context.Context, cmd *cli.Command) error
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.PhoneNumberRequirementsParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -401,6 +402,8 @@ func handlePhoneNumbersRequirements(ctx context.Context, cmd *cli.Command) error
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.PhoneNumberRequirementsParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -430,8 +433,6 @@ func handlePhoneNumbersSearchAvailable(ctx context.Context, cmd *cli.Command) er
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.PhoneNumberSearchAvailableParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -442,6 +443,8 @@ func handlePhoneNumbersSearchAvailable(ctx context.Context, cmd *cli.Command) er
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.PhoneNumberSearchAvailableParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))

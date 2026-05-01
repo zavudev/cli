@@ -70,8 +70,9 @@ var addressesRetrieve = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "address-id",
-			Required: true,
+			Name:      "address-id",
+			Required:  true,
+			PathParam: "addressId",
 		},
 	},
 	Action:          handleAddressesRetrieve,
@@ -107,8 +108,9 @@ var addressesDelete = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "address-id",
-			Required: true,
+			Name:      "address-id",
+			Required:  true,
+			PathParam: "addressId",
 		},
 	},
 	Action:          handleAddressesDelete,
@@ -123,8 +125,6 @@ func handleAddressesCreate(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.AddressNewParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -135,6 +135,8 @@ func handleAddressesCreate(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.AddressNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -206,8 +208,6 @@ func handleAddressesList(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.AddressListParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -218,6 +218,8 @@ func handleAddressesList(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.AddressListParams{}
 
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")

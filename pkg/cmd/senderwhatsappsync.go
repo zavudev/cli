@@ -20,8 +20,9 @@ var sendersWhatsappSyncRetrieve = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 	},
 	Action:          handleSendersWhatsappSyncRetrieve,
@@ -34,8 +35,9 @@ var sendersWhatsappSyncStartContactsSync = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 	},
 	Action:          handleSendersWhatsappSyncStartContactsSync,
@@ -48,8 +50,9 @@ var sendersWhatsappSyncStartHistorySync = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 	},
 	Action:          handleSendersWhatsappSyncStartHistorySync,

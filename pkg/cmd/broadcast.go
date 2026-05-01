@@ -124,8 +124,9 @@ var broadcastsRetrieve = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 	},
 	Action:          handleBroadcastsRetrieve,
@@ -138,8 +139,9 @@ var broadcastsUpdate = requestflag.WithInnerFlags(cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 		&requestflag.Flag[map[string]any]{
 			Name:     "content",
@@ -243,8 +245,9 @@ var broadcastsDelete = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 	},
 	Action:          handleBroadcastsDelete,
@@ -257,8 +260,9 @@ var broadcastsCancel = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 	},
 	Action:          handleBroadcastsCancel,
@@ -271,8 +275,9 @@ var broadcastsEscalateReview = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 	},
 	Action:          handleBroadcastsEscalateReview,
@@ -285,8 +290,9 @@ var broadcastsProgress = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 	},
 	Action:          handleBroadcastsProgress,
@@ -299,8 +305,9 @@ var broadcastsReschedule = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 		&requestflag.Flag[any]{
 			Name:     "scheduled-at",
@@ -319,8 +326,9 @@ var broadcastsRetryReview = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 	},
 	Action:          handleBroadcastsRetryReview,
@@ -333,8 +341,9 @@ var broadcastsSend = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 		&requestflag.Flag[any]{
 			Name:     "scheduled-at",
@@ -354,8 +363,6 @@ func handleBroadcastsCreate(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.BroadcastNewParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -366,6 +373,8 @@ func handleBroadcastsCreate(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.BroadcastNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -440,8 +449,6 @@ func handleBroadcastsUpdate(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.BroadcastUpdateParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -452,6 +459,8 @@ func handleBroadcastsUpdate(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.BroadcastUpdateParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -486,8 +495,6 @@ func handleBroadcastsList(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.BroadcastListParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -498,6 +505,8 @@ func handleBroadcastsList(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.BroadcastListParams{}
 
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
@@ -695,8 +704,6 @@ func handleBroadcastsReschedule(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.BroadcastRescheduleParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -707,6 +714,8 @@ func handleBroadcastsReschedule(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.BroadcastRescheduleParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -786,8 +795,6 @@ func handleBroadcastsSend(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.BroadcastSendParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -798,6 +805,8 @@ func handleBroadcastsSend(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.BroadcastSendParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))

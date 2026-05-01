@@ -74,8 +74,9 @@ var contactsRetrieve = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "contact-id",
-			Required: true,
+			Name:      "contact-id",
+			Required:  true,
+			PathParam: "contactId",
 		},
 	},
 	Action:          handleContactsRetrieve,
@@ -88,8 +89,9 @@ var contactsUpdate = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "contact-id",
-			Required: true,
+			Name:      "contact-id",
+			Required:  true,
+			PathParam: "contactId",
 		},
 		&requestflag.Flag[*string]{
 			Name:     "default-channel",
@@ -138,8 +140,9 @@ var contactsDismissMergeSuggestion = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "contact-id",
-			Required: true,
+			Name:      "contact-id",
+			Required:  true,
+			PathParam: "contactId",
 		},
 	},
 	Action:          handleContactsDismissMergeSuggestion,
@@ -152,8 +155,9 @@ var contactsMerge = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "contact-id",
-			Required: true,
+			Name:      "contact-id",
+			Required:  true,
+			PathParam: "contactId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "source-contact-id",
@@ -172,8 +176,9 @@ var contactsRetrieveByPhone = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "phone-number",
-			Required: true,
+			Name:      "phone-number",
+			Required:  true,
+			PathParam: "phoneNumber",
 		},
 	},
 	Action:          handleContactsRetrieveByPhone,
@@ -188,8 +193,6 @@ func handleContactsCreate(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.ContactNewParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -200,6 +203,8 @@ func handleContactsCreate(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.ContactNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -274,8 +279,6 @@ func handleContactsUpdate(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.ContactUpdateParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -286,6 +289,8 @@ func handleContactsUpdate(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.ContactUpdateParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -320,8 +325,6 @@ func handleContactsList(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.ContactListParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -332,6 +335,8 @@ func handleContactsList(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.ContactListParams{}
 
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
@@ -403,8 +408,6 @@ func handleContactsMerge(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.ContactMergeParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -415,6 +418,8 @@ func handleContactsMerge(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.ContactMergeParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))

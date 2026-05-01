@@ -57,8 +57,9 @@ var regulatoryDocumentsRetrieve = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "document-id",
-			Required: true,
+			Name:      "document-id",
+			Required:  true,
+			PathParam: "documentId",
 		},
 	},
 	Action:          handleRegulatoryDocumentsRetrieve,
@@ -94,8 +95,9 @@ var regulatoryDocumentsDelete = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "document-id",
-			Required: true,
+			Name:      "document-id",
+			Required:  true,
+			PathParam: "documentId",
 		},
 	},
 	Action:          handleRegulatoryDocumentsDelete,
@@ -119,8 +121,6 @@ func handleRegulatoryDocumentsCreate(ctx context.Context, cmd *cli.Command) erro
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.RegulatoryDocumentNewParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -131,6 +131,8 @@ func handleRegulatoryDocumentsCreate(ctx context.Context, cmd *cli.Command) erro
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.RegulatoryDocumentNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -202,8 +204,6 @@ func handleRegulatoryDocumentsList(ctx context.Context, cmd *cli.Command) error 
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.RegulatoryDocumentListParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -214,6 +214,8 @@ func handleRegulatoryDocumentsList(ctx context.Context, cmd *cli.Command) error 
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.RegulatoryDocumentListParams{}
 
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")

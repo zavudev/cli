@@ -122,8 +122,9 @@ var number10dlcCampaignsRetrieve = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "campaign-id",
-			Required: true,
+			Name:      "campaign-id",
+			Required:  true,
+			PathParam: "campaignId",
 		},
 	},
 	Action:          handleNumber10dlcCampaignsRetrieve,
@@ -136,8 +137,9 @@ var number10dlcCampaignsUpdate = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "campaign-id",
-			Required: true,
+			Name:      "campaign-id",
+			Required:  true,
+			PathParam: "campaignId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "description",
@@ -206,8 +208,9 @@ var number10dlcCampaignsDelete = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "campaign-id",
-			Required: true,
+			Name:      "campaign-id",
+			Required:  true,
+			PathParam: "campaignId",
 		},
 	},
 	Action:          handleNumber10dlcCampaignsDelete,
@@ -220,8 +223,9 @@ var number10dlcCampaignsSubmit = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "campaign-id",
-			Required: true,
+			Name:      "campaign-id",
+			Required:  true,
+			PathParam: "campaignId",
 		},
 	},
 	Action:          handleNumber10dlcCampaignsSubmit,
@@ -234,8 +238,9 @@ var number10dlcCampaignsSyncStatus = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "campaign-id",
-			Required: true,
+			Name:      "campaign-id",
+			Required:  true,
+			PathParam: "campaignId",
 		},
 	},
 	Action:          handleNumber10dlcCampaignsSyncStatus,
@@ -250,8 +255,6 @@ func handleNumber10dlcCampaignsCreate(ctx context.Context, cmd *cli.Command) err
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.Number10dlcCampaignNewParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -262,6 +265,8 @@ func handleNumber10dlcCampaignsCreate(ctx context.Context, cmd *cli.Command) err
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.Number10dlcCampaignNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -336,8 +341,6 @@ func handleNumber10dlcCampaignsUpdate(ctx context.Context, cmd *cli.Command) err
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.Number10dlcCampaignUpdateParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -348,6 +351,8 @@ func handleNumber10dlcCampaignsUpdate(ctx context.Context, cmd *cli.Command) err
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.Number10dlcCampaignUpdateParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -382,8 +387,6 @@ func handleNumber10dlcCampaignsList(ctx context.Context, cmd *cli.Command) error
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.Number10dlcCampaignListParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -394,6 +397,8 @@ func handleNumber10dlcCampaignsList(ctx context.Context, cmd *cli.Command) error
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.Number10dlcCampaignListParams{}
 
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
