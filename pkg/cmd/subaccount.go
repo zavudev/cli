@@ -67,7 +67,7 @@ var subAccountsUpdate = cli.Command{
 			Name:     "id",
 			Required: true,
 		},
-		&requestflag.Flag[any]{
+		&requestflag.Flag[*int64]{
 			Name:     "credit-limit",
 			BodyPath: "creditLimit",
 		},

@@ -72,7 +72,7 @@ var sendersAgentFlowsCreate = requestflag.WithInnerFlags(cli.Command{
 			Usage:      "Type of flow step.",
 			InnerField: "type",
 		},
-		&requestflag.InnerFlag[any]{
+		&requestflag.InnerFlag[*string]{
 			Name:       "step.next-step-id",
 			Usage:      "ID of the next step to execute.",
 			InnerField: "nextStepId",
@@ -172,7 +172,7 @@ var sendersAgentFlowsUpdate = requestflag.WithInnerFlags(cli.Command{
 			Usage:      "Type of flow step.",
 			InnerField: "type",
 		},
-		&requestflag.InnerFlag[any]{
+		&requestflag.InnerFlag[*string]{
 			Name:       "step.next-step-id",
 			Usage:      "ID of the next step to execute.",
 			InnerField: "nextStepId",

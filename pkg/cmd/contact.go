@@ -91,7 +91,7 @@ var contactsUpdate = cli.Command{
 			Name:     "contact-id",
 			Required: true,
 		},
-		&requestflag.Flag[any]{
+		&requestflag.Flag[*string]{
 			Name:     "default-channel",
 			Usage:    "Preferred channel for this contact. Set to null to clear.",
 			BodyPath: "defaultChannel",

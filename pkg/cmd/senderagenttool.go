@@ -122,7 +122,7 @@ var sendersAgentToolsUpdate = requestflag.WithInnerFlags(cli.Command{
 			Name:     "parameters",
 			BodyPath: "parameters",
 		},
-		&requestflag.Flag[any]{
+		&requestflag.Flag[*string]{
 			Name:     "webhook-secret",
 			BodyPath: "webhookSecret",
 		},

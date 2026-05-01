@@ -95,7 +95,7 @@ var sendersUpdate = cli.Command{
 			Usage:    "Events to subscribe to.",
 			BodyPath: "webhookEvents",
 		},
-		&requestflag.Flag[any]{
+		&requestflag.Flag[*string]{
 			Name:     "webhook-url",
 			Usage:    "HTTPS URL for webhook events. Set to null to remove webhook.",
 			BodyPath: "webhookUrl",

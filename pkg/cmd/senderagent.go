@@ -121,7 +121,7 @@ var sendersAgentUpdate = cli.Command{
 			Name:     "include-contact-metadata",
 			BodyPath: "includeContactMetadata",
 		},
-		&requestflag.Flag[any]{
+		&requestflag.Flag[*int64]{
 			Name:     "max-tokens",
 			BodyPath: "maxTokens",
 		},
@@ -142,7 +142,7 @@ var sendersAgentUpdate = cli.Command{
 			Name:     "system-prompt",
 			BodyPath: "systemPrompt",
 		},
-		&requestflag.Flag[any]{
+		&requestflag.Flag[*float64]{
 			Name:     "temperature",
 			BodyPath: "temperature",
 		},

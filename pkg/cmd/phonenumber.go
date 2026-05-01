@@ -37,12 +37,12 @@ var phoneNumbersUpdate = cli.Command{
 			Name:     "phone-number-id",
 			Required: true,
 		},
-		&requestflag.Flag[any]{
+		&requestflag.Flag[*string]{
 			Name:     "name",
 			Usage:    "Custom name for the phone number. Set to null to clear.",
 			BodyPath: "name",
 		},
-		&requestflag.Flag[any]{
+		&requestflag.Flag[*string]{
 			Name:     "sender-id",
 			Usage:    "Sender ID to assign the phone number to. Set to null to unassign.",
 			BodyPath: "senderId",
