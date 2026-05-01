@@ -115,8 +115,9 @@ var number10dlcBrandsRetrieve = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "brand-id",
-			Required: true,
+			Name:      "brand-id",
+			Required:  true,
+			PathParam: "brandId",
 		},
 	},
 	Action:          handleNumber10dlcBrandsRetrieve,
@@ -129,8 +130,9 @@ var number10dlcBrandsUpdate = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "brand-id",
-			Required: true,
+			Name:      "brand-id",
+			Required:  true,
+			PathParam: "brandId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "city",
@@ -235,8 +237,9 @@ var number10dlcBrandsDelete = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "brand-id",
-			Required: true,
+			Name:      "brand-id",
+			Required:  true,
+			PathParam: "brandId",
 		},
 	},
 	Action:          handleNumber10dlcBrandsDelete,
@@ -258,8 +261,9 @@ var number10dlcBrandsSubmit = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "brand-id",
-			Required: true,
+			Name:      "brand-id",
+			Required:  true,
+			PathParam: "brandId",
 		},
 	},
 	Action:          handleNumber10dlcBrandsSubmit,
@@ -272,8 +276,9 @@ var number10dlcBrandsSyncStatus = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "brand-id",
-			Required: true,
+			Name:      "brand-id",
+			Required:  true,
+			PathParam: "brandId",
 		},
 	},
 	Action:          handleNumber10dlcBrandsSyncStatus,
@@ -288,8 +293,6 @@ func handleNumber10dlcBrandsCreate(ctx context.Context, cmd *cli.Command) error 
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.Number10dlcBrandNewParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -300,6 +303,8 @@ func handleNumber10dlcBrandsCreate(ctx context.Context, cmd *cli.Command) error 
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.Number10dlcBrandNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -374,8 +379,6 @@ func handleNumber10dlcBrandsUpdate(ctx context.Context, cmd *cli.Command) error 
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.Number10dlcBrandUpdateParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -386,6 +389,8 @@ func handleNumber10dlcBrandsUpdate(ctx context.Context, cmd *cli.Command) error 
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.Number10dlcBrandUpdateParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -420,8 +425,6 @@ func handleNumber10dlcBrandsList(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.Number10dlcBrandListParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -432,6 +435,8 @@ func handleNumber10dlcBrandsList(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.Number10dlcBrandListParams{}
 
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")

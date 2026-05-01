@@ -20,12 +20,14 @@ var contactsChannelsUpdate = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "contact-id",
-			Required: true,
+			Name:      "contact-id",
+			Required:  true,
+			PathParam: "contactId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "channel-id",
-			Required: true,
+			Name:      "channel-id",
+			Required:  true,
+			PathParam: "channelId",
 		},
 		&requestflag.Flag[*string]{
 			Name:     "label",
@@ -52,8 +54,9 @@ var contactsChannelsAdd = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "contact-id",
-			Required: true,
+			Name:      "contact-id",
+			Required:  true,
+			PathParam: "contactId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "channel",
@@ -94,12 +97,14 @@ var contactsChannelsRemove = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "contact-id",
-			Required: true,
+			Name:      "contact-id",
+			Required:  true,
+			PathParam: "contactId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "channel-id",
-			Required: true,
+			Name:      "channel-id",
+			Required:  true,
+			PathParam: "channelId",
 		},
 	},
 	Action:          handleContactsChannelsRemove,
@@ -112,12 +117,14 @@ var contactsChannelsSetPrimary = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "contact-id",
-			Required: true,
+			Name:      "contact-id",
+			Required:  true,
+			PathParam: "contactId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "channel-id",
-			Required: true,
+			Name:      "channel-id",
+			Required:  true,
+			PathParam: "channelId",
 		},
 	},
 	Action:          handleContactsChannelsSetPrimary,
@@ -135,10 +142,6 @@ func handleContactsChannelsUpdate(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.ContactChannelUpdateParams{
-		ContactID: cmd.Value("contact-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -148,6 +151,10 @@ func handleContactsChannelsUpdate(ctx context.Context, cmd *cli.Command) error {
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.ContactChannelUpdateParams{
+		ContactID: cmd.Value("contact-id").(string),
 	}
 
 	var res []byte
@@ -186,8 +193,6 @@ func handleContactsChannelsAdd(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.ContactChannelAddParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -198,6 +203,8 @@ func handleContactsChannelsAdd(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.ContactChannelAddParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -235,10 +242,6 @@ func handleContactsChannelsRemove(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.ContactChannelRemoveParams{
-		ContactID: cmd.Value("contact-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -248,6 +251,10 @@ func handleContactsChannelsRemove(ctx context.Context, cmd *cli.Command) error {
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.ContactChannelRemoveParams{
+		ContactID: cmd.Value("contact-id").(string),
 	}
 
 	return client.Contacts.Channels.Remove(
@@ -269,10 +276,6 @@ func handleContactsChannelsSetPrimary(ctx context.Context, cmd *cli.Command) err
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.ContactChannelSetPrimaryParams{
-		ContactID: cmd.Value("contact-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -282,6 +285,10 @@ func handleContactsChannelsSetPrimary(ctx context.Context, cmd *cli.Command) err
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.ContactChannelSetPrimaryParams{
+		ContactID: cmd.Value("contact-id").(string),
 	}
 
 	var res []byte

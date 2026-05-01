@@ -20,8 +20,9 @@ var sendersAgentToolsCreate = requestflag.WithInnerFlags(cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "description",
@@ -81,12 +82,14 @@ var sendersAgentToolsRetrieve = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "tool-id",
-			Required: true,
+			Name:      "tool-id",
+			Required:  true,
+			PathParam: "toolId",
 		},
 	},
 	Action:          handleSendersAgentToolsRetrieve,
@@ -99,12 +102,14 @@ var sendersAgentToolsUpdate = requestflag.WithInnerFlags(cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "tool-id",
-			Required: true,
+			Name:      "tool-id",
+			Required:  true,
+			PathParam: "toolId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "description",
@@ -157,8 +162,9 @@ var sendersAgentToolsList = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
 			Name:      "cursor",
@@ -188,12 +194,14 @@ var sendersAgentToolsDelete = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "tool-id",
-			Required: true,
+			Name:      "tool-id",
+			Required:  true,
+			PathParam: "toolId",
 		},
 	},
 	Action:          handleSendersAgentToolsDelete,
@@ -206,12 +214,14 @@ var sendersAgentToolsTest = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "tool-id",
-			Required: true,
+			Name:      "tool-id",
+			Required:  true,
+			PathParam: "toolId",
 		},
 		&requestflag.Flag[map[string]any]{
 			Name:     "test-params",
@@ -235,8 +245,6 @@ func handleSendersAgentToolsCreate(ctx context.Context, cmd *cli.Command) error 
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentToolNewParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -247,6 +255,8 @@ func handleSendersAgentToolsCreate(ctx context.Context, cmd *cli.Command) error 
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.SenderAgentToolNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -284,10 +294,6 @@ func handleSendersAgentToolsRetrieve(ctx context.Context, cmd *cli.Command) erro
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentToolGetParams{
-		SenderID: cmd.Value("sender-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -297,6 +303,10 @@ func handleSendersAgentToolsRetrieve(ctx context.Context, cmd *cli.Command) erro
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.SenderAgentToolGetParams{
+		SenderID: cmd.Value("sender-id").(string),
 	}
 
 	var res []byte
@@ -335,10 +345,6 @@ func handleSendersAgentToolsUpdate(ctx context.Context, cmd *cli.Command) error 
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentToolUpdateParams{
-		SenderID: cmd.Value("sender-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -348,6 +354,10 @@ func handleSendersAgentToolsUpdate(ctx context.Context, cmd *cli.Command) error 
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.SenderAgentToolUpdateParams{
+		SenderID: cmd.Value("sender-id").(string),
 	}
 
 	var res []byte
@@ -386,8 +396,6 @@ func handleSendersAgentToolsList(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentToolListParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -398,6 +406,8 @@ func handleSendersAgentToolsList(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.SenderAgentToolListParams{}
 
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
@@ -454,10 +464,6 @@ func handleSendersAgentToolsDelete(ctx context.Context, cmd *cli.Command) error 
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentToolDeleteParams{
-		SenderID: cmd.Value("sender-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -467,6 +473,10 @@ func handleSendersAgentToolsDelete(ctx context.Context, cmd *cli.Command) error 
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.SenderAgentToolDeleteParams{
+		SenderID: cmd.Value("sender-id").(string),
 	}
 
 	return client.Senders.Agent.Tools.Delete(
@@ -488,10 +498,6 @@ func handleSendersAgentToolsTest(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentToolTestParams{
-		SenderID: cmd.Value("sender-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -501,6 +507,10 @@ func handleSendersAgentToolsTest(ctx context.Context, cmd *cli.Command) error {
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.SenderAgentToolTestParams{
+		SenderID: cmd.Value("sender-id").(string),
 	}
 
 	var res []byte

@@ -20,8 +20,9 @@ var number10dlcCampaignsPhoneNumbersList = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "campaign-id",
-			Required: true,
+			Name:      "campaign-id",
+			Required:  true,
+			PathParam: "campaignId",
 		},
 	},
 	Action:          handleNumber10dlcCampaignsPhoneNumbersList,
@@ -34,8 +35,9 @@ var number10dlcCampaignsPhoneNumbersAssign = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "campaign-id",
-			Required: true,
+			Name:      "campaign-id",
+			Required:  true,
+			PathParam: "campaignId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "phone-number-id",
@@ -54,12 +56,14 @@ var number10dlcCampaignsPhoneNumbersUnassign = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "campaign-id",
-			Required: true,
+			Name:      "campaign-id",
+			Required:  true,
+			PathParam: "campaignId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "assignment-id",
-			Required: true,
+			Name:      "assignment-id",
+			Required:  true,
+			PathParam: "assignmentId",
 		},
 	},
 	Action:          handleNumber10dlcCampaignsPhoneNumbersUnassign,
@@ -119,8 +123,6 @@ func handleNumber10dlcCampaignsPhoneNumbersAssign(ctx context.Context, cmd *cli.
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.Number10dlcCampaignPhoneNumberAssignParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -131,6 +133,8 @@ func handleNumber10dlcCampaignsPhoneNumbersAssign(ctx context.Context, cmd *cli.
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.Number10dlcCampaignPhoneNumberAssignParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -168,10 +172,6 @@ func handleNumber10dlcCampaignsPhoneNumbersUnassign(ctx context.Context, cmd *cl
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.Number10dlcCampaignPhoneNumberUnassignParams{
-		CampaignID: cmd.Value("campaign-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -181,6 +181,10 @@ func handleNumber10dlcCampaignsPhoneNumbersUnassign(ctx context.Context, cmd *cl
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.Number10dlcCampaignPhoneNumberUnassignParams{
+		CampaignID: cmd.Value("campaign-id").(string),
 	}
 
 	return client.Number10dlc.Campaigns.PhoneNumbers.Unassign(

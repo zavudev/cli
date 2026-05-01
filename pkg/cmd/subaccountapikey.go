@@ -20,8 +20,9 @@ var subAccountsAPIKeysCreate = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "id",
-			Required: true,
+			Name:      "id",
+			Required:  true,
+			PathParam: "id",
 		},
 		&requestflag.Flag[string]{
 			Name:     "name",
@@ -49,8 +50,9 @@ var subAccountsAPIKeysList = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "id",
-			Required: true,
+			Name:      "id",
+			Required:  true,
+			PathParam: "id",
 		},
 	},
 	Action:          handleSubAccountsAPIKeysList,
@@ -63,12 +65,14 @@ var subAccountsAPIKeysRevoke = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "id",
-			Required: true,
+			Name:      "id",
+			Required:  true,
+			PathParam: "id",
 		},
 		&requestflag.Flag[string]{
-			Name:     "key-id",
-			Required: true,
+			Name:      "key-id",
+			Required:  true,
+			PathParam: "keyId",
 		},
 	},
 	Action:          handleSubAccountsAPIKeysRevoke,
@@ -86,8 +90,6 @@ func handleSubAccountsAPIKeysCreate(ctx context.Context, cmd *cli.Command) error
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SubAccountAPIKeyNewParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -98,6 +100,8 @@ func handleSubAccountsAPIKeysCreate(ctx context.Context, cmd *cli.Command) error
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.SubAccountAPIKeyNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -177,10 +181,6 @@ func handleSubAccountsAPIKeysRevoke(ctx context.Context, cmd *cli.Command) error
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SubAccountAPIKeyRevokeParams{
-		ID: cmd.Value("id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -190,6 +190,10 @@ func handleSubAccountsAPIKeysRevoke(ctx context.Context, cmd *cli.Command) error
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.SubAccountAPIKeyRevokeParams{
+		ID: cmd.Value("id").(string),
 	}
 
 	return client.SubAccounts.APIKeys.Revoke(

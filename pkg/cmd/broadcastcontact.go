@@ -20,8 +20,9 @@ var broadcastsContactsList = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 		&requestflag.Flag[string]{
 			Name:      "cursor",
@@ -52,8 +53,9 @@ var broadcastsContactsAdd = requestflag.WithInnerFlags(cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 		&requestflag.Flag[[]map[string]any]{
 			Name:     "contact",
@@ -90,12 +92,14 @@ var broadcastsContactsRemove = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "contact-id",
-			Required: true,
+			Name:      "contact-id",
+			Required:  true,
+			PathParam: "contactId",
 		},
 	},
 	Action:          handleBroadcastsContactsRemove,
@@ -113,8 +117,6 @@ func handleBroadcastsContactsList(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.BroadcastContactListParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -125,6 +127,8 @@ func handleBroadcastsContactsList(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.BroadcastContactListParams{}
 
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
@@ -181,8 +185,6 @@ func handleBroadcastsContactsAdd(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.BroadcastContactAddParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -193,6 +195,8 @@ func handleBroadcastsContactsAdd(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.BroadcastContactAddParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -230,10 +234,6 @@ func handleBroadcastsContactsRemove(ctx context.Context, cmd *cli.Command) error
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.BroadcastContactRemoveParams{
-		BroadcastID: cmd.Value("broadcast-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -243,6 +243,10 @@ func handleBroadcastsContactsRemove(ctx context.Context, cmd *cli.Command) error
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.BroadcastContactRemoveParams{
+		BroadcastID: cmd.Value("broadcast-id").(string),
 	}
 
 	return client.Broadcasts.Contacts.Remove(
