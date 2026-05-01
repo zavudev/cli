@@ -27,7 +27,7 @@ var contactsChannelsUpdate = cli.Command{
 			Name:     "channel-id",
 			Required: true,
 		},
-		&requestflag.Flag[any]{
+		&requestflag.Flag[*string]{
 			Name:     "label",
 			Usage:    "Optional label for the channel. Set to null to clear.",
 			BodyPath: "label",
