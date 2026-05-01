@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -21,12 +20,14 @@ var sendersAgentKnowledgeBasesDocumentsCreate = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "kb-id",
-			Required: true,
+			Name:      "kb-id",
+			Required:  true,
+			PathParam: "kbId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "content",
@@ -49,12 +50,14 @@ var sendersAgentKnowledgeBasesDocumentsList = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "kb-id",
-			Required: true,
+			Name:      "kb-id",
+			Required:  true,
+			PathParam: "kbId",
 		},
 		&requestflag.Flag[string]{
 			Name:      "cursor",
@@ -80,16 +83,19 @@ var sendersAgentKnowledgeBasesDocumentsDelete = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "kb-id",
-			Required: true,
+			Name:      "kb-id",
+			Required:  true,
+			PathParam: "kbId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "doc-id",
-			Required: true,
+			Name:      "doc-id",
+			Required:  true,
+			PathParam: "docId",
 		},
 	},
 	Action:          handleSendersAgentKnowledgeBasesDocumentsDelete,
@@ -107,10 +113,6 @@ func handleSendersAgentKnowledgeBasesDocumentsCreate(ctx context.Context, cmd *c
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentKnowledgeBaseDocumentNewParams{
-		SenderID: cmd.Value("sender-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -120,6 +122,10 @@ func handleSendersAgentKnowledgeBasesDocumentsCreate(ctx context.Context, cmd *c
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.SenderAgentKnowledgeBaseDocumentNewParams{
+		SenderID: cmd.Value("sender-id").(string),
 	}
 
 	var res []byte
@@ -136,8 +142,15 @@ func handleSendersAgentKnowledgeBasesDocumentsCreate(ctx context.Context, cmd *c
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent:knowledge-bases:documents create", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders:agent:knowledge-bases:documents create",
+		Transform:      transform,
+	})
 }
 
 func handleSendersAgentKnowledgeBasesDocumentsList(ctx context.Context, cmd *cli.Command) error {
@@ -151,10 +164,6 @@ func handleSendersAgentKnowledgeBasesDocumentsList(ctx context.Context, cmd *cli
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentKnowledgeBaseDocumentListParams{
-		SenderID: cmd.Value("sender-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -166,7 +175,12 @@ func handleSendersAgentKnowledgeBasesDocumentsList(ctx context.Context, cmd *cli
 		return err
 	}
 
+	params := zavudev.SenderAgentKnowledgeBaseDocumentListParams{
+		SenderID: cmd.Value("sender-id").(string),
+	}
+
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -181,7 +195,13 @@ func handleSendersAgentKnowledgeBasesDocumentsList(ctx context.Context, cmd *cli
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "senders:agent:knowledge-bases:documents list", obj, format, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "senders:agent:knowledge-bases:documents list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.Senders.Agent.KnowledgeBases.Documents.ListAutoPaging(
 			ctx,
@@ -193,7 +213,13 @@ func handleSendersAgentKnowledgeBasesDocumentsList(ctx context.Context, cmd *cli
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "senders:agent:knowledge-bases:documents list", iter, format, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "senders:agent:knowledge-bases:documents list",
+			Transform:      transform,
+		})
 	}
 }
 
@@ -208,11 +234,6 @@ func handleSendersAgentKnowledgeBasesDocumentsDelete(ctx context.Context, cmd *c
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentKnowledgeBaseDocumentDeleteParams{
-		SenderID: cmd.Value("sender-id").(string),
-		KBID:     cmd.Value("kb-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -222,6 +243,11 @@ func handleSendersAgentKnowledgeBasesDocumentsDelete(ctx context.Context, cmd *c
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.SenderAgentKnowledgeBaseDocumentDeleteParams{
+		SenderID: cmd.Value("sender-id").(string),
+		KBID:     cmd.Value("kb-id").(string),
 	}
 
 	return client.Senders.Agent.KnowledgeBases.Documents.Delete(

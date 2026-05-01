@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -21,8 +20,9 @@ var phoneNumbersRetrieve = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "phone-number-id",
-			Required: true,
+			Name:      "phone-number-id",
+			Required:  true,
+			PathParam: "phoneNumberId",
 		},
 	},
 	Action:          handlePhoneNumbersRetrieve,
@@ -35,15 +35,16 @@ var phoneNumbersUpdate = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "phone-number-id",
-			Required: true,
+			Name:      "phone-number-id",
+			Required:  true,
+			PathParam: "phoneNumberId",
 		},
-		&requestflag.Flag[any]{
+		&requestflag.Flag[*string]{
 			Name:     "name",
 			Usage:    "Custom name for the phone number. Set to null to clear.",
 			BodyPath: "name",
 		},
-		&requestflag.Flag[any]{
+		&requestflag.Flag[*string]{
 			Name:     "sender-id",
 			Usage:    "Sender ID to assign the phone number to. Set to null to unassign.",
 			BodyPath: "senderId",
@@ -109,8 +110,9 @@ var phoneNumbersRelease = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "phone-number-id",
-			Required: true,
+			Name:      "phone-number-id",
+			Required:  true,
+			PathParam: "phoneNumberId",
 		},
 	},
 	Action:          handlePhoneNumbersRelease,
@@ -201,8 +203,15 @@ func handlePhoneNumbersRetrieve(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "phone-numbers retrieve", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "phone-numbers retrieve",
+		Transform:      transform,
+	})
 }
 
 func handlePhoneNumbersUpdate(ctx context.Context, cmd *cli.Command) error {
@@ -216,8 +225,6 @@ func handlePhoneNumbersUpdate(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.PhoneNumberUpdateParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -228,6 +235,8 @@ func handlePhoneNumbersUpdate(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.PhoneNumberUpdateParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -243,8 +252,15 @@ func handlePhoneNumbersUpdate(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "phone-numbers update", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "phone-numbers update",
+		Transform:      transform,
+	})
 }
 
 func handlePhoneNumbersList(ctx context.Context, cmd *cli.Command) error {
@@ -254,8 +270,6 @@ func handlePhoneNumbersList(ctx context.Context, cmd *cli.Command) error {
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
-
-	params := zavudev.PhoneNumberListParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -268,7 +282,10 @@ func handlePhoneNumbersList(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	params := zavudev.PhoneNumberListParams{}
+
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -278,14 +295,26 @@ func handlePhoneNumbersList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "phone-numbers list", obj, format, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "phone-numbers list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.PhoneNumbers.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "phone-numbers list", iter, format, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "phone-numbers list",
+			Transform:      transform,
+		})
 	}
 }
 
@@ -296,8 +325,6 @@ func handlePhoneNumbersPurchase(ctx context.Context, cmd *cli.Command) error {
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
-
-	params := zavudev.PhoneNumberPurchaseParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -310,6 +337,8 @@ func handlePhoneNumbersPurchase(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	params := zavudev.PhoneNumberPurchaseParams{}
+
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
 	_, err = client.PhoneNumbers.Purchase(ctx, params, options...)
@@ -319,8 +348,15 @@ func handlePhoneNumbersPurchase(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "phone-numbers purchase", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "phone-numbers purchase",
+		Transform:      transform,
+	})
 }
 
 func handlePhoneNumbersRelease(ctx context.Context, cmd *cli.Command) error {
@@ -356,8 +392,6 @@ func handlePhoneNumbersRequirements(ctx context.Context, cmd *cli.Command) error
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.PhoneNumberRequirementsParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -368,6 +402,8 @@ func handlePhoneNumbersRequirements(ctx context.Context, cmd *cli.Command) error
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.PhoneNumberRequirementsParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -378,8 +414,15 @@ func handlePhoneNumbersRequirements(ctx context.Context, cmd *cli.Command) error
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "phone-numbers requirements", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "phone-numbers requirements",
+		Transform:      transform,
+	})
 }
 
 func handlePhoneNumbersSearchAvailable(ctx context.Context, cmd *cli.Command) error {
@@ -389,8 +432,6 @@ func handlePhoneNumbersSearchAvailable(ctx context.Context, cmd *cli.Command) er
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
-
-	params := zavudev.PhoneNumberSearchAvailableParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -403,6 +444,8 @@ func handlePhoneNumbersSearchAvailable(ctx context.Context, cmd *cli.Command) er
 		return err
 	}
 
+	params := zavudev.PhoneNumberSearchAvailableParams{}
+
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
 	_, err = client.PhoneNumbers.SearchAvailable(ctx, params, options...)
@@ -412,6 +455,13 @@ func handlePhoneNumbersSearchAvailable(ctx context.Context, cmd *cli.Command) er
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "phone-numbers search-available", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "phone-numbers search-available",
+		Transform:      transform,
+	})
 }

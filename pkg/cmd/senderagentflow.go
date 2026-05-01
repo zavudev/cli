@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -21,8 +20,9 @@ var sendersAgentFlowsCreate = requestflag.WithInnerFlags(cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "name",
@@ -73,7 +73,7 @@ var sendersAgentFlowsCreate = requestflag.WithInnerFlags(cli.Command{
 			Usage:      "Type of flow step.",
 			InnerField: "type",
 		},
-		&requestflag.InnerFlag[any]{
+		&requestflag.InnerFlag[*string]{
 			Name:       "step.next-step-id",
 			Usage:      "ID of the next step to execute.",
 			InnerField: "nextStepId",
@@ -104,12 +104,14 @@ var sendersAgentFlowsRetrieve = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "flow-id",
-			Required: true,
+			Name:      "flow-id",
+			Required:  true,
+			PathParam: "flowId",
 		},
 	},
 	Action:          handleSendersAgentFlowsRetrieve,
@@ -122,12 +124,14 @@ var sendersAgentFlowsUpdate = requestflag.WithInnerFlags(cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "flow-id",
-			Required: true,
+			Name:      "flow-id",
+			Required:  true,
+			PathParam: "flowId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "description",
@@ -173,7 +177,7 @@ var sendersAgentFlowsUpdate = requestflag.WithInnerFlags(cli.Command{
 			Usage:      "Type of flow step.",
 			InnerField: "type",
 		},
-		&requestflag.InnerFlag[any]{
+		&requestflag.InnerFlag[*string]{
 			Name:       "step.next-step-id",
 			Usage:      "ID of the next step to execute.",
 			InnerField: "nextStepId",
@@ -204,8 +208,9 @@ var sendersAgentFlowsList = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
 			Name:      "cursor",
@@ -235,12 +240,14 @@ var sendersAgentFlowsDelete = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "flow-id",
-			Required: true,
+			Name:      "flow-id",
+			Required:  true,
+			PathParam: "flowId",
 		},
 	},
 	Action:          handleSendersAgentFlowsDelete,
@@ -253,12 +260,14 @@ var sendersAgentFlowsDuplicate = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "flow-id",
-			Required: true,
+			Name:      "flow-id",
+			Required:  true,
+			PathParam: "flowId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "new-name",
@@ -281,8 +290,6 @@ func handleSendersAgentFlowsCreate(ctx context.Context, cmd *cli.Command) error 
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentFlowNewParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -293,6 +300,8 @@ func handleSendersAgentFlowsCreate(ctx context.Context, cmd *cli.Command) error 
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.SenderAgentFlowNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -308,8 +317,15 @@ func handleSendersAgentFlowsCreate(ctx context.Context, cmd *cli.Command) error 
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent:flows create", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders:agent:flows create",
+		Transform:      transform,
+	})
 }
 
 func handleSendersAgentFlowsRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -323,10 +339,6 @@ func handleSendersAgentFlowsRetrieve(ctx context.Context, cmd *cli.Command) erro
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentFlowGetParams{
-		SenderID: cmd.Value("sender-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -336,6 +348,10 @@ func handleSendersAgentFlowsRetrieve(ctx context.Context, cmd *cli.Command) erro
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.SenderAgentFlowGetParams{
+		SenderID: cmd.Value("sender-id").(string),
 	}
 
 	var res []byte
@@ -352,8 +368,15 @@ func handleSendersAgentFlowsRetrieve(ctx context.Context, cmd *cli.Command) erro
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent:flows retrieve", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders:agent:flows retrieve",
+		Transform:      transform,
+	})
 }
 
 func handleSendersAgentFlowsUpdate(ctx context.Context, cmd *cli.Command) error {
@@ -367,10 +390,6 @@ func handleSendersAgentFlowsUpdate(ctx context.Context, cmd *cli.Command) error 
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentFlowUpdateParams{
-		SenderID: cmd.Value("sender-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -380,6 +399,10 @@ func handleSendersAgentFlowsUpdate(ctx context.Context, cmd *cli.Command) error 
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.SenderAgentFlowUpdateParams{
+		SenderID: cmd.Value("sender-id").(string),
 	}
 
 	var res []byte
@@ -396,8 +419,15 @@ func handleSendersAgentFlowsUpdate(ctx context.Context, cmd *cli.Command) error 
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent:flows update", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders:agent:flows update",
+		Transform:      transform,
+	})
 }
 
 func handleSendersAgentFlowsList(ctx context.Context, cmd *cli.Command) error {
@@ -411,8 +441,6 @@ func handleSendersAgentFlowsList(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentFlowListParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -424,7 +452,10 @@ func handleSendersAgentFlowsList(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	params := zavudev.SenderAgentFlowListParams{}
+
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -439,7 +470,13 @@ func handleSendersAgentFlowsList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "senders:agent:flows list", obj, format, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "senders:agent:flows list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.Senders.Agent.Flows.ListAutoPaging(
 			ctx,
@@ -451,7 +488,13 @@ func handleSendersAgentFlowsList(ctx context.Context, cmd *cli.Command) error {
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "senders:agent:flows list", iter, format, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "senders:agent:flows list",
+			Transform:      transform,
+		})
 	}
 }
 
@@ -466,10 +509,6 @@ func handleSendersAgentFlowsDelete(ctx context.Context, cmd *cli.Command) error 
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentFlowDeleteParams{
-		SenderID: cmd.Value("sender-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -479,6 +518,10 @@ func handleSendersAgentFlowsDelete(ctx context.Context, cmd *cli.Command) error 
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.SenderAgentFlowDeleteParams{
+		SenderID: cmd.Value("sender-id").(string),
 	}
 
 	return client.Senders.Agent.Flows.Delete(
@@ -500,10 +543,6 @@ func handleSendersAgentFlowsDuplicate(ctx context.Context, cmd *cli.Command) err
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentFlowDuplicateParams{
-		SenderID: cmd.Value("sender-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -513,6 +552,10 @@ func handleSendersAgentFlowsDuplicate(ctx context.Context, cmd *cli.Command) err
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.SenderAgentFlowDuplicateParams{
+		SenderID: cmd.Value("sender-id").(string),
 	}
 
 	var res []byte
@@ -529,6 +572,13 @@ func handleSendersAgentFlowsDuplicate(ctx context.Context, cmd *cli.Command) err
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent:flows duplicate", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders:agent:flows duplicate",
+		Transform:      transform,
+	})
 }

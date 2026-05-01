@@ -14,74 +14,50 @@ import (
 	"github.com/zavudev/sdk-go/option"
 )
 
-var addressesCreate = cli.Command{
+var exportsCreate = cli.Command{
 	Name:    "create",
-	Usage:   "Create a regulatory address for phone number purchases. Some countries require a\nverified address before phone numbers can be activated.",
+	Usage:   "Create a new data export job. The export will be processed asynchronously and\nthe download URL will be available when status is 'completed'. Export links\nexpire after 24 hours.",
 	Suggest: true,
 	Flags: []cli.Flag{
-		&requestflag.Flag[string]{
-			Name:     "country-code",
+		&requestflag.Flag[[]string]{
+			Name:     "data-type",
+			Usage:    "List of data types to include in the export.",
 			Required: true,
-			BodyPath: "countryCode",
+			BodyPath: "dataTypes",
 		},
-		&requestflag.Flag[string]{
-			Name:     "locality",
-			Required: true,
-			BodyPath: "locality",
+		&requestflag.Flag[any]{
+			Name:     "date-from",
+			Usage:    "Start date for data to export (inclusive).",
+			BodyPath: "dateFrom",
 		},
-		&requestflag.Flag[string]{
-			Name:     "postal-code",
-			Required: true,
-			BodyPath: "postalCode",
-		},
-		&requestflag.Flag[string]{
-			Name:     "street-address",
-			Required: true,
-			BodyPath: "streetAddress",
-		},
-		&requestflag.Flag[string]{
-			Name:     "administrative-area",
-			BodyPath: "administrativeArea",
-		},
-		&requestflag.Flag[string]{
-			Name:     "business-name",
-			BodyPath: "businessName",
-		},
-		&requestflag.Flag[string]{
-			Name:     "extended-address",
-			BodyPath: "extendedAddress",
-		},
-		&requestflag.Flag[string]{
-			Name:     "first-name",
-			BodyPath: "firstName",
-		},
-		&requestflag.Flag[string]{
-			Name:     "last-name",
-			BodyPath: "lastName",
+		&requestflag.Flag[any]{
+			Name:     "date-to",
+			Usage:    "End date for data to export (inclusive).",
+			BodyPath: "dateTo",
 		},
 	},
-	Action:          handleAddressesCreate,
+	Action:          handleExportsCreate,
 	HideHelpCommand: true,
 }
 
-var addressesRetrieve = cli.Command{
+var exportsRetrieve = cli.Command{
 	Name:    "retrieve",
-	Usage:   "Get a specific regulatory address.",
+	Usage:   "Get details of a specific data export, including download URL when completed.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:      "address-id",
+			Name:      "export-id",
 			Required:  true,
-			PathParam: "addressId",
+			PathParam: "exportId",
 		},
 	},
-	Action:          handleAddressesRetrieve,
+	Action:          handleExportsRetrieve,
 	HideHelpCommand: true,
 }
 
-var addressesList = cli.Command{
+var exportsList = cli.Command{
 	Name:    "list",
-	Usage:   "List regulatory addresses for this project.",
+	Usage:   "List data exports for this project.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
@@ -93,31 +69,21 @@ var addressesList = cli.Command{
 			Default:   50,
 			QueryPath: "limit",
 		},
+		&requestflag.Flag[string]{
+			Name:      "status",
+			Usage:     "Status of a data export job.",
+			QueryPath: "status",
+		},
 		&requestflag.Flag[int64]{
 			Name:  "max-items",
 			Usage: "The maximum number of items to return (use -1 for unlimited).",
 		},
 	},
-	Action:          handleAddressesList,
+	Action:          handleExportsList,
 	HideHelpCommand: true,
 }
 
-var addressesDelete = cli.Command{
-	Name:    "delete",
-	Usage:   "Delete a regulatory address. Cannot delete addresses that are in use.",
-	Suggest: true,
-	Flags: []cli.Flag{
-		&requestflag.Flag[string]{
-			Name:      "address-id",
-			Required:  true,
-			PathParam: "addressId",
-		},
-	},
-	Action:          handleAddressesDelete,
-	HideHelpCommand: true,
-}
-
-func handleAddressesCreate(ctx context.Context, cmd *cli.Command) error {
+func handleExportsCreate(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
@@ -136,11 +102,11 @@ func handleAddressesCreate(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	params := zavudev.AddressNewParams{}
+	params := zavudev.ExportNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Addresses.New(ctx, params, options...)
+	_, err = client.Exports.New(ctx, params, options...)
 	if err != nil {
 		return err
 	}
@@ -153,16 +119,16 @@ func handleAddressesCreate(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "addresses create",
+		Title:          "exports create",
 		Transform:      transform,
 	})
 }
 
-func handleAddressesRetrieve(ctx context.Context, cmd *cli.Command) error {
+func handleExportsRetrieve(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("address-id") && len(unusedArgs) > 0 {
-		cmd.Set("address-id", unusedArgs[0])
+	if !cmd.IsSet("export-id") && len(unusedArgs) > 0 {
+		cmd.Set("export-id", unusedArgs[0])
 		unusedArgs = unusedArgs[1:]
 	}
 	if len(unusedArgs) > 0 {
@@ -182,7 +148,7 @@ func handleAddressesRetrieve(ctx context.Context, cmd *cli.Command) error {
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Addresses.Get(ctx, cmd.Value("address-id").(string), options...)
+	_, err = client.Exports.Get(ctx, cmd.Value("export-id").(string), options...)
 	if err != nil {
 		return err
 	}
@@ -195,12 +161,12 @@ func handleAddressesRetrieve(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "addresses retrieve",
+		Title:          "exports retrieve",
 		Transform:      transform,
 	})
 }
 
-func handleAddressesList(ctx context.Context, cmd *cli.Command) error {
+func handleExportsList(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
@@ -219,7 +185,7 @@ func handleAddressesList(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	params := zavudev.AddressListParams{}
+	params := zavudev.ExportListParams{}
 
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
@@ -227,7 +193,7 @@ func handleAddressesList(ctx context.Context, cmd *cli.Command) error {
 	if format == "raw" {
 		var res []byte
 		options = append(options, option.WithResponseBodyInto(&res))
-		_, err = client.Addresses.List(ctx, params, options...)
+		_, err = client.Exports.List(ctx, params, options...)
 		if err != nil {
 			return err
 		}
@@ -236,11 +202,11 @@ func handleAddressesList(ctx context.Context, cmd *cli.Command) error {
 			ExplicitFormat: explicitFormat,
 			Format:         format,
 			RawOutput:      cmd.Root().Bool("raw-output"),
-			Title:          "addresses list",
+			Title:          "exports list",
 			Transform:      transform,
 		})
 	} else {
-		iter := client.Addresses.ListAutoPaging(ctx, params, options...)
+		iter := client.Exports.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
@@ -249,33 +215,8 @@ func handleAddressesList(ctx context.Context, cmd *cli.Command) error {
 			ExplicitFormat: explicitFormat,
 			Format:         format,
 			RawOutput:      cmd.Root().Bool("raw-output"),
-			Title:          "addresses list",
+			Title:          "exports list",
 			Transform:      transform,
 		})
 	}
-}
-
-func handleAddressesDelete(ctx context.Context, cmd *cli.Command) error {
-	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
-	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("address-id") && len(unusedArgs) > 0 {
-		cmd.Set("address-id", unusedArgs[0])
-		unusedArgs = unusedArgs[1:]
-	}
-	if len(unusedArgs) > 0 {
-		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
-	}
-
-	options, err := flagOptions(
-		cmd,
-		apiquery.NestedQueryFormatBrackets,
-		apiquery.ArrayQueryFormatComma,
-		EmptyBody,
-		false,
-	)
-	if err != nil {
-		return err
-	}
-
-	return client.Addresses.Delete(ctx, cmd.Value("address-id").(string), options...)
 }

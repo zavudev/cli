@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -53,6 +52,21 @@ var templatesCreate = requestflag.WithInnerFlags(cli.Command{
 			BodyPath: "codeExpirationMinutes",
 		},
 		&requestflag.Flag[string]{
+			Name:     "footer",
+			Usage:    "Footer text for the template.",
+			BodyPath: "footer",
+		},
+		&requestflag.Flag[string]{
+			Name:     "header-content",
+			Usage:    "Header content (text string or media URL).",
+			BodyPath: "headerContent",
+		},
+		&requestflag.Flag[string]{
+			Name:     "header-type",
+			Usage:    "Type of header for the template.",
+			BodyPath: "headerType",
+		},
+		&requestflag.Flag[string]{
 			Name:     "instagram-body",
 			Usage:    "Channel-specific body for Instagram. Falls back to `body` if not set.",
 			BodyPath: "instagramBody",
@@ -91,6 +105,11 @@ var templatesCreate = requestflag.WithInnerFlags(cli.Command{
 			InnerField: "type",
 		},
 		&requestflag.InnerFlag[string]{
+			Name:       "button.example",
+			Usage:      "Sample value Meta uses to review templates with a dynamic URL button. Substituted into `{{1}}` of the URL when the template is submitted to Meta. Only meaningful when `url` contains `{{1}}`; ignored for static URLs.",
+			InnerField: "example",
+		},
+		&requestflag.InnerFlag[string]{
 			Name:       "button.otp-type",
 			Usage:      "Required when type is 'otp'. COPY_CODE shows copy button, ONE_TAP enables Android autofill.",
 			InnerField: "otpType",
@@ -111,6 +130,7 @@ var templatesCreate = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.InnerFlag[string]{
 			Name:       "button.url",
+			Usage:      "Button destination. Use `{{1}}` exactly once for a dynamic URL (e.g. `https://example.com/orders/{{1}}`); WhatsApp only accepts the strict `{{1}}` form. Static URLs must not contain any `{{...}}` placeholder.",
 			InnerField: "url",
 		},
 	},
@@ -122,8 +142,9 @@ var templatesRetrieve = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "template-id",
-			Required: true,
+			Name:      "template-id",
+			Required:  true,
+			PathParam: "templateId",
 		},
 	},
 	Action:          handleTemplatesRetrieve,
@@ -159,8 +180,9 @@ var templatesDelete = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "template-id",
-			Required: true,
+			Name:      "template-id",
+			Required:  true,
+			PathParam: "templateId",
 		},
 	},
 	Action:          handleTemplatesDelete,
@@ -173,8 +195,9 @@ var templatesSubmit = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "template-id",
-			Required: true,
+			Name:      "template-id",
+			Required:  true,
+			PathParam: "templateId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "sender-id",
@@ -200,8 +223,6 @@ func handleTemplatesCreate(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.TemplateNewParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -213,6 +234,8 @@ func handleTemplatesCreate(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	params := zavudev.TemplateNewParams{}
+
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
 	_, err = client.Templates.New(ctx, params, options...)
@@ -222,8 +245,15 @@ func handleTemplatesCreate(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "templates create", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "templates create",
+		Transform:      transform,
+	})
 }
 
 func handleTemplatesRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -257,8 +287,15 @@ func handleTemplatesRetrieve(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "templates retrieve", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "templates retrieve",
+		Transform:      transform,
+	})
 }
 
 func handleTemplatesList(ctx context.Context, cmd *cli.Command) error {
@@ -268,8 +305,6 @@ func handleTemplatesList(ctx context.Context, cmd *cli.Command) error {
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
-
-	params := zavudev.TemplateListParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -282,7 +317,10 @@ func handleTemplatesList(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	params := zavudev.TemplateListParams{}
+
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -292,14 +330,26 @@ func handleTemplatesList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "templates list", obj, format, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "templates list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.Templates.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "templates list", iter, format, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "templates list",
+			Transform:      transform,
+		})
 	}
 }
 
@@ -339,8 +389,6 @@ func handleTemplatesSubmit(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.TemplateSubmitParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -351,6 +399,8 @@ func handleTemplatesSubmit(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.TemplateSubmitParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -366,6 +416,13 @@ func handleTemplatesSubmit(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "templates submit", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "templates submit",
+		Transform:      transform,
+	})
 }

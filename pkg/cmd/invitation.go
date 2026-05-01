@@ -14,61 +14,65 @@ import (
 	"github.com/zavudev/sdk-go/option"
 )
 
-var regulatoryDocumentsCreate = cli.Command{
+var invitationsCreate = cli.Command{
 	Name:    "create",
-	Usage:   "Create a regulatory document record after uploading the file. Use the upload-url\nendpoint first to get an upload URL.",
+	Usage:   "Create a partner invitation link for a client to connect their WhatsApp Business\naccount. The client will complete Meta's embedded signup flow and the resulting\nsender will be created in your project.",
 	Suggest: true,
 	Flags: []cli.Flag{
+		&requestflag.Flag[[]string]{
+			Name:     "allowed-phone-country",
+			Usage:    "ISO country codes for allowed phone numbers.",
+			BodyPath: "allowedPhoneCountries",
+		},
 		&requestflag.Flag[string]{
-			Name:     "document-type",
-			Usage:    `Allowed values: "passport", "national_id", "drivers_license", "utility_bill", "tax_id", "business_registration", "proof_of_address", "other".`,
-			Required: true,
-			BodyPath: "documentType",
+			Name:     "client-email",
+			Usage:    "Email of the client being invited.",
+			BodyPath: "clientEmail",
+		},
+		&requestflag.Flag[string]{
+			Name:     "client-name",
+			Usage:    "Name of the client being invited.",
+			BodyPath: "clientName",
+		},
+		&requestflag.Flag[string]{
+			Name:     "client-phone",
+			Usage:    "Phone number of the client in E.164 format.",
+			BodyPath: "clientPhone",
 		},
 		&requestflag.Flag[int64]{
-			Name:     "file-size",
-			Required: true,
-			BodyPath: "fileSize",
+			Name:     "expires-in-days",
+			Usage:    "Number of days until the invitation expires.",
+			Default:  7,
+			BodyPath: "expiresInDays",
 		},
 		&requestflag.Flag[string]{
-			Name:     "mime-type",
-			Required: true,
-			BodyPath: "mimeType",
-		},
-		&requestflag.Flag[string]{
-			Name:     "name",
-			Required: true,
-			BodyPath: "name",
-		},
-		&requestflag.Flag[string]{
-			Name:     "storage-id",
-			Usage:    "Storage ID from the upload-url endpoint.",
-			Required: true,
-			BodyPath: "storageId",
+			Name:     "phone-number-id",
+			Usage:    "ID of a Zavu phone number to pre-assign for WhatsApp registration. If provided, the client will use this number instead of their own.",
+			BodyPath: "phoneNumberId",
 		},
 	},
-	Action:          handleRegulatoryDocumentsCreate,
+	Action:          handleInvitationsCreate,
 	HideHelpCommand: true,
 }
 
-var regulatoryDocumentsRetrieve = cli.Command{
+var invitationsRetrieve = cli.Command{
 	Name:    "retrieve",
-	Usage:   "Get a specific regulatory document.",
+	Usage:   "Get invitation",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:      "document-id",
+			Name:      "invitation-id",
 			Required:  true,
-			PathParam: "documentId",
+			PathParam: "invitationId",
 		},
 	},
-	Action:          handleRegulatoryDocumentsRetrieve,
+	Action:          handleInvitationsRetrieve,
 	HideHelpCommand: true,
 }
 
-var regulatoryDocumentsList = cli.Command{
+var invitationsList = cli.Command{
 	Name:    "list",
-	Usage:   "List regulatory documents for this project.",
+	Usage:   "List partner invitations for this project.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
@@ -80,40 +84,36 @@ var regulatoryDocumentsList = cli.Command{
 			Default:   50,
 			QueryPath: "limit",
 		},
+		&requestflag.Flag[string]{
+			Name:      "status",
+			Usage:     "Current status of the partner invitation.",
+			QueryPath: "status",
+		},
 		&requestflag.Flag[int64]{
 			Name:  "max-items",
 			Usage: "The maximum number of items to return (use -1 for unlimited).",
 		},
 	},
-	Action:          handleRegulatoryDocumentsList,
+	Action:          handleInvitationsList,
 	HideHelpCommand: true,
 }
 
-var regulatoryDocumentsDelete = cli.Command{
-	Name:    "delete",
-	Usage:   "Delete a regulatory document. Cannot delete verified documents.",
+var invitationsCancel = cli.Command{
+	Name:    "cancel",
+	Usage:   "Cancel an active invitation. The client will no longer be able to use the\ninvitation link.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:      "document-id",
+			Name:      "invitation-id",
 			Required:  true,
-			PathParam: "documentId",
+			PathParam: "invitationId",
 		},
 	},
-	Action:          handleRegulatoryDocumentsDelete,
+	Action:          handleInvitationsCancel,
 	HideHelpCommand: true,
 }
 
-var regulatoryDocumentsUploadURL = cli.Command{
-	Name:            "upload-url",
-	Usage:           "Get a presigned URL to upload a document file. After uploading, use the\nstorageId to create the document record.",
-	Suggest:         true,
-	Flags:           []cli.Flag{},
-	Action:          handleRegulatoryDocumentsUploadURL,
-	HideHelpCommand: true,
-}
-
-func handleRegulatoryDocumentsCreate(ctx context.Context, cmd *cli.Command) error {
+func handleInvitationsCreate(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
@@ -132,11 +132,11 @@ func handleRegulatoryDocumentsCreate(ctx context.Context, cmd *cli.Command) erro
 		return err
 	}
 
-	params := zavudev.RegulatoryDocumentNewParams{}
+	params := zavudev.InvitationNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.RegulatoryDocuments.New(ctx, params, options...)
+	_, err = client.Invitations.New(ctx, params, options...)
 	if err != nil {
 		return err
 	}
@@ -149,16 +149,16 @@ func handleRegulatoryDocumentsCreate(ctx context.Context, cmd *cli.Command) erro
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "regulatory-documents create",
+		Title:          "invitations create",
 		Transform:      transform,
 	})
 }
 
-func handleRegulatoryDocumentsRetrieve(ctx context.Context, cmd *cli.Command) error {
+func handleInvitationsRetrieve(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("document-id") && len(unusedArgs) > 0 {
-		cmd.Set("document-id", unusedArgs[0])
+	if !cmd.IsSet("invitation-id") && len(unusedArgs) > 0 {
+		cmd.Set("invitation-id", unusedArgs[0])
 		unusedArgs = unusedArgs[1:]
 	}
 	if len(unusedArgs) > 0 {
@@ -178,7 +178,7 @@ func handleRegulatoryDocumentsRetrieve(ctx context.Context, cmd *cli.Command) er
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.RegulatoryDocuments.Get(ctx, cmd.Value("document-id").(string), options...)
+	_, err = client.Invitations.Get(ctx, cmd.Value("invitation-id").(string), options...)
 	if err != nil {
 		return err
 	}
@@ -191,12 +191,12 @@ func handleRegulatoryDocumentsRetrieve(ctx context.Context, cmd *cli.Command) er
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "regulatory-documents retrieve",
+		Title:          "invitations retrieve",
 		Transform:      transform,
 	})
 }
 
-func handleRegulatoryDocumentsList(ctx context.Context, cmd *cli.Command) error {
+func handleInvitationsList(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
@@ -215,7 +215,7 @@ func handleRegulatoryDocumentsList(ctx context.Context, cmd *cli.Command) error 
 		return err
 	}
 
-	params := zavudev.RegulatoryDocumentListParams{}
+	params := zavudev.InvitationListParams{}
 
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
@@ -223,7 +223,7 @@ func handleRegulatoryDocumentsList(ctx context.Context, cmd *cli.Command) error 
 	if format == "raw" {
 		var res []byte
 		options = append(options, option.WithResponseBodyInto(&res))
-		_, err = client.RegulatoryDocuments.List(ctx, params, options...)
+		_, err = client.Invitations.List(ctx, params, options...)
 		if err != nil {
 			return err
 		}
@@ -232,11 +232,11 @@ func handleRegulatoryDocumentsList(ctx context.Context, cmd *cli.Command) error 
 			ExplicitFormat: explicitFormat,
 			Format:         format,
 			RawOutput:      cmd.Root().Bool("raw-output"),
-			Title:          "regulatory-documents list",
+			Title:          "invitations list",
 			Transform:      transform,
 		})
 	} else {
-		iter := client.RegulatoryDocuments.ListAutoPaging(ctx, params, options...)
+		iter := client.Invitations.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
@@ -245,17 +245,17 @@ func handleRegulatoryDocumentsList(ctx context.Context, cmd *cli.Command) error 
 			ExplicitFormat: explicitFormat,
 			Format:         format,
 			RawOutput:      cmd.Root().Bool("raw-output"),
-			Title:          "regulatory-documents list",
+			Title:          "invitations list",
 			Transform:      transform,
 		})
 	}
 }
 
-func handleRegulatoryDocumentsDelete(ctx context.Context, cmd *cli.Command) error {
+func handleInvitationsCancel(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("document-id") && len(unusedArgs) > 0 {
-		cmd.Set("document-id", unusedArgs[0])
+	if !cmd.IsSet("invitation-id") && len(unusedArgs) > 0 {
+		cmd.Set("invitation-id", unusedArgs[0])
 		unusedArgs = unusedArgs[1:]
 	}
 	if len(unusedArgs) > 0 {
@@ -273,31 +273,9 @@ func handleRegulatoryDocumentsDelete(ctx context.Context, cmd *cli.Command) erro
 		return err
 	}
 
-	return client.RegulatoryDocuments.Delete(ctx, cmd.Value("document-id").(string), options...)
-}
-
-func handleRegulatoryDocumentsUploadURL(ctx context.Context, cmd *cli.Command) error {
-	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
-	unusedArgs := cmd.Args().Slice()
-
-	if len(unusedArgs) > 0 {
-		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
-	}
-
-	options, err := flagOptions(
-		cmd,
-		apiquery.NestedQueryFormatBrackets,
-		apiquery.ArrayQueryFormatComma,
-		EmptyBody,
-		false,
-	)
-	if err != nil {
-		return err
-	}
-
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.RegulatoryDocuments.UploadURL(ctx, options...)
+	_, err = client.Invitations.Cancel(ctx, cmd.Value("invitation-id").(string), options...)
 	if err != nil {
 		return err
 	}
@@ -310,7 +288,7 @@ func handleRegulatoryDocumentsUploadURL(ctx context.Context, cmd *cli.Command) e
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "regulatory-documents upload-url",
+		Title:          "invitations cancel",
 		Transform:      transform,
 	})
 }

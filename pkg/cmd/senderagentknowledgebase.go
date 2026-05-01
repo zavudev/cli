@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -21,8 +20,9 @@ var sendersAgentKnowledgeBasesCreate = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "name",
@@ -44,12 +44,14 @@ var sendersAgentKnowledgeBasesRetrieve = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "kb-id",
-			Required: true,
+			Name:      "kb-id",
+			Required:  true,
+			PathParam: "kbId",
 		},
 	},
 	Action:          handleSendersAgentKnowledgeBasesRetrieve,
@@ -62,14 +64,16 @@ var sendersAgentKnowledgeBasesUpdate = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "kb-id",
-			Required: true,
+			Name:      "kb-id",
+			Required:  true,
+			PathParam: "kbId",
 		},
-		&requestflag.Flag[any]{
+		&requestflag.Flag[*string]{
 			Name:     "description",
 			BodyPath: "description",
 		},
@@ -88,8 +92,9 @@ var sendersAgentKnowledgeBasesList = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
 			Name:      "cursor",
@@ -115,12 +120,14 @@ var sendersAgentKnowledgeBasesDelete = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "kb-id",
-			Required: true,
+			Name:      "kb-id",
+			Required:  true,
+			PathParam: "kbId",
 		},
 	},
 	Action:          handleSendersAgentKnowledgeBasesDelete,
@@ -138,8 +145,6 @@ func handleSendersAgentKnowledgeBasesCreate(ctx context.Context, cmd *cli.Comman
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentKnowledgeBaseNewParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -150,6 +155,8 @@ func handleSendersAgentKnowledgeBasesCreate(ctx context.Context, cmd *cli.Comman
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.SenderAgentKnowledgeBaseNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -165,8 +172,15 @@ func handleSendersAgentKnowledgeBasesCreate(ctx context.Context, cmd *cli.Comman
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent:knowledge-bases create", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders:agent:knowledge-bases create",
+		Transform:      transform,
+	})
 }
 
 func handleSendersAgentKnowledgeBasesRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -180,10 +194,6 @@ func handleSendersAgentKnowledgeBasesRetrieve(ctx context.Context, cmd *cli.Comm
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentKnowledgeBaseGetParams{
-		SenderID: cmd.Value("sender-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -193,6 +203,10 @@ func handleSendersAgentKnowledgeBasesRetrieve(ctx context.Context, cmd *cli.Comm
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.SenderAgentKnowledgeBaseGetParams{
+		SenderID: cmd.Value("sender-id").(string),
 	}
 
 	var res []byte
@@ -209,8 +223,15 @@ func handleSendersAgentKnowledgeBasesRetrieve(ctx context.Context, cmd *cli.Comm
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent:knowledge-bases retrieve", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders:agent:knowledge-bases retrieve",
+		Transform:      transform,
+	})
 }
 
 func handleSendersAgentKnowledgeBasesUpdate(ctx context.Context, cmd *cli.Command) error {
@@ -224,10 +245,6 @@ func handleSendersAgentKnowledgeBasesUpdate(ctx context.Context, cmd *cli.Comman
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentKnowledgeBaseUpdateParams{
-		SenderID: cmd.Value("sender-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -237,6 +254,10 @@ func handleSendersAgentKnowledgeBasesUpdate(ctx context.Context, cmd *cli.Comman
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.SenderAgentKnowledgeBaseUpdateParams{
+		SenderID: cmd.Value("sender-id").(string),
 	}
 
 	var res []byte
@@ -253,8 +274,15 @@ func handleSendersAgentKnowledgeBasesUpdate(ctx context.Context, cmd *cli.Comman
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent:knowledge-bases update", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders:agent:knowledge-bases update",
+		Transform:      transform,
+	})
 }
 
 func handleSendersAgentKnowledgeBasesList(ctx context.Context, cmd *cli.Command) error {
@@ -268,8 +296,6 @@ func handleSendersAgentKnowledgeBasesList(ctx context.Context, cmd *cli.Command)
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentKnowledgeBaseListParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -281,7 +307,10 @@ func handleSendersAgentKnowledgeBasesList(ctx context.Context, cmd *cli.Command)
 		return err
 	}
 
+	params := zavudev.SenderAgentKnowledgeBaseListParams{}
+
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -296,7 +325,13 @@ func handleSendersAgentKnowledgeBasesList(ctx context.Context, cmd *cli.Command)
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "senders:agent:knowledge-bases list", obj, format, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "senders:agent:knowledge-bases list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.Senders.Agent.KnowledgeBases.ListAutoPaging(
 			ctx,
@@ -308,7 +343,13 @@ func handleSendersAgentKnowledgeBasesList(ctx context.Context, cmd *cli.Command)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "senders:agent:knowledge-bases list", iter, format, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "senders:agent:knowledge-bases list",
+			Transform:      transform,
+		})
 	}
 }
 
@@ -323,10 +364,6 @@ func handleSendersAgentKnowledgeBasesDelete(ctx context.Context, cmd *cli.Comman
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentKnowledgeBaseDeleteParams{
-		SenderID: cmd.Value("sender-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -336,6 +373,10 @@ func handleSendersAgentKnowledgeBasesDelete(ctx context.Context, cmd *cli.Comman
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.SenderAgentKnowledgeBaseDeleteParams{
+		SenderID: cmd.Value("sender-id").(string),
 	}
 
 	return client.Senders.Agent.KnowledgeBases.Delete(

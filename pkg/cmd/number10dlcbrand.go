@@ -14,102 +14,203 @@ import (
 	"github.com/zavudev/sdk-go/option"
 )
 
-var sendersCreate = cli.Command{
+var number10dlcBrandsCreate = cli.Command{
 	Name:    "create",
-	Usage:   "Create sender",
+	Usage:   "Create a 10DLC brand registration. The brand starts in draft status. Submit it\nfor review using the submit endpoint.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "name",
+			Name:     "city",
 			Required: true,
-			BodyPath: "name",
+			BodyPath: "city",
 		},
 		&requestflag.Flag[string]{
-			Name:     "phone-number",
+			Name:     "country",
+			Usage:    "Two-letter ISO country code.",
 			Required: true,
-			BodyPath: "phoneNumber",
-		},
-		&requestflag.Flag[bool]{
-			Name:     "set-as-default",
-			Default:  false,
-			BodyPath: "setAsDefault",
-		},
-		&requestflag.Flag[[]string]{
-			Name:     "webhook-event",
-			Usage:    "Events to subscribe to.",
-			BodyPath: "webhookEvents",
+			BodyPath: "country",
 		},
 		&requestflag.Flag[string]{
-			Name:     "webhook-url",
-			Usage:    "HTTPS URL for webhook events.",
-			BodyPath: "webhookUrl",
+			Name:     "display-name",
+			Usage:    "Display name of the brand.",
+			Required: true,
+			BodyPath: "displayName",
+		},
+		&requestflag.Flag[string]{
+			Name:     "email",
+			Required: true,
+			BodyPath: "email",
+		},
+		&requestflag.Flag[string]{
+			Name:     "entity-type",
+			Usage:    "Business entity type for 10DLC brand registration.",
+			Required: true,
+			BodyPath: "entityType",
+		},
+		&requestflag.Flag[string]{
+			Name:     "phone",
+			Usage:    "Contact phone in E.164 format.",
+			Required: true,
+			BodyPath: "phone",
+		},
+		&requestflag.Flag[string]{
+			Name:     "postal-code",
+			Required: true,
+			BodyPath: "postalCode",
+		},
+		&requestflag.Flag[string]{
+			Name:     "state",
+			Required: true,
+			BodyPath: "state",
+		},
+		&requestflag.Flag[string]{
+			Name:     "street",
+			Required: true,
+			BodyPath: "street",
+		},
+		&requestflag.Flag[string]{
+			Name:     "vertical",
+			Usage:    "Industry vertical.",
+			Required: true,
+			BodyPath: "vertical",
+		},
+		&requestflag.Flag[string]{
+			Name:     "company-name",
+			Usage:    "Legal company name.",
+			BodyPath: "companyName",
+		},
+		&requestflag.Flag[string]{
+			Name:     "ein",
+			Usage:    "Employer Identification Number (format: XX-XXXXXXX).",
+			BodyPath: "ein",
+		},
+		&requestflag.Flag[string]{
+			Name:     "first-name",
+			BodyPath: "firstName",
+		},
+		&requestflag.Flag[string]{
+			Name:     "last-name",
+			BodyPath: "lastName",
+		},
+		&requestflag.Flag[string]{
+			Name:     "stock-exchange",
+			BodyPath: "stockExchange",
+		},
+		&requestflag.Flag[string]{
+			Name:     "stock-symbol",
+			BodyPath: "stockSymbol",
+		},
+		&requestflag.Flag[string]{
+			Name:     "website",
+			BodyPath: "website",
 		},
 	},
-	Action:          handleSendersCreate,
+	Action:          handleNumber10dlcBrandsCreate,
 	HideHelpCommand: true,
 }
 
-var sendersRetrieve = cli.Command{
+var number10dlcBrandsRetrieve = cli.Command{
 	Name:    "retrieve",
-	Usage:   "Get sender",
+	Usage:   "Get 10DLC brand",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:      "sender-id",
+			Name:      "brand-id",
 			Required:  true,
-			PathParam: "senderId",
+			PathParam: "brandId",
 		},
 	},
-	Action:          handleSendersRetrieve,
+	Action:          handleNumber10dlcBrandsRetrieve,
 	HideHelpCommand: true,
 }
 
-var sendersUpdate = cli.Command{
+var number10dlcBrandsUpdate = cli.Command{
 	Name:    "update",
-	Usage:   "Update sender",
+	Usage:   "Update a 10DLC brand in draft status. Cannot update after submission.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:      "sender-id",
+			Name:      "brand-id",
 			Required:  true,
-			PathParam: "senderId",
-		},
-		&requestflag.Flag[bool]{
-			Name:     "email-receiving-enabled",
-			Usage:    "Enable or disable inbound email receiving for this sender.",
-			BodyPath: "emailReceivingEnabled",
+			PathParam: "brandId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "name",
-			BodyPath: "name",
+			Name:     "city",
+			BodyPath: "city",
 		},
-		&requestflag.Flag[bool]{
-			Name:     "set-as-default",
-			BodyPath: "setAsDefault",
+		&requestflag.Flag[string]{
+			Name:     "company-name",
+			BodyPath: "companyName",
 		},
-		&requestflag.Flag[bool]{
-			Name:     "webhook-active",
-			Usage:    "Whether the webhook is active.",
-			BodyPath: "webhookActive",
+		&requestflag.Flag[string]{
+			Name:     "country",
+			BodyPath: "country",
 		},
-		&requestflag.Flag[[]string]{
-			Name:     "webhook-event",
-			Usage:    "Events to subscribe to.",
-			BodyPath: "webhookEvents",
+		&requestflag.Flag[string]{
+			Name:     "display-name",
+			BodyPath: "displayName",
 		},
-		&requestflag.Flag[*string]{
-			Name:     "webhook-url",
-			Usage:    "HTTPS URL for webhook events. Set to null to remove webhook.",
-			BodyPath: "webhookUrl",
+		&requestflag.Flag[string]{
+			Name:     "ein",
+			BodyPath: "ein",
+		},
+		&requestflag.Flag[string]{
+			Name:     "email",
+			BodyPath: "email",
+		},
+		&requestflag.Flag[string]{
+			Name:     "entity-type",
+			Usage:    "Business entity type for 10DLC brand registration.",
+			BodyPath: "entityType",
+		},
+		&requestflag.Flag[string]{
+			Name:     "first-name",
+			BodyPath: "firstName",
+		},
+		&requestflag.Flag[string]{
+			Name:     "last-name",
+			BodyPath: "lastName",
+		},
+		&requestflag.Flag[string]{
+			Name:     "phone",
+			BodyPath: "phone",
+		},
+		&requestflag.Flag[string]{
+			Name:     "postal-code",
+			BodyPath: "postalCode",
+		},
+		&requestflag.Flag[string]{
+			Name:     "state",
+			BodyPath: "state",
+		},
+		&requestflag.Flag[string]{
+			Name:     "stock-exchange",
+			BodyPath: "stockExchange",
+		},
+		&requestflag.Flag[string]{
+			Name:     "stock-symbol",
+			BodyPath: "stockSymbol",
+		},
+		&requestflag.Flag[string]{
+			Name:     "street",
+			BodyPath: "street",
+		},
+		&requestflag.Flag[string]{
+			Name:     "vertical",
+			BodyPath: "vertical",
+		},
+		&requestflag.Flag[string]{
+			Name:     "website",
+			BodyPath: "website",
 		},
 	},
-	Action:          handleSendersUpdate,
+	Action:          handleNumber10dlcBrandsUpdate,
 	HideHelpCommand: true,
 }
 
-var sendersList = cli.Command{
+var number10dlcBrandsList = cli.Command{
 	Name:    "list",
-	Usage:   "List senders",
+	Usage:   "List 10DLC brand registrations for this project.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
@@ -126,128 +227,65 @@ var sendersList = cli.Command{
 			Usage: "The maximum number of items to return (use -1 for unlimited).",
 		},
 	},
-	Action:          handleSendersList,
+	Action:          handleNumber10dlcBrandsList,
 	HideHelpCommand: true,
 }
 
-var sendersDelete = cli.Command{
+var number10dlcBrandsDelete = cli.Command{
 	Name:    "delete",
-	Usage:   "Delete sender",
+	Usage:   "Delete 10DLC brand",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:      "sender-id",
+			Name:      "brand-id",
 			Required:  true,
-			PathParam: "senderId",
+			PathParam: "brandId",
 		},
 	},
-	Action:          handleSendersDelete,
+	Action:          handleNumber10dlcBrandsDelete,
 	HideHelpCommand: true,
 }
 
-var sendersGetProfile = cli.Command{
-	Name:    "get-profile",
-	Usage:   "Get the WhatsApp Business profile for a sender. The sender must have a WhatsApp\nBusiness Account connected.",
+var number10dlcBrandsListUseCases = cli.Command{
+	Name:            "list-use-cases",
+	Usage:           "List available use cases for 10DLC campaign registration.",
+	Suggest:         true,
+	Flags:           []cli.Flag{},
+	Action:          handleNumber10dlcBrandsListUseCases,
+	HideHelpCommand: true,
+}
+
+var number10dlcBrandsSubmit = cli.Command{
+	Name:    "submit",
+	Usage:   "Submit a draft brand to The Campaign Registry (TCR) for vetting. The brand must\nbe in draft status. A $35 registration fee is charged from your balance.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:      "sender-id",
+			Name:      "brand-id",
 			Required:  true,
-			PathParam: "senderId",
+			PathParam: "brandId",
 		},
 	},
-	Action:          handleSendersGetProfile,
+	Action:          handleNumber10dlcBrandsSubmit,
 	HideHelpCommand: true,
 }
 
-var sendersRegenerateWebhookSecret = cli.Command{
-	Name:    "regenerate-webhook-secret",
-	Usage:   "Regenerate the webhook secret for a sender. The old secret will be invalidated\nimmediately.",
+var number10dlcBrandsSyncStatus = cli.Command{
+	Name:    "sync-status",
+	Usage:   "Sync the brand status with the registration provider. Use this to check for\napproval updates after submission.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:      "sender-id",
+			Name:      "brand-id",
 			Required:  true,
-			PathParam: "senderId",
+			PathParam: "brandId",
 		},
 	},
-	Action:          handleSendersRegenerateWebhookSecret,
+	Action:          handleNumber10dlcBrandsSyncStatus,
 	HideHelpCommand: true,
 }
 
-var sendersUpdateProfile = cli.Command{
-	Name:    "update-profile",
-	Usage:   "Update the WhatsApp Business profile for a sender. The sender must have a\nWhatsApp Business Account connected.",
-	Suggest: true,
-	Flags: []cli.Flag{
-		&requestflag.Flag[string]{
-			Name:      "sender-id",
-			Required:  true,
-			PathParam: "senderId",
-		},
-		&requestflag.Flag[string]{
-			Name:     "about",
-			Usage:    "Short description of the business (max 139 characters).",
-			BodyPath: "about",
-		},
-		&requestflag.Flag[string]{
-			Name:     "address",
-			Usage:    "Physical address of the business (max 256 characters).",
-			BodyPath: "address",
-		},
-		&requestflag.Flag[string]{
-			Name:     "description",
-			Usage:    "Extended description of the business (max 512 characters).",
-			BodyPath: "description",
-		},
-		&requestflag.Flag[string]{
-			Name:     "email",
-			Usage:    "Business email address.",
-			BodyPath: "email",
-		},
-		&requestflag.Flag[string]{
-			Name:     "vertical",
-			Usage:    "Business category for WhatsApp Business profile.",
-			BodyPath: "vertical",
-		},
-		&requestflag.Flag[[]string]{
-			Name:     "website",
-			Usage:    "Business website URLs (maximum 2).",
-			BodyPath: "websites",
-		},
-	},
-	Action:          handleSendersUpdateProfile,
-	HideHelpCommand: true,
-}
-
-var sendersUploadProfilePicture = cli.Command{
-	Name:    "upload-profile-picture",
-	Usage:   "Upload a new profile picture for the WhatsApp Business profile. The image will\nbe uploaded to Meta and set as the profile picture.",
-	Suggest: true,
-	Flags: []cli.Flag{
-		&requestflag.Flag[string]{
-			Name:      "sender-id",
-			Required:  true,
-			PathParam: "senderId",
-		},
-		&requestflag.Flag[string]{
-			Name:     "image-url",
-			Usage:    "URL of the image to upload.",
-			Required: true,
-			BodyPath: "imageUrl",
-		},
-		&requestflag.Flag[string]{
-			Name:     "mime-type",
-			Usage:    "MIME type of the image.",
-			Required: true,
-			BodyPath: "mimeType",
-		},
-	},
-	Action:          handleSendersUploadProfilePicture,
-	HideHelpCommand: true,
-}
-
-func handleSendersCreate(ctx context.Context, cmd *cli.Command) error {
+func handleNumber10dlcBrandsCreate(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
@@ -266,11 +304,11 @@ func handleSendersCreate(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	params := zavudev.SenderNewParams{}
+	params := zavudev.Number10dlcBrandNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Senders.New(ctx, params, options...)
+	_, err = client.Number10dlc.Brands.New(ctx, params, options...)
 	if err != nil {
 		return err
 	}
@@ -283,16 +321,16 @@ func handleSendersCreate(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "senders create",
+		Title:          "number-10dlc:brands create",
 		Transform:      transform,
 	})
 }
 
-func handleSendersRetrieve(ctx context.Context, cmd *cli.Command) error {
+func handleNumber10dlcBrandsRetrieve(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("sender-id") && len(unusedArgs) > 0 {
-		cmd.Set("sender-id", unusedArgs[0])
+	if !cmd.IsSet("brand-id") && len(unusedArgs) > 0 {
+		cmd.Set("brand-id", unusedArgs[0])
 		unusedArgs = unusedArgs[1:]
 	}
 	if len(unusedArgs) > 0 {
@@ -312,7 +350,7 @@ func handleSendersRetrieve(ctx context.Context, cmd *cli.Command) error {
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Senders.Get(ctx, cmd.Value("sender-id").(string), options...)
+	_, err = client.Number10dlc.Brands.Get(ctx, cmd.Value("brand-id").(string), options...)
 	if err != nil {
 		return err
 	}
@@ -325,16 +363,16 @@ func handleSendersRetrieve(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "senders retrieve",
+		Title:          "number-10dlc:brands retrieve",
 		Transform:      transform,
 	})
 }
 
-func handleSendersUpdate(ctx context.Context, cmd *cli.Command) error {
+func handleNumber10dlcBrandsUpdate(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("sender-id") && len(unusedArgs) > 0 {
-		cmd.Set("sender-id", unusedArgs[0])
+	if !cmd.IsSet("brand-id") && len(unusedArgs) > 0 {
+		cmd.Set("brand-id", unusedArgs[0])
 		unusedArgs = unusedArgs[1:]
 	}
 	if len(unusedArgs) > 0 {
@@ -352,13 +390,13 @@ func handleSendersUpdate(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	params := zavudev.SenderUpdateParams{}
+	params := zavudev.Number10dlcBrandUpdateParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Senders.Update(
+	_, err = client.Number10dlc.Brands.Update(
 		ctx,
-		cmd.Value("sender-id").(string),
+		cmd.Value("brand-id").(string),
 		params,
 		options...,
 	)
@@ -374,12 +412,12 @@ func handleSendersUpdate(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "senders update",
+		Title:          "number-10dlc:brands update",
 		Transform:      transform,
 	})
 }
 
-func handleSendersList(ctx context.Context, cmd *cli.Command) error {
+func handleNumber10dlcBrandsList(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
@@ -398,7 +436,7 @@ func handleSendersList(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	params := zavudev.SenderListParams{}
+	params := zavudev.Number10dlcBrandListParams{}
 
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
@@ -406,7 +444,7 @@ func handleSendersList(ctx context.Context, cmd *cli.Command) error {
 	if format == "raw" {
 		var res []byte
 		options = append(options, option.WithResponseBodyInto(&res))
-		_, err = client.Senders.List(ctx, params, options...)
+		_, err = client.Number10dlc.Brands.List(ctx, params, options...)
 		if err != nil {
 			return err
 		}
@@ -415,11 +453,11 @@ func handleSendersList(ctx context.Context, cmd *cli.Command) error {
 			ExplicitFormat: explicitFormat,
 			Format:         format,
 			RawOutput:      cmd.Root().Bool("raw-output"),
-			Title:          "senders list",
+			Title:          "number-10dlc:brands list",
 			Transform:      transform,
 		})
 	} else {
-		iter := client.Senders.ListAutoPaging(ctx, params, options...)
+		iter := client.Number10dlc.Brands.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
@@ -428,17 +466,17 @@ func handleSendersList(ctx context.Context, cmd *cli.Command) error {
 			ExplicitFormat: explicitFormat,
 			Format:         format,
 			RawOutput:      cmd.Root().Bool("raw-output"),
-			Title:          "senders list",
+			Title:          "number-10dlc:brands list",
 			Transform:      transform,
 		})
 	}
 }
 
-func handleSendersDelete(ctx context.Context, cmd *cli.Command) error {
+func handleNumber10dlcBrandsDelete(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("sender-id") && len(unusedArgs) > 0 {
-		cmd.Set("sender-id", unusedArgs[0])
+	if !cmd.IsSet("brand-id") && len(unusedArgs) > 0 {
+		cmd.Set("brand-id", unusedArgs[0])
 		unusedArgs = unusedArgs[1:]
 	}
 	if len(unusedArgs) > 0 {
@@ -456,14 +494,53 @@ func handleSendersDelete(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	return client.Senders.Delete(ctx, cmd.Value("sender-id").(string), options...)
+	return client.Number10dlc.Brands.Delete(ctx, cmd.Value("brand-id").(string), options...)
 }
 
-func handleSendersGetProfile(ctx context.Context, cmd *cli.Command) error {
+func handleNumber10dlcBrandsListUseCases(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("sender-id") && len(unusedArgs) > 0 {
-		cmd.Set("sender-id", unusedArgs[0])
+
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Number10dlc.Brands.ListUseCases(ctx, options...)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "number-10dlc:brands list-use-cases",
+		Transform:      transform,
+	})
+}
+
+func handleNumber10dlcBrandsSubmit(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("brand-id") && len(unusedArgs) > 0 {
+		cmd.Set("brand-id", unusedArgs[0])
 		unusedArgs = unusedArgs[1:]
 	}
 	if len(unusedArgs) > 0 {
@@ -483,7 +560,7 @@ func handleSendersGetProfile(ctx context.Context, cmd *cli.Command) error {
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Senders.GetProfile(ctx, cmd.Value("sender-id").(string), options...)
+	_, err = client.Number10dlc.Brands.Submit(ctx, cmd.Value("brand-id").(string), options...)
 	if err != nil {
 		return err
 	}
@@ -496,16 +573,16 @@ func handleSendersGetProfile(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "senders get-profile",
+		Title:          "number-10dlc:brands submit",
 		Transform:      transform,
 	})
 }
 
-func handleSendersRegenerateWebhookSecret(ctx context.Context, cmd *cli.Command) error {
+func handleNumber10dlcBrandsSyncStatus(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("sender-id") && len(unusedArgs) > 0 {
-		cmd.Set("sender-id", unusedArgs[0])
+	if !cmd.IsSet("brand-id") && len(unusedArgs) > 0 {
+		cmd.Set("brand-id", unusedArgs[0])
 		unusedArgs = unusedArgs[1:]
 	}
 	if len(unusedArgs) > 0 {
@@ -525,7 +602,7 @@ func handleSendersRegenerateWebhookSecret(ctx context.Context, cmd *cli.Command)
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Senders.RegenerateWebhookSecret(ctx, cmd.Value("sender-id").(string), options...)
+	_, err = client.Number10dlc.Brands.SyncStatus(ctx, cmd.Value("brand-id").(string), options...)
 	if err != nil {
 		return err
 	}
@@ -538,105 +615,7 @@ func handleSendersRegenerateWebhookSecret(ctx context.Context, cmd *cli.Command)
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "senders regenerate-webhook-secret",
-		Transform:      transform,
-	})
-}
-
-func handleSendersUpdateProfile(ctx context.Context, cmd *cli.Command) error {
-	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
-	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("sender-id") && len(unusedArgs) > 0 {
-		cmd.Set("sender-id", unusedArgs[0])
-		unusedArgs = unusedArgs[1:]
-	}
-	if len(unusedArgs) > 0 {
-		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
-	}
-
-	options, err := flagOptions(
-		cmd,
-		apiquery.NestedQueryFormatBrackets,
-		apiquery.ArrayQueryFormatComma,
-		ApplicationJSON,
-		false,
-	)
-	if err != nil {
-		return err
-	}
-
-	params := zavudev.SenderUpdateProfileParams{}
-
-	var res []byte
-	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Senders.UpdateProfile(
-		ctx,
-		cmd.Value("sender-id").(string),
-		params,
-		options...,
-	)
-	if err != nil {
-		return err
-	}
-
-	obj := gjson.ParseBytes(res)
-	format := cmd.Root().String("format")
-	explicitFormat := cmd.Root().IsSet("format")
-	transform := cmd.Root().String("transform")
-	return ShowJSON(obj, ShowJSONOpts{
-		ExplicitFormat: explicitFormat,
-		Format:         format,
-		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "senders update-profile",
-		Transform:      transform,
-	})
-}
-
-func handleSendersUploadProfilePicture(ctx context.Context, cmd *cli.Command) error {
-	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
-	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("sender-id") && len(unusedArgs) > 0 {
-		cmd.Set("sender-id", unusedArgs[0])
-		unusedArgs = unusedArgs[1:]
-	}
-	if len(unusedArgs) > 0 {
-		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
-	}
-
-	options, err := flagOptions(
-		cmd,
-		apiquery.NestedQueryFormatBrackets,
-		apiquery.ArrayQueryFormatComma,
-		ApplicationJSON,
-		false,
-	)
-	if err != nil {
-		return err
-	}
-
-	params := zavudev.SenderUploadProfilePictureParams{}
-
-	var res []byte
-	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Senders.UploadProfilePicture(
-		ctx,
-		cmd.Value("sender-id").(string),
-		params,
-		options...,
-	)
-	if err != nil {
-		return err
-	}
-
-	obj := gjson.ParseBytes(res)
-	format := cmd.Root().String("format")
-	explicitFormat := cmd.Root().IsSet("format")
-	transform := cmd.Root().String("transform")
-	return ShowJSON(obj, ShowJSONOpts{
-		ExplicitFormat: explicitFormat,
-		Format:         format,
-		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "senders upload-profile-picture",
+		Title:          "number-10dlc:brands sync-status",
 		Transform:      transform,
 	})
 }

@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -101,6 +100,11 @@ var broadcastsCreate = requestflag.WithInnerFlags(cli.Command{
 			Usage:      "MIME type of the media.",
 			InnerField: "mimeType",
 		},
+		&requestflag.InnerFlag[map[string]any]{
+			Name:       "content.template-button-variables",
+			Usage:      "Default button variables for dynamic URL/OTP buttons. Keys are the button index (0, 1, 2). Per-contact values override these.",
+			InnerField: "templateButtonVariables",
+		},
 		&requestflag.InnerFlag[string]{
 			Name:       "content.template-id",
 			Usage:      "Template ID for template messages.",
@@ -108,7 +112,7 @@ var broadcastsCreate = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.InnerFlag[map[string]any]{
 			Name:       "content.template-variables",
-			Usage:      "Default template variables (can be overridden per contact).",
+			Usage:      "Default body variables (can be overridden per contact). Keys are positions (1, 2, ...).",
 			InnerField: "templateVariables",
 		},
 	},
@@ -120,8 +124,9 @@ var broadcastsRetrieve = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 	},
 	Action:          handleBroadcastsRetrieve,
@@ -134,8 +139,9 @@ var broadcastsUpdate = requestflag.WithInnerFlags(cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 		&requestflag.Flag[map[string]any]{
 			Name:     "content",
@@ -187,6 +193,11 @@ var broadcastsUpdate = requestflag.WithInnerFlags(cli.Command{
 			Usage:      "MIME type of the media.",
 			InnerField: "mimeType",
 		},
+		&requestflag.InnerFlag[map[string]any]{
+			Name:       "content.template-button-variables",
+			Usage:      "Default button variables for dynamic URL/OTP buttons. Keys are the button index (0, 1, 2). Per-contact values override these.",
+			InnerField: "templateButtonVariables",
+		},
 		&requestflag.InnerFlag[string]{
 			Name:       "content.template-id",
 			Usage:      "Template ID for template messages.",
@@ -194,7 +205,7 @@ var broadcastsUpdate = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.InnerFlag[map[string]any]{
 			Name:       "content.template-variables",
-			Usage:      "Default template variables (can be overridden per contact).",
+			Usage:      "Default body variables (can be overridden per contact). Keys are positions (1, 2, ...).",
 			InnerField: "templateVariables",
 		},
 	},
@@ -234,8 +245,9 @@ var broadcastsDelete = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 	},
 	Action:          handleBroadcastsDelete,
@@ -248,11 +260,27 @@ var broadcastsCancel = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 	},
 	Action:          handleBroadcastsCancel,
+	HideHelpCommand: true,
+}
+
+var broadcastsEscalateReview = cli.Command{
+	Name:    "escalate-review",
+	Usage:   "Request manual review by the Zavu team for a rejected broadcast. Use this after\nautomated review rejection if you believe the content is legitimate.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
+		},
+	},
+	Action:          handleBroadcastsEscalateReview,
 	HideHelpCommand: true,
 }
 
@@ -262,8 +290,9 @@ var broadcastsProgress = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 	},
 	Action:          handleBroadcastsProgress,
@@ -276,8 +305,9 @@ var broadcastsReschedule = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 		&requestflag.Flag[any]{
 			Name:     "scheduled-at",
@@ -290,14 +320,30 @@ var broadcastsReschedule = cli.Command{
 	HideHelpCommand: true,
 }
 
+var broadcastsRetryReview = cli.Command{
+	Name:    "retry-review",
+	Usage:   "Resubmit a rejected broadcast for AI review after editing content. Maximum 3\nreview attempts allowed per broadcast.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
+		},
+	},
+	Action:          handleBroadcastsRetryReview,
+	HideHelpCommand: true,
+}
+
 var broadcastsSend = cli.Command{
 	Name:    "send",
 	Usage:   "Start sending the broadcast immediately or schedule for later. Broadcasts go\nthrough automated AI content review before sending. If the review passes, the\nbroadcast proceeds. If rejected, use PATCH to edit content, then call POST\n/retry-review. Reserves the estimated cost from your balance.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 		&requestflag.Flag[any]{
 			Name:     "scheduled-at",
@@ -317,8 +363,6 @@ func handleBroadcastsCreate(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.BroadcastNewParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -330,6 +374,8 @@ func handleBroadcastsCreate(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	params := zavudev.BroadcastNewParams{}
+
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
 	_, err = client.Broadcasts.New(ctx, params, options...)
@@ -339,8 +385,15 @@ func handleBroadcastsCreate(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "broadcasts create", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "broadcasts create",
+		Transform:      transform,
+	})
 }
 
 func handleBroadcastsRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -374,8 +427,15 @@ func handleBroadcastsRetrieve(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "broadcasts retrieve", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "broadcasts retrieve",
+		Transform:      transform,
+	})
 }
 
 func handleBroadcastsUpdate(ctx context.Context, cmd *cli.Command) error {
@@ -389,8 +449,6 @@ func handleBroadcastsUpdate(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.BroadcastUpdateParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -401,6 +459,8 @@ func handleBroadcastsUpdate(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.BroadcastUpdateParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -416,8 +476,15 @@ func handleBroadcastsUpdate(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "broadcasts update", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "broadcasts update",
+		Transform:      transform,
+	})
 }
 
 func handleBroadcastsList(ctx context.Context, cmd *cli.Command) error {
@@ -427,8 +494,6 @@ func handleBroadcastsList(ctx context.Context, cmd *cli.Command) error {
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
-
-	params := zavudev.BroadcastListParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -441,7 +506,10 @@ func handleBroadcastsList(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	params := zavudev.BroadcastListParams{}
+
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -451,14 +519,26 @@ func handleBroadcastsList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "broadcasts list", obj, format, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "broadcasts list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.Broadcasts.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "broadcasts list", iter, format, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "broadcasts list",
+			Transform:      transform,
+		})
 	}
 }
 
@@ -518,8 +598,57 @@ func handleBroadcastsCancel(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "broadcasts cancel", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "broadcasts cancel",
+		Transform:      transform,
+	})
+}
+
+func handleBroadcastsEscalateReview(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("broadcast-id") && len(unusedArgs) > 0 {
+		cmd.Set("broadcast-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Broadcasts.EscalateReview(ctx, cmd.Value("broadcast-id").(string), options...)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "broadcasts escalate-review",
+		Transform:      transform,
+	})
 }
 
 func handleBroadcastsProgress(ctx context.Context, cmd *cli.Command) error {
@@ -553,8 +682,15 @@ func handleBroadcastsProgress(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "broadcasts progress", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "broadcasts progress",
+		Transform:      transform,
+	})
 }
 
 func handleBroadcastsReschedule(ctx context.Context, cmd *cli.Command) error {
@@ -568,8 +704,6 @@ func handleBroadcastsReschedule(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.BroadcastRescheduleParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -580,6 +714,8 @@ func handleBroadcastsReschedule(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.BroadcastRescheduleParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -595,8 +731,57 @@ func handleBroadcastsReschedule(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "broadcasts reschedule", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "broadcasts reschedule",
+		Transform:      transform,
+	})
+}
+
+func handleBroadcastsRetryReview(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("broadcast-id") && len(unusedArgs) > 0 {
+		cmd.Set("broadcast-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Broadcasts.RetryReview(ctx, cmd.Value("broadcast-id").(string), options...)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "broadcasts retry-review",
+		Transform:      transform,
+	})
 }
 
 func handleBroadcastsSend(ctx context.Context, cmd *cli.Command) error {
@@ -610,8 +795,6 @@ func handleBroadcastsSend(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.BroadcastSendParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -622,6 +805,8 @@ func handleBroadcastsSend(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.BroadcastSendParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -637,6 +822,13 @@ func handleBroadcastsSend(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "broadcasts send", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "broadcasts send",
+		Transform:      transform,
+	})
 }
