@@ -25,8 +25,40 @@ var sendersCreate = cli.Command{
 			BodyPath: "name",
 		},
 		&requestflag.Flag[string]{
+			Name:     "email-address",
+			Usage:    "From-address for the email channel (e.g. noreply@yourdomain.com). The address's domain must be a verified email domain in your project. Setting this attaches the email channel to the sender.",
+			BodyPath: "emailAddress",
+		},
+		&requestflag.Flag[string]{
+			Name:     "email-domain-id",
+			Usage:    "ID of the verified email domain to attach. Optional — resolved from `emailAddress`'s domain when omitted.",
+			BodyPath: "emailDomainId",
+		},
+		&requestflag.Flag[string]{
+			Name:     "email-from-name",
+			Usage:    "Display name shown in the recipient's inbox for the email channel.",
+			BodyPath: "emailFromName",
+		},
+		&requestflag.Flag[bool]{
+			Name:     "email-receiving-enabled",
+			Usage:    "Enable inbound email receiving on this sender. Requires a verified MX record on the domain; ignored otherwise.",
+			BodyPath: "emailReceivingEnabled",
+		},
+		&requestflag.Flag[bool]{
+			Name:     "enable-sms-oneway",
+			Usage:    "Enable the one-way SMS channel (`sms_oneway`). Needs nothing else — no phone number, no credential — so it is the fastest way to get a sender that can send. Recipients cannot reply. Confirm with `sms_oneway` in the `channels` array on the response.",
+			Default:  false,
+			BodyPath: "enableSmsOneway",
+		},
+		&requestflag.Flag[bool]{
+			Name:     "enable-voice",
+			Usage:    "Let this sender place and answer phone calls. Requires `phoneNumber`; enabling it without one returns 400. Check the `channels` array on the response to confirm `voice` is on.",
+			Default:  false,
+			BodyPath: "enableVoice",
+		},
+		&requestflag.Flag[string]{
 			Name:     "phone-number",
-			Required: true,
+			Usage:    "Phone number in E.164 format, and it must be a number your project already owns (see `GET /v1/phone-numbers`). The number is routed to the sender as part of this call, which is what turns the SMS channel on. Passing a number the project does not own, or one already attached to another sender, returns 400 rather than creating a sender that cannot send. Omit for an email-only sender.",
 			BodyPath: "phoneNumber",
 		},
 		&requestflag.Flag[bool]{
@@ -38,6 +70,11 @@ var sendersCreate = cli.Command{
 			Name:     "webhook-event",
 			Usage:    "Events to subscribe to.",
 			BodyPath: "webhookEvents",
+		},
+		&requestflag.Flag[string]{
+			Name:     "webhook-signature-version",
+			Usage:    "Which `X-Zavu-Signature` scheme this receiver is sent.\n\n- `v1`: `v1=HMAC_SHA256(secret, body)`. The scheme used before this was configurable. Existing webhooks stay on it until you move them.\n- `v2`: `v2=HMAC_SHA256(secret, \"{t}.{body}\")`. The current scheme, and the default for new senders. It signs the timestamp together with the body.\n- `v1+v2`: both signatures, sharing one `t`. The migration setting: a receiver reading either one works, so you can deploy and confirm your new verifier before switching over.\n\nMoving from `v1` straight to `v2` returns `400`. Set `v1+v2` first. See https://docs.zavu.dev/guides/receiving-messages/signature-migration",
+			BodyPath: "webhookSignatureVersion",
 		},
 		&requestflag.Flag[string]{
 			Name:     "webhook-url",
@@ -74,10 +111,40 @@ var sendersUpdate = cli.Command{
 			Required:  true,
 			PathParam: "senderId",
 		},
+		&requestflag.Flag[string]{
+			Name:     "email-address",
+			Usage:    "Attach or change the sender's email from-address (e.g. noreply@yourdomain.com). The domain must be a verified email domain in your project.",
+			BodyPath: "emailAddress",
+		},
+		&requestflag.Flag[bool]{
+			Name:     "email-catch-all-enabled",
+			Usage:    "Enable or disable domain catch-all. When enabled (with emailReceivingEnabled true), this sender receives email for any address at its domain. Ignored (treated as false) if receiving is not enabled.",
+			BodyPath: "emailCatchAllEnabled",
+		},
+		&requestflag.Flag[string]{
+			Name:     "email-domain-id",
+			Usage:    "ID of the verified email domain to attach. Optional — resolved from `emailAddress`'s domain when omitted.",
+			BodyPath: "emailDomainId",
+		},
+		&requestflag.Flag[string]{
+			Name:     "email-from-name",
+			Usage:    "Display name shown in the recipient's inbox for the email channel.",
+			BodyPath: "emailFromName",
+		},
 		&requestflag.Flag[bool]{
 			Name:     "email-receiving-enabled",
 			Usage:    "Enable or disable inbound email receiving for this sender.",
 			BodyPath: "emailReceivingEnabled",
+		},
+		&requestflag.Flag[bool]{
+			Name:     "enable-sms-oneway",
+			Usage:    "Turn the one-way SMS channel on or off. Enabling needs nothing else and takes effect immediately; disabling removes the channel from the sender. Confirm with the `channels` array on the response.",
+			BodyPath: "enableSmsOneway",
+		},
+		&requestflag.Flag[bool]{
+			Name:     "enable-voice",
+			Usage:    "Turn the voice channel on or off. The sender must already have a phone number provisioned for calls; enabling it otherwise returns 400 instead of storing a flag that changes nothing. Confirm with the `channels` array on the response.",
+			BodyPath: "enableVoice",
 		},
 		&requestflag.Flag[string]{
 			Name:     "name",
@@ -96,6 +163,11 @@ var sendersUpdate = cli.Command{
 			Name:     "webhook-event",
 			Usage:    "Events to subscribe to.",
 			BodyPath: "webhookEvents",
+		},
+		&requestflag.Flag[string]{
+			Name:     "webhook-signature-version",
+			Usage:    "Which `X-Zavu-Signature` scheme this receiver is sent.\n\n- `v1`: `v1=HMAC_SHA256(secret, body)`. The scheme used before this was configurable. Existing webhooks stay on it until you move them.\n- `v2`: `v2=HMAC_SHA256(secret, \"{t}.{body}\")`. The current scheme, and the default for new senders. It signs the timestamp together with the body.\n- `v1+v2`: both signatures, sharing one `t`. The migration setting: a receiver reading either one works, so you can deploy and confirm your new verifier before switching over.\n\nMoving from `v1` straight to `v2` returns `400`. Set `v1+v2` first. See https://docs.zavu.dev/guides/receiving-messages/signature-migration",
+			BodyPath: "webhookSignatureVersion",
 		},
 		&requestflag.Flag[*string]{
 			Name:     "webhook-url",

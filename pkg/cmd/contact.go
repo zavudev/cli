@@ -134,6 +134,21 @@ var contactsList = cli.Command{
 	HideHelpCommand: true,
 }
 
+var contactsDelete = cli.Command{
+	Name:    "delete",
+	Usage:   "Permanently delete a contact and its communication channels. Implements\nright-to-erasure obligations under GDPR Art. 17, Ley 19.628 (Chile) Art. 12,\nCCPA § 1798.105, and LGPD Art. 18.VI. The contact, its channels, and any\nassociated agent flow sessions and conversation threads are removed. Past\nmessage records and broadcast delivery logs are retained for billing/audit but\nno longer reference the deleted contact.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "contact-id",
+			Required:  true,
+			PathParam: "contactId",
+		},
+	},
+	Action:          handleContactsDelete,
+	HideHelpCommand: true,
+}
+
 var contactsDismissMergeSuggestion = cli.Command{
 	Name:    "dismiss-merge-suggestion",
 	Usage:   "Dismiss the merge suggestion for a contact.",
@@ -370,6 +385,31 @@ func handleContactsList(ctx context.Context, cmd *cli.Command) error {
 			Transform:      transform,
 		})
 	}
+}
+
+func handleContactsDelete(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("contact-id") && len(unusedArgs) > 0 {
+		cmd.Set("contact-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	return client.Contacts.Delete(ctx, cmd.Value("contact-id").(string), options...)
 }
 
 func handleContactsDismissMergeSuggestion(ctx context.Context, cmd *cli.Command) error {

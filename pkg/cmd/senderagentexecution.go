@@ -14,6 +14,26 @@ import (
 	"github.com/zavudev/sdk-go/option"
 )
 
+var sendersAgentExecutionsRetrieve = cli.Command{
+	Name:    "retrieve",
+	Usage:   "Fetch full details for one execution — including `errorMessage`, `errorCode`,\nand `responseText`. Use this to debug failures surfaced by the list endpoint.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
+		},
+		&requestflag.Flag[string]{
+			Name:      "execution-id",
+			Required:  true,
+			PathParam: "executionId",
+		},
+	},
+	Action:          handleSendersAgentExecutionsRetrieve,
+	HideHelpCommand: true,
+}
+
 var sendersAgentExecutionsList = cli.Command{
 	Name:    "list",
 	Usage:   "List recent agent executions with pagination.",
@@ -45,6 +65,57 @@ var sendersAgentExecutionsList = cli.Command{
 	},
 	Action:          handleSendersAgentExecutionsList,
 	HideHelpCommand: true,
+}
+
+func handleSendersAgentExecutionsRetrieve(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("execution-id") && len(unusedArgs) > 0 {
+		cmd.Set("execution-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	params := zavudev.SenderAgentExecutionGetParams{
+		SenderID: cmd.Value("sender-id").(string),
+	}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Senders.Agent.Executions.Get(
+		ctx,
+		cmd.Value("execution-id").(string),
+		params,
+		options...,
+	)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders:agent:executions retrieve",
+		Transform:      transform,
+	})
 }
 
 func handleSendersAgentExecutionsList(ctx context.Context, cmd *cli.Command) error {

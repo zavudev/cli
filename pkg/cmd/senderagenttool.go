@@ -52,7 +52,7 @@ var sendersAgentToolsCreate = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:     "webhook-secret",
-			Usage:    "Optional secret for webhook signature verification.",
+			Usage:    "Signing secret for the webhook. Optional: Zavu generates one when omitted and returns it on this response only. Supply your own if you already have a secret you want reused.",
 			BodyPath: "webhookSecret",
 		},
 	},
@@ -210,7 +210,7 @@ var sendersAgentToolsDelete = cli.Command{
 
 var sendersAgentToolsTest = cli.Command{
 	Name:    "test",
-	Usage:   "Test a tool by triggering its webhook with test parameters.",
+	Usage:   "Run a tool with the parameters you supply and return what it answered.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{

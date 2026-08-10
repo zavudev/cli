@@ -20,6 +20,7 @@ func TestInvitationsCreate(t *testing.T) {
 			"--client-email", "contact@acme.com",
 			"--client-name", "Acme Corp",
 			"--client-phone", "+14155551234",
+			"--connection-type", "whatsapp_waba",
 			"--expires-in-days", "1",
 			"--phone-number-id", "pn_abc123",
 		)
@@ -34,6 +35,7 @@ func TestInvitationsCreate(t *testing.T) {
 			"clientEmail: contact@acme.com\n" +
 			"clientName: Acme Corp\n" +
 			"clientPhone: '+14155551234'\n" +
+			"connectionType: whatsapp_waba\n" +
 			"expiresInDays: 1\n" +
 			"phoneNumberId: pn_abc123\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(

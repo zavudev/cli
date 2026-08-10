@@ -29,7 +29,7 @@ func TestMessagesList(t *testing.T) {
 			"--api-key", "string",
 			"messages", "list",
 			"--max-items", "10",
-			"--channel", "auto",
+			"--channel", "sms",
 			"--cursor", "cursor",
 			"--limit", "100",
 			"--status", "queued",
@@ -74,7 +74,7 @@ func TestMessagesSend(t *testing.T) {
 			"--to", "+56912345678",
 			"--attachment", "{filename: invoice.pdf, content: content, content_id: logo, content_type: application/pdf, path: https://example.com}",
 			"--channel", "auto",
-			"--content", "{buttons: [{id: id, title: title}], contacts: [{name: name, phones: [string]}], ctaDisplayText: See Dates, ctaHeaderMediaUrl: https://example.com, ctaHeaderText: ctaHeaderText, ctaHeaderType: text, ctaUrl: https://example.com/schedule, emoji: emoji, filename: invoice.pdf, footerText: Dates subject to change., latitude: 0, listButton: listButton, locationAddress: locationAddress, locationName: locationName, longitude: 0, mediaId: mediaId, mediaUrl: https://example.com/image.jpg, mimeType: image/jpeg, reactToMessageId: reactToMessageId, sections: [{rows: [{id: id, title: title, description: description}], title: title}], templateButtonVariables: {'0': abc-report-token}, templateId: templateId, templateVariables: {'1': John, '2': ORD-12345}}",
+			"--content", "{buttons: [{id: id, title: title}], contacts: [{name: name, phones: [string]}], ctaDisplayText: See Dates, ctaHeaderMediaUrl: https://example.com, ctaHeaderText: ctaHeaderText, ctaHeaderType: text, ctaUrl: https://example.com/schedule, emoji: emoji, filename: invoice.pdf, footerText: Dates subject to change., latitude: 0, listButton: listButton, locationAddress: locationAddress, locationName: locationName, longitude: 0, mediaId: mediaId, mediaUrl: https://example.com/image.jpg, mimeType: image/jpeg, reactToMessageId: reactToMessageId, replyToFrom: replyToFrom, replyToMessageId: replyToMessageId, replyToMessageType: replyToMessageType, replyToProviderMessageId: replyToProviderMessageId, replyToText: replyToText, sections: [{rows: [{id: id, title: title, description: description}], title: title}], templateButtonVariables: {'0': abc-report-token}, templateHeaderVariables: {'1': Jorge y Laura}, templateId: templateId, templateVariables: {'1': John, '2': ORD-12345}}",
 			"--fallback-enabled=true",
 			"--html-body", "htmlBody",
 			"--idempotency-key", "msg_01HZY4ZP7VQY2J3BRW7Z6G0QGE",
@@ -123,8 +123,14 @@ func TestMessagesSend(t *testing.T) {
 			"--content.media-url", "https://example.com/image.jpg",
 			"--content.mime-type", "image/jpeg",
 			"--content.react-to-message-id", "reactToMessageId",
+			"--content.reply-to-from", "replyToFrom",
+			"--content.reply-to-message-id", "replyToMessageId",
+			"--content.reply-to-message-type", "replyToMessageType",
+			"--content.reply-to-provider-message-id", "replyToProviderMessageId",
+			"--content.reply-to-text", "replyToText",
 			"--content.sections", "[{rows: [{id: id, title: title, description: description}], title: title}]",
 			"--content.template-button-variables", "{'0': abc-report-token}",
+			"--content.template-header-variables", "{'1': Jorge y Laura}",
 			"--content.template-id", "templateId",
 			"--content.template-variables", "{'1': John, '2': ORD-12345}",
 			"--fallback-enabled=true",
@@ -176,6 +182,11 @@ func TestMessagesSend(t *testing.T) {
 			"  mediaUrl: https://example.com/image.jpg\n" +
 			"  mimeType: image/jpeg\n" +
 			"  reactToMessageId: reactToMessageId\n" +
+			"  replyToFrom: replyToFrom\n" +
+			"  replyToMessageId: replyToMessageId\n" +
+			"  replyToMessageType: replyToMessageType\n" +
+			"  replyToProviderMessageId: replyToProviderMessageId\n" +
+			"  replyToText: replyToText\n" +
 			"  sections:\n" +
 			"    - rows:\n" +
 			"        - id: id\n" +
@@ -184,6 +195,8 @@ func TestMessagesSend(t *testing.T) {
 			"      title: title\n" +
 			"  templateButtonVariables:\n" +
 			"    '0': abc-report-token\n" +
+			"  templateHeaderVariables:\n" +
+			"    '1': Jorge y Laura\n" +
 			"  templateId: templateId\n" +
 			"  templateVariables:\n" +
 			"    '1': John\n" +
@@ -202,6 +215,19 @@ func TestMessagesSend(t *testing.T) {
 			t, pipeData,
 			"--api-key", "string",
 			"messages", "send",
+			"--zavu-sender", "sender_12345",
+		)
+	})
+}
+
+func TestMessagesShowTyping(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"messages", "show-typing",
+			"--message-id", "messageId",
 			"--zavu-sender", "sender_12345",
 		)
 	})

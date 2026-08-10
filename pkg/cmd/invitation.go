@@ -16,12 +16,12 @@ import (
 
 var invitationsCreate = cli.Command{
 	Name:    "create",
-	Usage:   "Create a partner invitation link for a client to connect their WhatsApp Business\naccount. The client will complete Meta's embedded signup flow and the resulting\nsender will be created in your project.",
+	Usage:   "Create a partner invitation link for a client to connect a Meta channel. The\nclient opens the returned `url` and authorizes with Meta; the resulting sender\nis created in your project when they finish, and the invitation transitions to\n`completed`.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[[]string]{
 			Name:     "allowed-phone-country",
-			Usage:    "ISO country codes for allowed phone numbers.",
+			Usage:    "ISO country codes for allowed phone numbers. Only valid when `connectionType` is `whatsapp_waba` — sending it with `messenger` returns 400.",
 			BodyPath: "allowedPhoneCountries",
 		},
 		&requestflag.Flag[string]{
@@ -39,6 +39,12 @@ var invitationsCreate = cli.Command{
 			Usage:    "Phone number of the client in E.164 format.",
 			BodyPath: "clientPhone",
 		},
+		&requestflag.Flag[string]{
+			Name:     "connection-type",
+			Usage:    "Which Meta channel the client connects, and how.\n- `whatsapp_waba` (default): Meta's embedded signup links an official WhatsApp Business Account. Accepts `phoneNumberId` and `allowedPhoneCountries`.\n- `messenger`: the client authorizes with Facebook and picks a Facebook Page they administer. The Page's Messenger inbox — including Marketplace chats — is routed to Zavu. They must be an admin of at least one Page. A Page can only be connected to one Zavu project at a time: if the client picks a Page that another project already connected, the newer connection wins and the older one is disconnected.\n\nOne invitation connects one channel. To onboard a client on several channels, create one invitation per channel; each completes into its own sender.",
+			Default:  "whatsapp_waba",
+			BodyPath: "connectionType",
+		},
 		&requestflag.Flag[int64]{
 			Name:     "expires-in-days",
 			Usage:    "Number of days until the invitation expires.",
@@ -47,7 +53,7 @@ var invitationsCreate = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:     "phone-number-id",
-			Usage:    "ID of a Zavu phone number to pre-assign for WhatsApp registration. If provided, the client will use this number instead of their own.",
+			Usage:    "ID of a Zavu phone number to pre-assign for WhatsApp registration. If provided, the client will use this number instead of their own. Only valid when `connectionType` is `whatsapp_waba` — sending it with `messenger` returns 400, since a Facebook Page has no phone number.",
 			BodyPath: "phoneNumberId",
 		},
 	},
@@ -86,7 +92,7 @@ var invitationsList = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:      "status",
-			Usage:     "Current status of the partner invitation.",
+			Usage:     "Current status of the partner invitation.\n\n`failed` means the client started the connection and it did not finish (they cancelled Meta's dialog, denied a permission, or abandoned the tab). A failed invitation is still usable: the same link can be retried, and it moves back to `in_progress` when the client tries again.",
 			QueryPath: "status",
 		},
 		&requestflag.Flag[int64]{

@@ -85,7 +85,7 @@ var phoneNumbersList = cli.Command{
 
 var phoneNumbersPurchase = cli.Command{
 	Name:    "purchase",
-	Usage:   "Purchase an available phone number. The first US phone number is free for each\nteam.",
+	Usage:   "Purchase an available phone number. Requires a paid plan: the Free plan cannot\npurchase phone numbers and receives `402` with code `paid_plan_required`. Paid\nplans include one US number at no charge. The included number is one per account\nand is granted once: claiming it spends the benefit for good, so releasing that\nnumber does not make another one free, and numbers the account already bought do\nnot consume it.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
@@ -132,7 +132,7 @@ var phoneNumbersRequirements = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:      "type",
-			Usage:     `Allowed values: "local", "mobile", "tollFree".`,
+			Usage:     `Allowed values: "local", "national", "tollFree".`,
 			QueryPath: "type",
 		},
 	},
@@ -152,6 +152,11 @@ var phoneNumbersSearchAvailable = cli.Command{
 			QueryPath: "countryCode",
 		},
 		&requestflag.Flag[string]{
+			Name:      "capabilities",
+			Usage:     "Comma-separated capabilities the number must have: `sms`, `voice`, `mms`. Numbers missing any of them are dropped.",
+			QueryPath: "capabilities",
+		},
+		&requestflag.Flag[string]{
 			Name:      "contains",
 			Usage:     "Search for numbers containing this string.",
 			QueryPath: "contains",
@@ -164,7 +169,7 @@ var phoneNumbersSearchAvailable = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:      "type",
-			Usage:     `Allowed values: "local", "mobile", "tollFree".`,
+			Usage:     `Allowed values: "local", "national", "tollFree".`,
 			QueryPath: "type",
 		},
 	},

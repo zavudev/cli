@@ -14,7 +14,7 @@ import (
 	"github.com/zavudev/sdk-go/option"
 )
 
-var sendersAgentCreate = cli.Command{
+var sendersAgentCreate = requestflag.WithInnerFlags(cli.Command{
 	Name:    "create",
 	Usage:   "Create an AI agent for a sender. Each sender can have at most one agent.",
 	Suggest: true,
@@ -78,10 +78,103 @@ var sendersAgentCreate = cli.Command{
 			Default:  []string{"text"},
 			BodyPath: "triggerOnMessageTypes",
 		},
+		&requestflag.Flag[map[string]any]{
+			Name:     "voice",
+			Usage:    "Voice Agent configuration. Enable this to let the agent answer and place phone calls with Zavu's managed voice pipeline. Requires the Voice Agents feature to be enabled for your team.",
+			BodyPath: "voice",
+		},
 	},
 	Action:          handleSendersAgentCreate,
 	HideHelpCommand: true,
-}
+}, map[string][]requestflag.HasOuterFlag{
+	"voice": {
+		&requestflag.InnerFlag[bool]{
+			Name:       "voice.enabled",
+			Usage:      "Whether the agent handles voice calls. When false, the sender's number is not answered by the voice agent and outbound calls are rejected.",
+			InnerField: "enabled",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "voice.greeting",
+			Usage:      "Opening line the agent speaks when the call connects. If omitted, the agent waits for the caller to speak first.",
+			InnerField: "greeting",
+		},
+		&requestflag.InnerFlag[map[string]any]{
+			Name:       "voice.greetings",
+			Usage:      "Greeting per language, keyed by language code. Used when the caller's language differs from the one `greeting` is written in.",
+			InnerField: "greetings",
+		},
+		&requestflag.InnerFlag[bool]{
+			Name:       "voice.interruptible",
+			Usage:      "Whether the caller can interrupt the agent while it is speaking (barge-in). When true, the agent stops talking as soon as the caller starts.",
+			InnerField: "interruptible",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "voice.language",
+			Usage:      "BCP-47 language code used for both speech recognition and speech synthesis (e.g. `en`, `es`, `pt-BR`). Auto-detected from the recipient when omitted.",
+			InnerField: "language",
+		},
+		&requestflag.InnerFlag[int64]{
+			Name:       "voice.max-call-duration-minutes",
+			Usage:      "Hard limit on call length in minutes. The call ends automatically when reached.",
+			InnerField: "maxCallDurationMinutes",
+		},
+		&requestflag.InnerFlag[int64]{
+			Name:       "voice.max-idle-seconds",
+			Usage:      "How long the agent waits during silence before ending the call.",
+			InnerField: "maxIdleSeconds",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "voice.model",
+			Usage:      "Model that runs the conversation, co-located in the voice network for lowest latency. Independent of the model used for text messaging. Derived from the agent's text model when omitted.",
+			InnerField: "model",
+		},
+		&requestflag.InnerFlag[bool]{
+			Name:       "voice.record-calls",
+			Usage:      "Whether the call audio is recorded.",
+			InnerField: "recordCalls",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "voice.stt-model",
+			Usage:      "Speech-recognition model. Uses the default when omitted.",
+			InnerField: "sttModel",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "voice.stt-provider",
+			Usage:      "Speech-recognition provider. Uses the default when omitted.",
+			InnerField: "sttProvider",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "voice.transfer-phone-number",
+			Usage:      "E.164 phone number the agent can transfer the call to. When set, the agent is given a transfer tool it can use to hand the call to a human.",
+			InnerField: "transferPhoneNumber",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "voice.tts-provider",
+			Usage:      "Speech-synthesis provider. Uses the default when omitted.",
+			InnerField: "ttsProvider",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "voice.tts-voice-id",
+			Usage:      "Identifier of the synthesized voice that speaks. Choose from the voices available in the dashboard. Uses a neutral default when omitted.",
+			InnerField: "ttsVoiceId",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "voice.voicemail-action",
+			Usage:      "What the agent does when an answering machine or voicemail is detected on an outbound call.",
+			InnerField: "voicemailAction",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "voice.voicemail-message",
+			Usage:      "Message spoken when `voicemailAction` is `leave_message`. Falls back to `greeting` when omitted.",
+			InnerField: "voicemailMessage",
+		},
+		&requestflag.InnerFlag[float64]{
+			Name:       "voice.voice-speed",
+			Usage:      "Speech rate. 1.0 is natural. Only honoured by voices that support rate control; ignored by the others.",
+			InnerField: "voiceSpeed",
+		},
+	},
+})
 
 var sendersAgentRetrieve = cli.Command{
 	Name:    "retrieve",
@@ -98,7 +191,7 @@ var sendersAgentRetrieve = cli.Command{
 	HideHelpCommand: true,
 }
 
-var sendersAgentUpdate = cli.Command{
+var sendersAgentUpdate = requestflag.WithInnerFlags(cli.Command{
 	Name:    "update",
 	Usage:   "Update an AI agent's configuration.",
 	Suggest: true,
@@ -157,10 +250,103 @@ var sendersAgentUpdate = cli.Command{
 			Name:     "trigger-on-message-type",
 			BodyPath: "triggerOnMessageTypes",
 		},
+		&requestflag.Flag[map[string]any]{
+			Name:     "voice",
+			Usage:    "Voice Agent configuration. Patch this object to enable voice, change the greeting, or adjust call limits. Requires the Voice Agents feature to be enabled for your team.",
+			BodyPath: "voice",
+		},
 	},
 	Action:          handleSendersAgentUpdate,
 	HideHelpCommand: true,
-}
+}, map[string][]requestflag.HasOuterFlag{
+	"voice": {
+		&requestflag.InnerFlag[bool]{
+			Name:       "voice.enabled",
+			Usage:      "Whether the agent handles voice calls. When false, the sender's number is not answered by the voice agent and outbound calls are rejected.",
+			InnerField: "enabled",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "voice.greeting",
+			Usage:      "Opening line the agent speaks when the call connects. If omitted, the agent waits for the caller to speak first.",
+			InnerField: "greeting",
+		},
+		&requestflag.InnerFlag[map[string]any]{
+			Name:       "voice.greetings",
+			Usage:      "Greeting per language, keyed by language code. Used when the caller's language differs from the one `greeting` is written in.",
+			InnerField: "greetings",
+		},
+		&requestflag.InnerFlag[bool]{
+			Name:       "voice.interruptible",
+			Usage:      "Whether the caller can interrupt the agent while it is speaking (barge-in). When true, the agent stops talking as soon as the caller starts.",
+			InnerField: "interruptible",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "voice.language",
+			Usage:      "BCP-47 language code used for both speech recognition and speech synthesis (e.g. `en`, `es`, `pt-BR`). Auto-detected from the recipient when omitted.",
+			InnerField: "language",
+		},
+		&requestflag.InnerFlag[int64]{
+			Name:       "voice.max-call-duration-minutes",
+			Usage:      "Hard limit on call length in minutes. The call ends automatically when reached.",
+			InnerField: "maxCallDurationMinutes",
+		},
+		&requestflag.InnerFlag[int64]{
+			Name:       "voice.max-idle-seconds",
+			Usage:      "How long the agent waits during silence before ending the call.",
+			InnerField: "maxIdleSeconds",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "voice.model",
+			Usage:      "Model that runs the conversation, co-located in the voice network for lowest latency. Independent of the model used for text messaging. Derived from the agent's text model when omitted.",
+			InnerField: "model",
+		},
+		&requestflag.InnerFlag[bool]{
+			Name:       "voice.record-calls",
+			Usage:      "Whether the call audio is recorded.",
+			InnerField: "recordCalls",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "voice.stt-model",
+			Usage:      "Speech-recognition model. Uses the default when omitted.",
+			InnerField: "sttModel",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "voice.stt-provider",
+			Usage:      "Speech-recognition provider. Uses the default when omitted.",
+			InnerField: "sttProvider",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "voice.transfer-phone-number",
+			Usage:      "E.164 phone number the agent can transfer the call to. When set, the agent is given a transfer tool it can use to hand the call to a human.",
+			InnerField: "transferPhoneNumber",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "voice.tts-provider",
+			Usage:      "Speech-synthesis provider. Uses the default when omitted.",
+			InnerField: "ttsProvider",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "voice.tts-voice-id",
+			Usage:      "Identifier of the synthesized voice that speaks. Choose from the voices available in the dashboard. Uses a neutral default when omitted.",
+			InnerField: "ttsVoiceId",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "voice.voicemail-action",
+			Usage:      "What the agent does when an answering machine or voicemail is detected on an outbound call.",
+			InnerField: "voicemailAction",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "voice.voicemail-message",
+			Usage:      "Message spoken when `voicemailAction` is `leave_message`. Falls back to `greeting` when omitted.",
+			InnerField: "voicemailMessage",
+		},
+		&requestflag.InnerFlag[float64]{
+			Name:       "voice.voice-speed",
+			Usage:      "Speech rate. 1.0 is natural. Only honoured by voices that support rate control; ignored by the others.",
+			InnerField: "voiceSpeed",
+		},
+	},
+})
 
 var sendersAgentDelete = cli.Command{
 	Name:    "delete",

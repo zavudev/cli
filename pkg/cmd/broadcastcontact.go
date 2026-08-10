@@ -79,8 +79,13 @@ var broadcastsContactsAdd = requestflag.WithInnerFlags(cli.Command{
 			InnerField: "templateButtonVariables",
 		},
 		&requestflag.InnerFlag[map[string]any]{
+			Name:       "contact.template-header-variables",
+			Usage:      "Per-contact value for a text-header variable, keyed by `1`. If omitted, Zavu resolves the header from `templateVariables` by the header placeholder's name.",
+			InnerField: "templateHeaderVariables",
+		},
+		&requestflag.InnerFlag[map[string]any]{
 			Name:       "contact.template-variables",
-			Usage:      "Per-contact body variables. Keys are positions (1, 2, ...) matching the order placeholders appear in the template body.",
+			Usage:      "Per-contact body variables. Key them to match the template body: by position (`1`, `2`, ...) for positional templates, or by name (e.g. `customer_name`) for named templates. Zavu detects the template's format and sends the correct payload to Meta. Do not mix positional and named keys.",
 			InnerField: "templateVariables",
 		},
 	},
