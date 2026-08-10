@@ -105,6 +105,11 @@ var broadcastsCreate = requestflag.WithInnerFlags(cli.Command{
 			Usage:      "Default button variables for dynamic URL/OTP buttons. Keys are the button index (0, 1, 2). Per-contact values override these.",
 			InnerField: "templateButtonVariables",
 		},
+		&requestflag.InnerFlag[map[string]any]{
+			Name:       "content.template-header-variables",
+			Usage:      "Default value for a text-header variable, keyed by `1` (can be overridden per contact). If omitted, Zavu resolves the header from `templateVariables` by the header placeholder's name.",
+			InnerField: "templateHeaderVariables",
+		},
 		&requestflag.InnerFlag[string]{
 			Name:       "content.template-id",
 			Usage:      "Template ID for template messages.",
@@ -112,7 +117,7 @@ var broadcastsCreate = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.InnerFlag[map[string]any]{
 			Name:       "content.template-variables",
-			Usage:      "Default body variables (can be overridden per contact). Keys are positions (1, 2, ...).",
+			Usage:      "Default body variables (can be overridden per contact). Key them to match the template body: by position (`1`, `2`, ...) for positional templates, or by name (e.g. `customer_name`) for named templates. Zavu detects the template's format and sends the correct payload to Meta. Do not mix positional and named keys.",
 			InnerField: "templateVariables",
 		},
 	},
@@ -198,6 +203,11 @@ var broadcastsUpdate = requestflag.WithInnerFlags(cli.Command{
 			Usage:      "Default button variables for dynamic URL/OTP buttons. Keys are the button index (0, 1, 2). Per-contact values override these.",
 			InnerField: "templateButtonVariables",
 		},
+		&requestflag.InnerFlag[map[string]any]{
+			Name:       "content.template-header-variables",
+			Usage:      "Default value for a text-header variable, keyed by `1` (can be overridden per contact). If omitted, Zavu resolves the header from `templateVariables` by the header placeholder's name.",
+			InnerField: "templateHeaderVariables",
+		},
 		&requestflag.InnerFlag[string]{
 			Name:       "content.template-id",
 			Usage:      "Template ID for template messages.",
@@ -205,7 +215,7 @@ var broadcastsUpdate = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.InnerFlag[map[string]any]{
 			Name:       "content.template-variables",
-			Usage:      "Default body variables (can be overridden per contact). Keys are positions (1, 2, ...).",
+			Usage:      "Default body variables (can be overridden per contact). Key them to match the template body: by position (`1`, `2`, ...) for positional templates, or by name (e.g. `customer_name`) for named templates. Zavu detects the template's format and sends the correct payload to Meta. Do not mix positional and named keys.",
 			InnerField: "templateVariables",
 		},
 	},
@@ -337,7 +347,7 @@ var broadcastsRetryReview = cli.Command{
 
 var broadcastsSend = cli.Command{
 	Name:    "send",
-	Usage:   "Start sending the broadcast immediately or schedule for later. Broadcasts go\nthrough automated AI content review before sending. If the review passes, the\nbroadcast proceeds. If rejected, use PATCH to edit content, then call POST\n/retry-review. Reserves the estimated cost from your balance.",
+	Usage:   "Start sending the broadcast immediately or schedule for later.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{

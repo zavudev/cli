@@ -219,7 +219,7 @@ var number10dlcCampaignsDelete = cli.Command{
 
 var number10dlcCampaignsSubmit = cli.Command{
 	Name:    "submit",
-	Usage:   "Submit a draft campaign for carrier review. The campaign must be in draft status\nand its brand must be verified.",
+	Usage:   "Submit a draft campaign for carrier review. The campaign must be in draft status\nand its brand must be verified. TCR's one-time registration fee is charged from\nyour balance at submission ($15 for standard use cases, $2 for LOW_VOLUME),\npassed through at cost and refunded if the carrier rejects it. Once approved,\nthe campaign's monthly TCR fee ($10 standard, $2 LOW_VOLUME) is charged from\nyour balance while the campaign is active — see registrationCostCents and\nmonthlyFeeCents on the campaign object.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{

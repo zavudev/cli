@@ -96,12 +96,8 @@ var templatesCreate = requestflag.WithInnerFlags(cli.Command{
 }, map[string][]requestflag.HasOuterFlag{
 	"button": {
 		&requestflag.InnerFlag[string]{
-			Name:       "button.text",
-			InnerField: "text",
-		},
-		&requestflag.InnerFlag[string]{
 			Name:       "button.type",
-			Usage:      `Allowed values: "quick_reply", "url", "phone", "otp".`,
+			Usage:      "`request_contact_info` renders a fixed **Share Contact Info** button that asks the recipient to share their phone number — useful when a contact adopted a WhatsApp username and you only know their BSUID. It takes no other fields.",
 			InnerField: "type",
 		},
 		&requestflag.InnerFlag[string]{
@@ -127,6 +123,11 @@ var templatesCreate = requestflag.WithInnerFlags(cli.Command{
 			Name:       "button.signature-hash",
 			Usage:      "Android app signature hash. Required for ONE_TAP buttons.",
 			InnerField: "signatureHash",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "button.text",
+			Usage:      "Button label. Required for every type except `request_contact_info`, whose label is fixed by WhatsApp.",
+			InnerField: "text",
 		},
 		&requestflag.InnerFlag[string]{
 			Name:       "button.url",

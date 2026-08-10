@@ -8,13 +8,13 @@ import (
 	"github.com/zavudev/cli/internal/mocktest"
 )
 
-func TestUsageRetrieve(t *testing.T) {
+func TestMeRetrieve(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t,
 			"--api-key", "string",
-			"usage", "retrieve",
+			"me", "retrieve",
 		)
 	})
 }

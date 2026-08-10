@@ -20,7 +20,7 @@ func TestTemplatesCreate(t *testing.T) {
 			"--language", "en",
 			"--name", "order_confirmation",
 			"--add-security-recommendation=true",
-			"--button", "{text: text, type: quick_reply, example: ORD-12345, otpType: COPY_CODE, packageName: packageName, phoneNumber: phoneNumber, signatureHash: signatureHash, url: https://example.com}",
+			"--button", "{type: quick_reply, example: ORD-12345, otpType: COPY_CODE, packageName: packageName, phoneNumber: phoneNumber, signatureHash: signatureHash, text: text, url: https://example.com}",
 			"--code-expiration-minutes", "1",
 			"--footer", "footer",
 			"--header-content", "headerContent",
@@ -47,13 +47,13 @@ func TestTemplatesCreate(t *testing.T) {
 			"--language", "en",
 			"--name", "order_confirmation",
 			"--add-security-recommendation=true",
-			"--button.text", "text",
 			"--button.type", "quick_reply",
 			"--button.example", "ORD-12345",
 			"--button.otp-type", "COPY_CODE",
 			"--button.package-name", "packageName",
 			"--button.phone-number", "phoneNumber",
 			"--button.signature-hash", "signatureHash",
+			"--button.text", "text",
 			"--button.url", "https://example.com",
 			"--code-expiration-minutes", "1",
 			"--footer", "footer",
@@ -76,13 +76,13 @@ func TestTemplatesCreate(t *testing.T) {
 			"name: order_confirmation\n" +
 			"addSecurityRecommendation: true\n" +
 			"buttons:\n" +
-			"  - text: text\n" +
-			"    type: quick_reply\n" +
+			"  - type: quick_reply\n" +
 			"    example: ORD-12345\n" +
 			"    otpType: COPY_CODE\n" +
 			"    packageName: packageName\n" +
 			"    phoneNumber: phoneNumber\n" +
 			"    signatureHash: signatureHash\n" +
+			"    text: text\n" +
 			"    url: https://example.com\n" +
 			"codeExpirationMinutes: 1\n" +
 			"footer: footer\n" +

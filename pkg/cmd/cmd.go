@@ -93,6 +93,7 @@ func init() {
 					&messagesList,
 					&messagesReact,
 					&messagesSend,
+					&messagesShowTyping,
 				},
 			},
 			{
@@ -140,6 +141,7 @@ func init() {
 				Category: "API RESOURCE",
 				Suggest:  true,
 				Commands: []*cli.Command{
+					&sendersAgentExecutionsRetrieve,
 					&sendersAgentExecutionsList,
 				},
 			},
@@ -210,6 +212,7 @@ func init() {
 					&contactsRetrieve,
 					&contactsUpdate,
 					&contactsList,
+					&contactsDelete,
 					&contactsDismissMergeSuggestion,
 					&contactsMerge,
 					&contactsRetrieveByPhone,
@@ -311,16 +314,6 @@ func init() {
 				},
 			},
 			{
-				Name:     "exports",
-				Category: "API RESOURCE",
-				Suggest:  true,
-				Commands: []*cli.Command{
-					&exportsCreate,
-					&exportsRetrieve,
-					&exportsList,
-				},
-			},
-			{
 				Name:     "urls",
 				Category: "API RESOURCE",
 				Suggest:  true,
@@ -336,22 +329,6 @@ func init() {
 				Suggest:  true,
 				Commands: []*cli.Command{
 					&balanceRetrieve,
-				},
-			},
-			{
-				Name:     "plan",
-				Category: "API RESOURCE",
-				Suggest:  true,
-				Commands: []*cli.Command{
-					&planRetrieve,
-				},
-			},
-			{
-				Name:     "usage",
-				Category: "API RESOURCE",
-				Suggest:  true,
-				Commands: []*cli.Command{
-					&usageRetrieve,
 				},
 			},
 			{
@@ -414,6 +391,38 @@ func init() {
 					&number10dlcCampaignsPhoneNumbersList,
 					&number10dlcCampaignsPhoneNumbersAssign,
 					&number10dlcCampaignsPhoneNumbersUnassign,
+				},
+			},
+			{
+				Name:     "me",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&meRetrieve,
+				},
+			},
+			{
+				Name:     "functions",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&functionsCreate,
+					&functionsRetrieve,
+					&functionsUpdate,
+					&functionsDelete,
+					&functionsDeploy,
+					&functionsGetDeployment,
+					&functionsTailLogs,
+				},
+			},
+			{
+				Name:     "functions:secrets",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&functionsSecretsList,
+					&functionsSecretsSet,
+					&functionsSecretsUnset,
 				},
 			},
 			{

@@ -36,7 +36,7 @@ var messagesList = cli.Command{
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
 			Name:      "channel",
-			Usage:     "Delivery channel. Use 'auto' for intelligent routing.",
+			Usage:     "Filter by delivery channel.",
 			QueryPath: "channel",
 		},
 		&requestflag.Flag[string]{
@@ -50,7 +50,7 @@ var messagesList = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:      "status",
-			Usage:     `Allowed values: "queued", "sending", "sent", "delivered", "read", "failed", "received", "pending_url_verification".`,
+			Usage:     "Filter by status. Not all stored statuses are filterable.",
 			QueryPath: "status",
 		},
 		&requestflag.Flag[string]{
@@ -98,7 +98,7 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
 			Name:     "to",
-			Usage:    "Recipient phone number in E.164 format, email address, or numeric chat ID (for Telegram/Instagram).",
+			Usage:    "Recipient phone number in E.164 format, email address, WhatsApp business-scoped user ID (BSUID, e.g. `US.13491208655302741918`), or numeric chat ID (for Telegram/Instagram/Messenger). A BSUID is routed to WhatsApp and sent via the `recipient` field; use it to message a contact who adopted a username and whose phone number is hidden.",
 			Required: true,
 			BodyPath: "to",
 		},
@@ -135,7 +135,7 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:     "message-type",
-			Usage:    "Type of message. Non-text types are supported by WhatsApp and Telegram (varies by type).",
+			Usage:    "Type of message. Non-text types are supported by WhatsApp and Telegram (varies by type).\n\n`location_request` asks the recipient to share their location and is WhatsApp-only. It takes no `content` object — the prompt goes in `text` (max 1024 characters) and the button label is fixed by WhatsApp. The recipient's answer arrives as an inbound `location` message whose `content.replyToMessageId` is the ID of the request.\n\n`request_contact_info` asks the recipient to share their phone number and is WhatsApp-only. Like `location_request` it takes no `content` object — the prompt goes in `text` (max 1024 characters) and WhatsApp renders a fixed **Share Contact Info** button. The answer arrives as an inbound `contact` message. Use it to recover the phone number of a contact who adopted a WhatsApp username and is only known by their business-scoped user ID (BSUID); when they share it, Zavu automatically links the phone number to that contact.",
 			BodyPath: "messageType",
 		},
 		&requestflag.Flag[map[string]any]{
@@ -294,6 +294,31 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 			Usage:      "Message ID to react to.",
 			InnerField: "reactToMessageId",
 		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.reply-to-from",
+			Usage:      "Sender of the quoted message (phone number in E.164 format).",
+			InnerField: "replyToFrom",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.reply-to-message-id",
+			Usage:      "Zavu message ID of the quoted message this message replies to. Present on inbound messages that quote an earlier message. Omitted when the quoted message is not found in Zavu (e.g. an old or unknown message) — use replyToProviderMessageId in that case.",
+			InnerField: "replyToMessageId",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.reply-to-message-type",
+			Usage:      "Type of the quoted message (text, image, video, etc.).",
+			InnerField: "replyToMessageType",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.reply-to-provider-message-id",
+			Usage:      "Provider message ID (WhatsApp WAMID) of the quoted message. Present whenever an inbound message is a reply, even if the quoted message is not stored in Zavu.",
+			InnerField: "replyToProviderMessageId",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.reply-to-text",
+			Usage:      "Truncated snippet of the quoted message's text, for display. Empty when the quoted message has no text (e.g. media).",
+			InnerField: "replyToText",
+		},
 		&requestflag.InnerFlag[[]map[string]any]{
 			Name:       "content.sections",
 			Usage:      "Sections for list messages.",
@@ -304,6 +329,11 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 			Usage:      "Variables for dynamic button placeholders (URL buttons and OTP buttons). Keys are the button index (0, 1, 2) in the template's `buttons` array — not the placeholder name. Values substitute the `{{1}}` placeholder inside that button's URL.\n\n**WhatsApp constraints:**\n- URL buttons only accept `{{1}}` — positional, numeric, no whitespace, no name. Named placeholders like `{{token}}` are stored as literal URL text by Meta and cannot be substituted.\n- At most one placeholder per URL button.\n- A template may have at most three buttons.\n- Static URL buttons (no placeholder) and `quick_reply` buttons are not included here.",
 			InnerField: "templateButtonVariables",
 		},
+		&requestflag.InnerFlag[map[string]any]{
+			Name:       "content.template-header-variables",
+			Usage:      "Value for a text-header variable, keyed by `1` (WhatsApp text headers allow at most one variable). Optional override. If omitted, Zavu resolves the header from `templateVariables` using the header placeholder's name (e.g. `novios`). Static text headers need no value.",
+			InnerField: "templateHeaderVariables",
+		},
 		&requestflag.InnerFlag[string]{
 			Name:       "content.template-id",
 			Usage:      "Template ID for template messages.",
@@ -311,11 +341,30 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.InnerFlag[map[string]any]{
 			Name:       "content.template-variables",
-			Usage:      "Variables for body placeholders. Keys are positions (1, 2, 3, ...) matching the order placeholders appear in the template body.",
+			Usage:      "Variables for body placeholders. Key them to match the template body: by position (`1`, `2`, ...) for positional templates, or by name (e.g. `customer_name`) for named templates. Zavu detects the template's format and sends the correct payload to Meta. Named keys also resolve a named text-header variable. Do not mix positional and named keys in the same request.",
 			InnerField: "templateVariables",
 		},
 	},
 })
+
+var messagesShowTyping = cli.Command{
+	Name:    "show-typing",
+	Usage:   "Mark an inbound WhatsApp message as read and display a typing indicator to the\nuser while you prepare a response. The indicator is automatically dismissed when\nyou send a reply, or after 25 seconds — whichever comes first. Only valid for\ninbound WhatsApp messages. Use this when a reply will take more than a couple of\nseconds (LLM agent, tool call, lookup) to improve the recipient's experience.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "message-id",
+			Required:  true,
+			PathParam: "messageId",
+		},
+		&requestflag.Flag[string]{
+			Name:       "zavu-sender",
+			HeaderPath: "Zavu-Sender",
+		},
+	},
+	Action:          handleMessagesShowTyping,
+	HideHelpCommand: true,
+}
 
 func handleMessagesRetrieve(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
@@ -500,6 +549,55 @@ func handleMessagesSend(ctx context.Context, cmd *cli.Command) error {
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "messages send",
+		Transform:      transform,
+	})
+}
+
+func handleMessagesShowTyping(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("message-id") && len(unusedArgs) > 0 {
+		cmd.Set("message-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	params := zavudev.MessageShowTypingParams{}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Messages.ShowTyping(
+		ctx,
+		cmd.Value("message-id").(string),
+		params,
+		options...,
+	)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "messages show-typing",
 		Transform:      transform,
 	})
 }

@@ -13,16 +13,16 @@ import (
 	"github.com/zavudev/sdk-go/option"
 )
 
-var usageRetrieve = cli.Command{
+var meRetrieve = cli.Command{
 	Name:            "retrieve",
-	Usage:           "Get the current month's usage counters for A2P messages and emails, along with\nthe tier limits.",
+	Usage:           "Returns the project, team, and API key metadata bound to the current Bearer\ntoken. Used by CLIs and SDKs to confirm which project they will operate on.",
 	Suggest:         true,
 	Flags:           []cli.Flag{},
-	Action:          handleUsageRetrieve,
+	Action:          handleMeRetrieve,
 	HideHelpCommand: true,
 }
 
-func handleUsageRetrieve(ctx context.Context, cmd *cli.Command) error {
+func handleMeRetrieve(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
@@ -43,7 +43,7 @@ func handleUsageRetrieve(ctx context.Context, cmd *cli.Command) error {
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Usage.Get(ctx, options...)
+	_, err = client.Me.Get(ctx, options...)
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func handleUsageRetrieve(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "usage retrieve",
+		Title:          "me retrieve",
 		Transform:      transform,
 	})
 }
