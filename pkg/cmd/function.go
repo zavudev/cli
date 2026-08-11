@@ -39,6 +39,17 @@ var functionsCreate = cli.Command{
 			Name:     "description",
 			BodyPath: "description",
 		},
+		&requestflag.Flag[string]{
+			Name:     "entrypoint",
+			Usage:    "Which file in `files` is the entry point. Defaults to `index.ts`.",
+			Default:  "index.ts",
+			BodyPath: "entrypoint",
+		},
+		&requestflag.Flag[map[string]any]{
+			Name:     "files",
+			Usage:    "The project's source files, keyed by path relative to the project root (e.g. `index.ts`, `lib/orders.ts`). Imports between them are resolved when the function is built, so a function can be split across as many files as it needs.\n\nPaths must be relative and use forward slashes; `..`, `node_modules/` and `package.json` are rejected. npm packages are not uploaded here — declare them under `dependencies` and Zavu installs them. Limits: 200 files and 900,000 bytes for the whole tree.",
+			BodyPath: "files",
+		},
 		&requestflag.Flag[bool]{
 			Name:     "http-enabled",
 			Usage:    "Whether to expose a public HTTPS URL for this function.",
@@ -58,7 +69,7 @@ var functionsCreate = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:     "source-code",
-			Usage:    "TypeScript source code for the function entry point (max ~900KB).",
+			Usage:    "Shortcut for a single-file function: exactly equivalent to sending `files` with one entry named after `entrypoint` (`index.ts` by default). Fully supported — use whichever fits. If both are sent, `files` wins.",
 			BodyPath: "sourceCode",
 		},
 		&requestflag.Flag[int64]{
@@ -102,6 +113,17 @@ var functionsUpdate = cli.Command{
 			Usage:    "New dependency map (replaces existing dependencies).",
 			BodyPath: "dependencies",
 		},
+		&requestflag.Flag[string]{
+			Name:     "entrypoint",
+			Usage:    "Which file in `files` is the entry point. Defaults to `index.ts`.",
+			Default:  "index.ts",
+			BodyPath: "entrypoint",
+		},
+		&requestflag.Flag[map[string]any]{
+			Name:     "files",
+			Usage:    "The project's source files, keyed by path relative to the project root (e.g. `index.ts`, `lib/orders.ts`). Imports between them are resolved when the function is built, so a function can be split across as many files as it needs.\n\nPaths must be relative and use forward slashes; `..`, `node_modules/` and `package.json` are rejected. npm packages are not uploaded here — declare them under `dependencies` and Zavu installs them. Limits: 200 files and 900,000 bytes for the whole tree.",
+			BodyPath: "files",
+		},
 		&requestflag.Flag[bool]{
 			Name:     "http-enabled",
 			Usage:    "Expose the function on its public HTTPS URL, or take it down. Applies to the already-deployed function without redeploying; the URL is returned as `publicUrl`.",
@@ -109,7 +131,7 @@ var functionsUpdate = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:     "source-code",
-			Usage:    "New source code for the draft (replaces it).",
+			Usage:    "Shortcut for a single-file function: exactly equivalent to sending `files` with one entry named after `entrypoint` (`index.ts` by default). Fully supported — use whichever fits. If both are sent, `files` wins.",
 			BodyPath: "sourceCode",
 		},
 	},
@@ -148,8 +170,19 @@ var functionsDeploy = cli.Command{
 			BodyPath: "dependencies",
 		},
 		&requestflag.Flag[string]{
+			Name:     "entrypoint",
+			Usage:    "Which file in `files` is the entry point. Defaults to `index.ts`.",
+			Default:  "index.ts",
+			BodyPath: "entrypoint",
+		},
+		&requestflag.Flag[map[string]any]{
+			Name:     "files",
+			Usage:    "The project's source files, keyed by path relative to the project root (e.g. `index.ts`, `lib/orders.ts`). Imports between them are resolved when the function is built, so a function can be split across as many files as it needs.\n\nPaths must be relative and use forward slashes; `..`, `node_modules/` and `package.json` are rejected. npm packages are not uploaded here — declare them under `dependencies` and Zavu installs them. Limits: 200 files and 900,000 bytes for the whole tree.",
+			BodyPath: "files",
+		},
+		&requestflag.Flag[string]{
 			Name:     "source-code",
-			Usage:    "New source code to publish (replaces the draft).",
+			Usage:    "Shortcut for a single-file function: exactly equivalent to sending `files` with one entry named after `entrypoint` (`index.ts` by default). Fully supported — use whichever fits. If both are sent, `files` wins.",
 			BodyPath: "sourceCode",
 		},
 	},
