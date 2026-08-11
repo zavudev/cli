@@ -19,6 +19,8 @@ func TestFunctionsCreate(t *testing.T) {
 			"--slug", "order-bot",
 			"--dependencies", "{openai: ^4.20.0}",
 			"--description", "Replies to order status questions on WhatsApp.",
+			"--entrypoint", "index.ts",
+			"--files", `{index.ts: "import { formatOrder } from './lib/orders';\n\nexport default async function handler(event) {\n  return { statusCode: 200, body: formatOrder(event) };\n}\n", lib/orders.ts: "export function formatOrder(event) {\n  return JSON.stringify(event);\n}\n"}`,
 			"--http-enabled=true",
 			"--memory-mb", "128",
 			"--runtime", "nodejs24",
@@ -35,6 +37,18 @@ func TestFunctionsCreate(t *testing.T) {
 			"dependencies:\n" +
 			"  openai: ^4.20.0\n" +
 			"description: Replies to order status questions on WhatsApp.\n" +
+			"entrypoint: index.ts\n" +
+			"files:\n" +
+			"  index.ts: |\n" +
+			"    import { formatOrder } from './lib/orders';\n" +
+			"\n" +
+			"    export default async function handler(event) {\n" +
+			"      return { statusCode: 200, body: formatOrder(event) };\n" +
+			"    }\n" +
+			"  lib/orders.ts: |\n" +
+			"    export function formatOrder(event) {\n" +
+			"      return JSON.stringify(event);\n" +
+			"    }\n" +
 			"httpEnabled: true\n" +
 			"memoryMb: 128\n" +
 			"runtime: nodejs24\n" +
@@ -74,6 +88,8 @@ func TestFunctionsUpdate(t *testing.T) {
 			"functions", "update",
 			"--function-id", "functionId",
 			"--dependencies", "{foo: string}",
+			"--entrypoint", "index.ts",
+			"--files", `{index.ts: "import { formatOrder } from './lib/orders';\n\nexport default async function handler(event) {\n  return { statusCode: 200, body: formatOrder(event) };\n}\n", lib/orders.ts: "export function formatOrder(event) {\n  return JSON.stringify(event);\n}\n"}`,
 			"--http-enabled=true",
 			"--source-code", "sourceCode",
 		)
@@ -84,6 +100,18 @@ func TestFunctionsUpdate(t *testing.T) {
 		pipeData := []byte("" +
 			"dependencies:\n" +
 			"  foo: string\n" +
+			"entrypoint: index.ts\n" +
+			"files:\n" +
+			"  index.ts: |\n" +
+			"    import { formatOrder } from './lib/orders';\n" +
+			"\n" +
+			"    export default async function handler(event) {\n" +
+			"      return { statusCode: 200, body: formatOrder(event) };\n" +
+			"    }\n" +
+			"  lib/orders.ts: |\n" +
+			"    export function formatOrder(event) {\n" +
+			"      return JSON.stringify(event);\n" +
+			"    }\n" +
 			"httpEnabled: true\n" +
 			"sourceCode: sourceCode\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
@@ -116,6 +144,8 @@ func TestFunctionsDeploy(t *testing.T) {
 			"functions", "deploy",
 			"--function-id", "functionId",
 			"--dependencies", "{foo: string}",
+			"--entrypoint", "index.ts",
+			"--files", `{index.ts: "import { formatOrder } from './lib/orders';\n\nexport default async function handler(event) {\n  return { statusCode: 200, body: formatOrder(event) };\n}\n", lib/orders.ts: "export function formatOrder(event) {\n  return JSON.stringify(event);\n}\n"}`,
 			"--source-code", "sourceCode",
 		)
 	})
@@ -125,6 +155,18 @@ func TestFunctionsDeploy(t *testing.T) {
 		pipeData := []byte("" +
 			"dependencies:\n" +
 			"  foo: string\n" +
+			"entrypoint: index.ts\n" +
+			"files:\n" +
+			"  index.ts: |\n" +
+			"    import { formatOrder } from './lib/orders';\n" +
+			"\n" +
+			"    export default async function handler(event) {\n" +
+			"      return { statusCode: 200, body: formatOrder(event) };\n" +
+			"    }\n" +
+			"  lib/orders.ts: |\n" +
+			"    export function formatOrder(event) {\n" +
+			"      return JSON.stringify(event);\n" +
+			"    }\n" +
 			"sourceCode: sourceCode\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
 			t, pipeData,
