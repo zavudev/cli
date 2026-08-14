@@ -294,6 +294,11 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 			Usage:      "Message ID to react to.",
 			InnerField: "reactToMessageId",
 		},
+		&requestflag.InnerFlag[map[string]any]{
+			Name:       "content.referral",
+			Usage:      "Click-to-WhatsApp (CTWA) ad attribution: where an inbound conversation came from.\n\nWhatsApp only. Present on the **first inbound message** of a conversation opened from a Meta ad or post, and on no message after it — so store it when it arrives rather than expecting it again. Organic conversations never carry it.\n\nField names are camelCased to match the rest of this API; Meta sends them as snake_case (`ctwa_clid`, `source_id`, ...). Fields that do not apply are omitted: a `post` source has no click id, and an image ad has no `videoUrl`.",
+			InnerField: "referral",
+		},
 		&requestflag.InnerFlag[string]{
 			Name:       "content.reply-to-from",
 			Usage:      "Sender of the quoted message (phone number in E.164 format).",
