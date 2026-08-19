@@ -14,45 +14,37 @@ import (
 	"github.com/zavudev/sdk-go/option"
 )
 
-var introspectValidateEmail = cli.Command{
-	Name:    "validate-email",
-	Usage:   "Heuristic email validation to run before sending: catches invalid syntax, dead\ndomains (no MX/A records), disposable inboxes, role-based addresses (info@,\ncontacto@, sales@), and addresses already on your project's suppression list.\nUse it to clean a list before a broadcast and keep your bounce rate low.",
+var agentTemplatesRetrieve = cli.Command{
+	Name:    "retrieve",
+	Usage:   "Fetch a single factory agent fully rendered: the function files to scaffold (an\n`index.ts` that declares the agent with `defineAgent` and its skills with\n`defineTool`) plus the secrets it needs. This is what\n`npx zavudev agents pull <id>` writes to disk before `npx zavudev deploy`.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "email",
-			Usage:    "Single email address to validate.",
-			BodyPath: "email",
-		},
-		&requestflag.Flag[[]string]{
-			Name:     "email",
-			Usage:    "Batch of email addresses to validate (max 100).",
-			BodyPath: "emails",
+			Name:      "template-id",
+			Required:  true,
+			PathParam: "templateId",
 		},
 	},
-	Action:          handleIntrospectValidateEmail,
+	Action:          handleAgentTemplatesRetrieve,
 	HideHelpCommand: true,
 }
 
-var introspectValidatePhone = cli.Command{
-	Name:    "validate-phone",
-	Usage:   "Validate a phone number and check if a WhatsApp conversation window is open.",
-	Suggest: true,
-	Flags: []cli.Flag{
-		&requestflag.Flag[string]{
-			Name:     "phone-number",
-			Required: true,
-			BodyPath: "phoneNumber",
-		},
-	},
-	Action:          handleIntrospectValidatePhone,
+var agentTemplatesList = cli.Command{
+	Name:            "list",
+	Usage:           "List the factory agents available to scaffold with `npx zavudev agents pull`.\nEach entry is a ready-made voice or text agent (system prompt, skills, and — for\nvoice agents — a co-located voice config).",
+	Suggest:         true,
+	Flags:           []cli.Flag{},
+	Action:          handleAgentTemplatesList,
 	HideHelpCommand: true,
 }
 
-func handleIntrospectValidateEmail(ctx context.Context, cmd *cli.Command) error {
+func handleAgentTemplatesRetrieve(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-
+	if !cmd.IsSet("template-id") && len(unusedArgs) > 0 {
+		cmd.Set("template-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
@@ -61,18 +53,16 @@ func handleIntrospectValidateEmail(ctx context.Context, cmd *cli.Command) error 
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
 		apiquery.ArrayQueryFormatComma,
-		ApplicationJSON,
+		EmptyBody,
 		false,
 	)
 	if err != nil {
 		return err
 	}
 
-	params := zavudev.IntrospectValidateEmailParams{}
-
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Introspect.ValidateEmail(ctx, params, options...)
+	_, err = client.AgentTemplates.Get(ctx, cmd.Value("template-id").(string), options...)
 	if err != nil {
 		return err
 	}
@@ -85,12 +75,12 @@ func handleIntrospectValidateEmail(ctx context.Context, cmd *cli.Command) error 
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "introspect validate-email",
+		Title:          "agent-templates retrieve",
 		Transform:      transform,
 	})
 }
 
-func handleIntrospectValidatePhone(ctx context.Context, cmd *cli.Command) error {
+func handleAgentTemplatesList(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
@@ -102,18 +92,16 @@ func handleIntrospectValidatePhone(ctx context.Context, cmd *cli.Command) error 
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
 		apiquery.ArrayQueryFormatComma,
-		ApplicationJSON,
+		EmptyBody,
 		false,
 	)
 	if err != nil {
 		return err
 	}
 
-	params := zavudev.IntrospectValidatePhoneParams{}
-
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Introspect.ValidatePhone(ctx, params, options...)
+	_, err = client.AgentTemplates.List(ctx, options...)
 	if err != nil {
 		return err
 	}
@@ -126,7 +114,7 @@ func handleIntrospectValidatePhone(ctx context.Context, cmd *cli.Command) error 
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "introspect validate-phone",
+		Title:          "agent-templates list",
 		Transform:      transform,
 	})
 }

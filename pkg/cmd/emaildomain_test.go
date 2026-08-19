@@ -8,75 +8,71 @@ import (
 	"github.com/zavudev/cli/internal/mocktest"
 )
 
-func TestURLsEscalate(t *testing.T) {
+func TestEmailDomainsCreate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t,
 			"--api-key", "string",
-			"urls", "escalate",
-			"--url-id", "urlId",
-			"--reason", "This is our official landing page and was rejected in error.",
+			"email-domains", "create",
+			"--domain", "example.com",
 		)
 	})
 
 	t.Run("piping data", func(t *testing.T) {
 		// Test piping YAML data over stdin
-		pipeData := []byte("reason: This is our official landing page and was rejected in error.")
+		pipeData := []byte("domain: example.com")
 		mocktest.TestRunMockTestWithPipeAndFlags(
 			t, pipeData,
 			"--api-key", "string",
-			"urls", "escalate",
-			"--url-id", "urlId",
+			"email-domains", "create",
 		)
 	})
 }
 
-func TestURLsListVerified(t *testing.T) {
+func TestEmailDomainsRetrieve(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t,
 			"--api-key", "string",
-			"urls", "list-verified",
-			"--max-items", "10",
-			"--cursor", "cursor",
-			"--limit", "100",
-			"--status", "pending",
+			"email-domains", "retrieve",
+			"--domain-id", "domainId",
 		)
 	})
 }
 
-func TestURLsRetrieveDetails(t *testing.T) {
+func TestEmailDomainsList(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t,
 			"--api-key", "string",
-			"urls", "retrieve-details",
-			"--url-id", "urlId",
+			"email-domains", "list",
 		)
 	})
 }
 
-func TestURLsSubmitForVerification(t *testing.T) {
+func TestEmailDomainsDelete(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t,
 			"--api-key", "string",
-			"urls", "submit-for-verification",
-			"--url", "https://example.com/page",
+			"email-domains", "delete",
+			"--domain-id", "domainId",
 		)
 	})
+}
 
-	t.Run("piping data", func(t *testing.T) {
-		// Test piping YAML data over stdin
-		pipeData := []byte("url: https://example.com/page")
-		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData,
+func TestEmailDomainsVerify(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
 			"--api-key", "string",
-			"urls", "submit-for-verification",
+			"email-domains", "verify",
+			"--domain-id", "domainId",
 		)
 	})
 }

@@ -91,6 +91,7 @@ func init() {
 				Commands: []*cli.Command{
 					&messagesRetrieve,
 					&messagesList,
+					&messagesListAttachments,
 					&messagesReact,
 					&messagesSend,
 					&messagesShowTyping,
@@ -106,6 +107,7 @@ func init() {
 					&templatesList,
 					&templatesDelete,
 					&templatesSubmit,
+					&templatesSync,
 				},
 			},
 			{
@@ -168,7 +170,16 @@ func init() {
 					&sendersAgentToolsUpdate,
 					&sendersAgentToolsList,
 					&sendersAgentToolsDelete,
+					&sendersAgentToolsListTestRuns,
 					&sendersAgentToolsTest,
+				},
+			},
+			{
+				Name:     "senders:agent:tools:webhook",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&sendersAgentToolsWebhookRotateSecret,
 				},
 			},
 			{
@@ -191,6 +202,8 @@ func init() {
 					&sendersAgentKnowledgeBasesDocumentsCreate,
 					&sendersAgentKnowledgeBasesDocumentsList,
 					&sendersAgentKnowledgeBasesDocumentsDelete,
+					&sendersAgentKnowledgeBasesDocumentsRetrieveDocument,
+					&sendersAgentKnowledgeBasesDocumentsUpdateDocument,
 				},
 			},
 			{
@@ -201,6 +214,15 @@ func init() {
 					&sendersWhatsappSyncRetrieve,
 					&sendersWhatsappSyncStartContactsSync,
 					&sendersWhatsappSyncStartHistorySync,
+				},
+			},
+			{
+				Name:     "senders:telegram",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&sendersTelegramConnect,
+					&sendersTelegramDisconnect,
 				},
 			},
 			{
@@ -262,6 +284,7 @@ func init() {
 				Category: "API RESOURCE",
 				Suggest:  true,
 				Commands: []*cli.Command{
+					&introspectValidateEmail,
 					&introspectValidatePhone,
 				},
 			},
@@ -318,6 +341,7 @@ func init() {
 				Category: "API RESOURCE",
 				Suggest:  true,
 				Commands: []*cli.Command{
+					&urlsEscalate,
 					&urlsListVerified,
 					&urlsRetrieveDetails,
 					&urlsSubmitForVerification,
@@ -412,6 +436,9 @@ func init() {
 					&functionsDelete,
 					&functionsDeploy,
 					&functionsGetDeployment,
+					&functionsListDeployments,
+					&functionsListEventTypes,
+					&functionsRollbackDeployment,
 					&functionsTailLogs,
 				},
 			},
@@ -423,6 +450,95 @@ func init() {
 					&functionsSecretsList,
 					&functionsSecretsSet,
 					&functionsSecretsUnset,
+				},
+			},
+			{
+				Name:     "functions:triggers",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&functionsTriggersCreate,
+					&functionsTriggersUpdate,
+					&functionsTriggersList,
+					&functionsTriggersDelete,
+				},
+			},
+			{
+				Name:     "functions:git-link",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&functionsGitLinkRetrieve,
+					&functionsGitLinkUpdate,
+					&functionsGitLinkDeployNow,
+					&functionsGitLinkLink,
+					&functionsGitLinkUnlink,
+				},
+			},
+			{
+				Name:     "conversations",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&conversationsRetrieve,
+					&conversationsList,
+					&conversationsListMessages,
+					&conversationsMarkAsRead,
+				},
+			},
+			{
+				Name:     "calls",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&callsCreate,
+					&callsRetrieve,
+					&callsList,
+					&callsHangup,
+				},
+			},
+			{
+				Name:     "agent-templates",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&agentTemplatesRetrieve,
+					&agentTemplatesList,
+				},
+			},
+			{
+				Name:     "email-domains",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&emailDomainsCreate,
+					&emailDomainsRetrieve,
+					&emailDomainsList,
+					&emailDomainsDelete,
+					&emailDomainsVerify,
+				},
+			},
+			{
+				Name:     "agents",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&agentsCreate,
+					&agentsRetrieve,
+					&agentsUpdate,
+					&agentsList,
+					&agentsDelete,
+					&agentsListVoices,
+					&agentsTest,
+				},
+			},
+			{
+				Name:     "agents:senders",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&agentsSendersConnect,
+					&agentsSendersDisconnect,
 				},
 			},
 			{

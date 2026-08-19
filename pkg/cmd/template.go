@@ -216,6 +216,21 @@ var templatesSubmit = cli.Command{
 	HideHelpCommand: true,
 }
 
+var templatesSync = cli.Command{
+	Name:    "sync",
+	Usage:   "Reconcile this project's templates against WhatsApp. Two things happen per\nconnected WhatsApp Business Account: templates that exist on Meta but not in\nZavu are imported (or linked to an existing template with the same name), and\nthe approval status of the templates Zavu already knows about is refreshed from\nMeta.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:     "sender-id",
+			Usage:    "Sync only the WhatsApp Business Account attached to this sender. If omitted, every WhatsApp sender in the project is synced.",
+			BodyPath: "senderId",
+		},
+	},
+	Action:          handleTemplatesSync,
+	HideHelpCommand: true,
+}
+
 func handleTemplatesCreate(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
@@ -424,6 +439,47 @@ func handleTemplatesSubmit(ctx context.Context, cmd *cli.Command) error {
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "templates submit",
+		Transform:      transform,
+	})
+}
+
+func handleTemplatesSync(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		ApplicationJSON,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	params := zavudev.TemplateSyncParams{}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Templates.Sync(ctx, params, options...)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "templates sync",
 		Transform:      transform,
 	})
 }

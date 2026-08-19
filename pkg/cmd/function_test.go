@@ -189,6 +189,54 @@ func TestFunctionsGetDeployment(t *testing.T) {
 	})
 }
 
+func TestFunctionsListDeployments(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"functions", "list-deployments",
+			"--function-id", "functionId",
+			"--limit", "100",
+		)
+	})
+}
+
+func TestFunctionsListEventTypes(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"functions", "list-event-types",
+		)
+	})
+}
+
+func TestFunctionsRollbackDeployment(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"functions", "rollback-deployment",
+			"--function-id", "functionId",
+			"--deployment-id", "fnd_abc123",
+		)
+	})
+
+	t.Run("piping data", func(t *testing.T) {
+		// Test piping YAML data over stdin
+		pipeData := []byte("deploymentId: fnd_abc123")
+		mocktest.TestRunMockTestWithPipeAndFlags(
+			t, pipeData,
+			"--api-key", "string",
+			"functions", "rollback-deployment",
+			"--function-id", "functionId",
+		)
+	})
+}
+
 func TestFunctionsTailLogs(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
