@@ -205,6 +205,56 @@ var functionsGetDeployment = cli.Command{
 	HideHelpCommand: true,
 }
 
+var functionsListDeployments = cli.Command{
+	Name:    "list-deployments",
+	Usage:   "List a function's deployment history, newest first. Source code is omitted;\nfetch a single deployment via GET /v1/functions/deployments/{deploymentId} for\nfull details.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "function-id",
+			Required:  true,
+			PathParam: "functionId",
+		},
+		&requestflag.Flag[int64]{
+			Name:      "limit",
+			Default:   20,
+			QueryPath: "limit",
+		},
+	},
+	Action:          handleFunctionsListDeployments,
+	HideHelpCommand: true,
+}
+
+var functionsListEventTypes = cli.Command{
+	Name:            "list-event-types",
+	Usage:           "List the event types a function trigger can subscribe to. Includes the special\ntype `cron`, which fires on a schedule (see POST\n/v1/functions/{functionId}/triggers) rather than on a messaging event.",
+	Suggest:         true,
+	Flags:           []cli.Flag{},
+	Action:          handleFunctionsListEventTypes,
+	HideHelpCommand: true,
+}
+
+var functionsRollbackDeployment = cli.Command{
+	Name:    "rollback-deployment",
+	Usage:   "Re-deploy a previous version by copying its source, dependencies, and runtime\npin onto the function's draft, then deploying. Returns immediately with a\ndeployment ID — poll GET /v1/functions/deployments/{deploymentId} until status\nis active or failed. Secrets are not rolled back.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "function-id",
+			Required:  true,
+			PathParam: "functionId",
+		},
+		&requestflag.Flag[string]{
+			Name:     "deployment-id",
+			Usage:    "ID of the deployment to roll back to.",
+			Required: true,
+			BodyPath: "deploymentId",
+		},
+	},
+	Action:          handleFunctionsRollbackDeployment,
+	HideHelpCommand: true,
+}
+
 var functionsTailLogs = cli.Command{
 	Name:    "tail-logs",
 	Usage:   "Fetch invocation logs for a function. Logs are paginated via `nextToken`. Pass\n`startTime` / `endTime` (Unix epoch milliseconds) to bound the window, or\n`filterPattern` to filter messages.",
@@ -504,6 +554,143 @@ func handleFunctionsGetDeployment(ctx context.Context, cmd *cli.Command) error {
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "functions get-deployment",
+		Transform:      transform,
+	})
+}
+
+func handleFunctionsListDeployments(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("function-id") && len(unusedArgs) > 0 {
+		cmd.Set("function-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	params := zavudev.FunctionListDeploymentsParams{}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Functions.ListDeployments(
+		ctx,
+		cmd.Value("function-id").(string),
+		params,
+		options...,
+	)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "functions list-deployments",
+		Transform:      transform,
+	})
+}
+
+func handleFunctionsListEventTypes(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Functions.ListEventTypes(ctx, options...)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "functions list-event-types",
+		Transform:      transform,
+	})
+}
+
+func handleFunctionsRollbackDeployment(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("function-id") && len(unusedArgs) > 0 {
+		cmd.Set("function-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		ApplicationJSON,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	params := zavudev.FunctionRollbackDeploymentParams{}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Functions.RollbackDeployment(
+		ctx,
+		cmd.Value("function-id").(string),
+		params,
+		options...,
+	)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "functions rollback-deployment",
 		Transform:      transform,
 	})
 }

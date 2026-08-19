@@ -102,6 +102,64 @@ var sendersAgentKnowledgeBasesDocumentsDelete = cli.Command{
 	HideHelpCommand: true,
 }
 
+var sendersAgentKnowledgeBasesDocumentsRetrieveDocument = cli.Command{
+	Name:    "retrieve-document",
+	Usage:   "Get a single document from a knowledge base.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
+		},
+		&requestflag.Flag[string]{
+			Name:      "kb-id",
+			Required:  true,
+			PathParam: "kbId",
+		},
+		&requestflag.Flag[string]{
+			Name:      "doc-id",
+			Required:  true,
+			PathParam: "docId",
+		},
+	},
+	Action:          handleSendersAgentKnowledgeBasesDocumentsRetrieveDocument,
+	HideHelpCommand: true,
+}
+
+var sendersAgentKnowledgeBasesDocumentsUpdateDocument = cli.Command{
+	Name:    "update-document",
+	Usage:   "Update a document's title or content. Updating content reprocesses the document\nfor RAG.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
+		},
+		&requestflag.Flag[string]{
+			Name:      "kb-id",
+			Required:  true,
+			PathParam: "kbId",
+		},
+		&requestflag.Flag[string]{
+			Name:      "doc-id",
+			Required:  true,
+			PathParam: "docId",
+		},
+		&requestflag.Flag[string]{
+			Name:     "content",
+			BodyPath: "content",
+		},
+		&requestflag.Flag[string]{
+			Name:     "title",
+			BodyPath: "title",
+		},
+	},
+	Action:          handleSendersAgentKnowledgeBasesDocumentsUpdateDocument,
+	HideHelpCommand: true,
+}
+
 func handleSendersAgentKnowledgeBasesDocumentsCreate(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
@@ -256,4 +314,108 @@ func handleSendersAgentKnowledgeBasesDocumentsDelete(ctx context.Context, cmd *c
 		params,
 		options...,
 	)
+}
+
+func handleSendersAgentKnowledgeBasesDocumentsRetrieveDocument(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("doc-id") && len(unusedArgs) > 0 {
+		cmd.Set("doc-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	params := zavudev.SenderAgentKnowledgeBaseDocumentGetDocumentParams{
+		SenderID: cmd.Value("sender-id").(string),
+		KBID:     cmd.Value("kb-id").(string),
+	}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Senders.Agent.KnowledgeBases.Documents.GetDocument(
+		ctx,
+		cmd.Value("doc-id").(string),
+		params,
+		options...,
+	)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders:agent:knowledge-bases:documents retrieve-document",
+		Transform:      transform,
+	})
+}
+
+func handleSendersAgentKnowledgeBasesDocumentsUpdateDocument(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("doc-id") && len(unusedArgs) > 0 {
+		cmd.Set("doc-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		ApplicationJSON,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	params := zavudev.SenderAgentKnowledgeBaseDocumentUpdateDocumentParams{
+		SenderID: cmd.Value("sender-id").(string),
+		KBID:     cmd.Value("kb-id").(string),
+	}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Senders.Agent.KnowledgeBases.Documents.UpdateDocument(
+		ctx,
+		cmd.Value("doc-id").(string),
+		params,
+		options...,
+	)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders:agent:knowledge-bases:documents update-document",
+		Transform:      transform,
+	})
 }

@@ -8,75 +8,76 @@ import (
 	"github.com/zavudev/cli/internal/mocktest"
 )
 
-func TestURLsEscalate(t *testing.T) {
+func TestCallsCreate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t,
 			"--api-key", "string",
-			"urls", "escalate",
-			"--url-id", "urlId",
-			"--reason", "This is our official landing page and was rejected in error.",
+			"calls", "create",
+			"--to", "+56912345678",
+			"--greeting", "greeting",
+			"--language", "es-ES",
+			"--max-duration-minutes", "1",
+			"--metadata", "{foo: string}",
+			"--sender-id", "sender_12345",
 		)
 	})
 
 	t.Run("piping data", func(t *testing.T) {
 		// Test piping YAML data over stdin
-		pipeData := []byte("reason: This is our official landing page and was rejected in error.")
+		pipeData := []byte("" +
+			"to: '+56912345678'\n" +
+			"greeting: greeting\n" +
+			"language: es-ES\n" +
+			"maxDurationMinutes: 1\n" +
+			"metadata:\n" +
+			"  foo: string\n" +
+			"senderId: sender_12345\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
 			t, pipeData,
 			"--api-key", "string",
-			"urls", "escalate",
-			"--url-id", "urlId",
+			"calls", "create",
 		)
 	})
 }
 
-func TestURLsListVerified(t *testing.T) {
+func TestCallsRetrieve(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t,
 			"--api-key", "string",
-			"urls", "list-verified",
+			"calls", "retrieve",
+			"--call-id", "callId",
+		)
+	})
+}
+
+func TestCallsList(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"calls", "list",
 			"--max-items", "10",
 			"--cursor", "cursor",
+			"--direction", "inbound",
 			"--limit", "100",
-			"--status", "pending",
+			"--status", "queued",
 		)
 	})
 }
 
-func TestURLsRetrieveDetails(t *testing.T) {
+func TestCallsHangup(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t,
 			"--api-key", "string",
-			"urls", "retrieve-details",
-			"--url-id", "urlId",
-		)
-	})
-}
-
-func TestURLsSubmitForVerification(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
-	t.Run("regular flags", func(t *testing.T) {
-		mocktest.TestRunMockTestWithFlags(
-			t,
-			"--api-key", "string",
-			"urls", "submit-for-verification",
-			"--url", "https://example.com/page",
-		)
-	})
-
-	t.Run("piping data", func(t *testing.T) {
-		// Test piping YAML data over stdin
-		pipeData := []byte("url: https://example.com/page")
-		mocktest.TestRunMockTestWithPipeAndFlags(
-			t, pipeData,
-			"--api-key", "string",
-			"urls", "submit-for-verification",
+			"calls", "hangup",
+			"--call-id", "callId",
 		)
 	})
 }

@@ -66,3 +66,48 @@ func TestSendersAgentKnowledgeBasesDocumentsDelete(t *testing.T) {
 		)
 	})
 }
+
+func TestSendersAgentKnowledgeBasesDocumentsRetrieveDocument(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"senders:agent:knowledge-bases:documents", "retrieve-document",
+			"--sender-id", "senderId",
+			"--kb-id", "kbId",
+			"--doc-id", "docId",
+		)
+	})
+}
+
+func TestSendersAgentKnowledgeBasesDocumentsUpdateDocument(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"senders:agent:knowledge-bases:documents", "update-document",
+			"--sender-id", "senderId",
+			"--kb-id", "kbId",
+			"--doc-id", "docId",
+			"--content", "content",
+			"--title", "title",
+		)
+	})
+
+	t.Run("piping data", func(t *testing.T) {
+		// Test piping YAML data over stdin
+		pipeData := []byte("" +
+			"content: content\n" +
+			"title: title\n")
+		mocktest.TestRunMockTestWithPipeAndFlags(
+			t, pipeData,
+			"--api-key", "string",
+			"senders:agent:knowledge-bases:documents", "update-document",
+			"--sender-id", "senderId",
+			"--kb-id", "kbId",
+			"--doc-id", "docId",
+		)
+	})
+}

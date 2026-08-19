@@ -66,6 +66,21 @@ var messagesList = cli.Command{
 	HideHelpCommand: true,
 }
 
+var messagesListAttachments = cli.Command{
+	Name:    "list-attachments",
+	Usage:   "List the stored file attachments for an email message and get a short-lived\nsigned `downloadUrl` for each. Works for both inbound emails (received via\n`message.inbound`) and outbound emails you sent with attachments. Messages\nwithout stored attachments (including SMS, WhatsApp, and other channels) return\nan empty list. Each `downloadUrl` is generated fresh per request and expires —\nfetch the file promptly and do not cache the URL.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "message-id",
+			Required:  true,
+			PathParam: "messageId",
+		},
+	},
+	Action:          handleMessagesListAttachments,
+	HideHelpCommand: true,
+}
+
 var messagesReact = cli.Command{
 	Name:    "react",
 	Usage:   "Send an emoji reaction to an existing WhatsApp message. Reactions are only\nsupported for WhatsApp messages.",
@@ -466,6 +481,48 @@ func handleMessagesList(ctx context.Context, cmd *cli.Command) error {
 			Transform:      transform,
 		})
 	}
+}
+
+func handleMessagesListAttachments(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("message-id") && len(unusedArgs) > 0 {
+		cmd.Set("message-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Messages.ListAttachments(ctx, cmd.Value("message-id").(string), options...)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "messages list-attachments",
+		Transform:      transform,
+	})
 }
 
 func handleMessagesReact(ctx context.Context, cmd *cli.Command) error {

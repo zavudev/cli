@@ -180,6 +180,20 @@ func TestSendersAgentToolsDelete(t *testing.T) {
 	})
 }
 
+func TestSendersAgentToolsListTestRuns(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"senders:agent:tools", "list-test-runs",
+			"--sender-id", "senderId",
+			"--tool-id", "toolId",
+			"--limit", "100",
+		)
+	})
+}
+
 func TestSendersAgentToolsTest(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {

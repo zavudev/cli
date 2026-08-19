@@ -208,6 +208,31 @@ var sendersAgentToolsDelete = cli.Command{
 	HideHelpCommand: true,
 }
 
+var sendersAgentToolsListTestRuns = cli.Command{
+	Name:    "list-test-runs",
+	Usage:   "Recent runs of this tool triggered from the test endpoint, newest first. Covers\nmanual tests only: a tool called by an agent during a real conversation is not\nrecorded here.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
+		},
+		&requestflag.Flag[string]{
+			Name:      "tool-id",
+			Required:  true,
+			PathParam: "toolId",
+		},
+		&requestflag.Flag[int64]{
+			Name:      "limit",
+			Default:   20,
+			QueryPath: "limit",
+		},
+	},
+	Action:          handleSendersAgentToolsListTestRuns,
+	HideHelpCommand: true,
+}
+
 var sendersAgentToolsTest = cli.Command{
 	Name:    "test",
 	Usage:   "Run a tool with the parameters you supply and return what it answered.",
@@ -485,6 +510,57 @@ func handleSendersAgentToolsDelete(ctx context.Context, cmd *cli.Command) error 
 		params,
 		options...,
 	)
+}
+
+func handleSendersAgentToolsListTestRuns(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("tool-id") && len(unusedArgs) > 0 {
+		cmd.Set("tool-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	params := zavudev.SenderAgentToolListTestRunsParams{
+		SenderID: cmd.Value("sender-id").(string),
+	}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Senders.Agent.Tools.ListTestRuns(
+		ctx,
+		cmd.Value("tool-id").(string),
+		params,
+		options...,
+	)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders:agent:tools list-test-runs",
+		Transform:      transform,
+	})
 }
 
 func handleSendersAgentToolsTest(ctx context.Context, cmd *cli.Command) error {
