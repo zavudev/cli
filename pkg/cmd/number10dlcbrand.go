@@ -257,7 +257,7 @@ var number10dlcBrandsListUseCases = cli.Command{
 
 var number10dlcBrandsSubmit = cli.Command{
 	Name:    "submit",
-	Usage:   "Submit a draft brand to The Campaign Registry (TCR) for vetting. The brand must\nbe in draft status. TCR's one-time $4 brand registration fee is charged from\nyour balance at submission (passed through at cost) and refunded if the carrier\nrejects the registration. A team that already paid this fee through the\ncompliance flow is not charged again. Campaign registration is billed separately\nwhen a campaign is submitted.",
+	Usage:   "Submit a draft brand to The Campaign Registry (TCR) for vetting. The brand must\nbe in draft status, and the team must have an approved Business Verification\n(KYB) — carriers register a brand against a vetted legal entity, so submitting\nwithout one returns `403` with code `kyb_required`.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
