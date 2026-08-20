@@ -235,7 +235,6 @@ func init() {
 					&contactsUpdate,
 					&contactsList,
 					&contactsDelete,
-					&contactsDismissMergeSuggestion,
 					&contactsMerge,
 					&contactsRetrieveByPhone,
 				},

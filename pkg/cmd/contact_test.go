@@ -82,6 +82,7 @@ func TestContactsUpdate(t *testing.T) {
 			"contacts", "update",
 			"--contact-id", "contactId",
 			"--default-channel", "sms",
+			"--display-name", "John Doe",
 			"--metadata", "{foo: string}",
 		)
 	})
@@ -90,6 +91,7 @@ func TestContactsUpdate(t *testing.T) {
 		// Test piping YAML data over stdin
 		pipeData := []byte("" +
 			"defaultChannel: sms\n" +
+			"displayName: John Doe\n" +
 			"metadata:\n" +
 			"  foo: string\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
@@ -112,6 +114,8 @@ func TestContactsList(t *testing.T) {
 			"--cursor", "cursor",
 			"--limit", "100",
 			"--phone-number", "phoneNumber",
+			"--search", "search",
+			"--tag", "string",
 		)
 	})
 }
@@ -123,18 +127,6 @@ func TestContactsDelete(t *testing.T) {
 			t,
 			"--api-key", "string",
 			"contacts", "delete",
-			"--contact-id", "contactId",
-		)
-	})
-}
-
-func TestContactsDismissMergeSuggestion(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
-	t.Run("regular flags", func(t *testing.T) {
-		mocktest.TestRunMockTestWithFlags(
-			t,
-			"--api-key", "string",
-			"contacts", "dismiss-merge-suggestion",
 			"--contact-id", "contactId",
 		)
 	})
