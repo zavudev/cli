@@ -98,6 +98,11 @@ var contactsUpdate = cli.Command{
 			Usage:    "Preferred channel for this contact. Set to null to clear.",
 			BodyPath: "defaultChannel",
 		},
+		&requestflag.Flag[*string]{
+			Name:     "display-name",
+			Usage:    "Human-readable name for this contact. Set to null to clear it and fall back to the contact's identifier. Contacts created automatically from an inbound message have no display name until you set one.",
+			BodyPath: "displayName",
+		},
 		&requestflag.Flag[map[string]any]{
 			Name:     "metadata",
 			BodyPath: "metadata",
@@ -114,6 +119,7 @@ var contactsList = cli.Command{
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
 			Name:      "cursor",
+			Usage:     "Opaque cursor from a previous response's `nextCursor`. Do not construct it.",
 			QueryPath: "cursor",
 		},
 		&requestflag.Flag[int64]{
@@ -123,7 +129,18 @@ var contactsList = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:      "phone-number",
+			Usage:     "Exact match on the contact's primary phone number, in E.164.",
 			QueryPath: "phoneNumber",
+		},
+		&requestflag.Flag[string]{
+			Name:      "search",
+			Usage:     "Free-text match over the contact's name (`displayName` and the WhatsApp profile name), phone numbers and email addresses. Case- and accent-insensitive. A phone number matches on a trailing fragment too, so `5551234` finds `+14155551234`.\n\nContacts created automatically from an inbound message have no `displayName` — they are matched by their identifier until you set one with `PATCH /v1/contacts/{contactId}`.\n\nResults come back in relevance order rather than newest-first. `cursor` is opaque in both modes; pass back exactly what the previous response returned, and start a new pagination run when the search term changes.",
+			QueryPath: "search",
+		},
+		&requestflag.Flag[[]string]{
+			Name:      "tag",
+			Usage:     "Tag name. Repeatable: `?tag=vip&tag=chile` returns contacts carrying **every** tag given, not any of them — the same rule the dashboard filter applies.\n\nTags are matched by name, case-insensitively. An unknown tag returns 400 rather than being ignored, because a typo that silently matched every contact would be a worse answer than an error.",
+			QueryPath: "tag",
 		},
 		&requestflag.Flag[int64]{
 			Name:  "max-items",
@@ -146,21 +163,6 @@ var contactsDelete = cli.Command{
 		},
 	},
 	Action:          handleContactsDelete,
-	HideHelpCommand: true,
-}
-
-var contactsDismissMergeSuggestion = cli.Command{
-	Name:    "dismiss-merge-suggestion",
-	Usage:   "Dismiss the merge suggestion for a contact.",
-	Suggest: true,
-	Flags: []cli.Flag{
-		&requestflag.Flag[string]{
-			Name:      "contact-id",
-			Required:  true,
-			PathParam: "contactId",
-		},
-	},
-	Action:          handleContactsDismissMergeSuggestion,
 	HideHelpCommand: true,
 }
 
@@ -410,31 +412,6 @@ func handleContactsDelete(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	return client.Contacts.Delete(ctx, cmd.Value("contact-id").(string), options...)
-}
-
-func handleContactsDismissMergeSuggestion(ctx context.Context, cmd *cli.Command) error {
-	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
-	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("contact-id") && len(unusedArgs) > 0 {
-		cmd.Set("contact-id", unusedArgs[0])
-		unusedArgs = unusedArgs[1:]
-	}
-	if len(unusedArgs) > 0 {
-		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
-	}
-
-	options, err := flagOptions(
-		cmd,
-		apiquery.NestedQueryFormatBrackets,
-		apiquery.ArrayQueryFormatComma,
-		EmptyBody,
-		false,
-	)
-	if err != nil {
-		return err
-	}
-
-	return client.Contacts.DismissMergeSuggestion(ctx, cmd.Value("contact-id").(string), options...)
 }
 
 func handleContactsMerge(ctx context.Context, cmd *cli.Command) error {
