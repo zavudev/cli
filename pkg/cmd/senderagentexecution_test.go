@@ -8,6 +8,19 @@ import (
 	"github.com/zavudev/cli/internal/mocktest"
 )
 
+func TestSendersAgentExecutionsRetrieve(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"senders:agent:executions", "retrieve",
+			"--sender-id", "senderId",
+			"--execution-id", "executionId",
+		)
+	})
+}
+
 func TestSendersAgentExecutionsList(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {

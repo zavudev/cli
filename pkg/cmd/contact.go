@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -15,14 +14,69 @@ import (
 	"github.com/zavudev/sdk-go/option"
 )
 
+var contactsCreate = requestflag.WithInnerFlags(cli.Command{
+	Name:    "create",
+	Usage:   "Create a new contact with one or more communication channels.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[[]map[string]any]{
+			Name:     "channel",
+			Usage:    "Communication channels for the contact.",
+			Required: true,
+			BodyPath: "channels",
+		},
+		&requestflag.Flag[string]{
+			Name:     "display-name",
+			Usage:    "Display name for the contact.",
+			BodyPath: "displayName",
+		},
+		&requestflag.Flag[map[string]any]{
+			Name:     "metadata",
+			Usage:    "Arbitrary metadata to associate with the contact.",
+			BodyPath: "metadata",
+		},
+	},
+	Action:          handleContactsCreate,
+	HideHelpCommand: true,
+}, map[string][]requestflag.HasOuterFlag{
+	"channel": {
+		&requestflag.InnerFlag[string]{
+			Name:       "channel.channel",
+			Usage:      "Channel type.",
+			InnerField: "channel",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "channel.identifier",
+			Usage:      "Channel identifier (phone number in E.164 format or email address).",
+			InnerField: "identifier",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "channel.country-code",
+			Usage:      "ISO country code for phone numbers.",
+			InnerField: "countryCode",
+		},
+		&requestflag.InnerFlag[bool]{
+			Name:       "channel.is-primary",
+			Usage:      "Whether this should be the primary channel for its type.",
+			InnerField: "isPrimary",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "channel.label",
+			Usage:      "Optional label for the channel.",
+			InnerField: "label",
+		},
+	},
+})
+
 var contactsRetrieve = cli.Command{
 	Name:    "retrieve",
 	Usage:   "Get contact",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "contact-id",
-			Required: true,
+			Name:      "contact-id",
+			Required:  true,
+			PathParam: "contactId",
 		},
 	},
 	Action:          handleContactsRetrieve,
@@ -35,13 +89,19 @@ var contactsUpdate = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "contact-id",
-			Required: true,
+			Name:      "contact-id",
+			Required:  true,
+			PathParam: "contactId",
 		},
-		&requestflag.Flag[any]{
+		&requestflag.Flag[*string]{
 			Name:     "default-channel",
 			Usage:    "Preferred channel for this contact. Set to null to clear.",
 			BodyPath: "defaultChannel",
+		},
+		&requestflag.Flag[*string]{
+			Name:     "display-name",
+			Usage:    "Human-readable name for this contact. Set to null to clear it and fall back to the contact's identifier. Contacts created automatically from an inbound message have no display name until you set one.",
+			BodyPath: "displayName",
 		},
 		&requestflag.Flag[map[string]any]{
 			Name:     "metadata",
@@ -59,6 +119,7 @@ var contactsList = cli.Command{
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
 			Name:      "cursor",
+			Usage:     "Opaque cursor from a previous response's `nextCursor`. Do not construct it.",
 			QueryPath: "cursor",
 		},
 		&requestflag.Flag[int64]{
@@ -68,7 +129,18 @@ var contactsList = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:      "phone-number",
+			Usage:     "Exact match on the contact's primary phone number, in E.164.",
 			QueryPath: "phoneNumber",
+		},
+		&requestflag.Flag[string]{
+			Name:      "search",
+			Usage:     "Free-text match over the contact's name (`displayName` and the WhatsApp profile name), phone numbers and email addresses. Case- and accent-insensitive. A phone number matches on a trailing fragment too, so `5551234` finds `+14155551234`.\n\nContacts created automatically from an inbound message have no `displayName` — they are matched by their identifier until you set one with `PATCH /v1/contacts/{contactId}`.\n\nResults come back in relevance order rather than newest-first. `cursor` is opaque in both modes; pass back exactly what the previous response returned, and start a new pagination run when the search term changes.",
+			QueryPath: "search",
+		},
+		&requestflag.Flag[[]string]{
+			Name:      "tag",
+			Usage:     "Tag name. Repeatable: `?tag=vip&tag=chile` returns contacts carrying **every** tag given, not any of them — the same rule the dashboard filter applies.\n\nTags are matched by name, case-insensitively. An unknown tag returns 400 rather than being ignored, because a typo that silently matched every contact would be a worse answer than an error.",
+			QueryPath: "tag",
 		},
 		&requestflag.Flag[int64]{
 			Name:  "max-items",
@@ -79,18 +151,96 @@ var contactsList = cli.Command{
 	HideHelpCommand: true,
 }
 
+var contactsDelete = cli.Command{
+	Name:    "delete",
+	Usage:   "Permanently delete a contact and its communication channels. Implements\nright-to-erasure obligations under GDPR Art. 17, Ley 19.628 (Chile) Art. 12,\nCCPA § 1798.105, and LGPD Art. 18.VI. The contact, its channels, and any\nassociated agent flow sessions and conversation threads are removed. Past\nmessage records and broadcast delivery logs are retained for billing/audit but\nno longer reference the deleted contact.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "contact-id",
+			Required:  true,
+			PathParam: "contactId",
+		},
+	},
+	Action:          handleContactsDelete,
+	HideHelpCommand: true,
+}
+
+var contactsMerge = cli.Command{
+	Name:    "merge",
+	Usage:   "Merge a source contact into this contact. All channels from the source contact\nwill be moved to the target contact, and the source contact will be marked as\nmerged.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "contact-id",
+			Required:  true,
+			PathParam: "contactId",
+		},
+		&requestflag.Flag[string]{
+			Name:     "source-contact-id",
+			Usage:    "ID of the contact to merge into the target contact. The source contact will be marked as merged.",
+			Required: true,
+			BodyPath: "sourceContactId",
+		},
+	},
+	Action:          handleContactsMerge,
+	HideHelpCommand: true,
+}
+
 var contactsRetrieveByPhone = cli.Command{
 	Name:    "retrieve-by-phone",
 	Usage:   "Get contact by phone number",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "phone-number",
-			Required: true,
+			Name:      "phone-number",
+			Required:  true,
+			PathParam: "phoneNumber",
 		},
 	},
 	Action:          handleContactsRetrieveByPhone,
 	HideHelpCommand: true,
+}
+
+func handleContactsCreate(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		ApplicationJSON,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	params := zavudev.ContactNewParams{}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Contacts.New(ctx, params, options...)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "contacts create",
+		Transform:      transform,
+	})
 }
 
 func handleContactsRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -124,8 +274,15 @@ func handleContactsRetrieve(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "contacts retrieve", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "contacts retrieve",
+		Transform:      transform,
+	})
 }
 
 func handleContactsUpdate(ctx context.Context, cmd *cli.Command) error {
@@ -139,8 +296,6 @@ func handleContactsUpdate(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.ContactUpdateParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -151,6 +306,8 @@ func handleContactsUpdate(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.ContactUpdateParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -166,8 +323,15 @@ func handleContactsUpdate(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "contacts update", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "contacts update",
+		Transform:      transform,
+	})
 }
 
 func handleContactsList(ctx context.Context, cmd *cli.Command) error {
@@ -177,8 +341,6 @@ func handleContactsList(ctx context.Context, cmd *cli.Command) error {
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
-
-	params := zavudev.ContactListParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -191,7 +353,10 @@ func handleContactsList(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	params := zavudev.ContactListParams{}
+
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -201,15 +366,101 @@ func handleContactsList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "contacts list", obj, format, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "contacts list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.Contacts.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "contacts list", iter, format, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "contacts list",
+			Transform:      transform,
+		})
 	}
+}
+
+func handleContactsDelete(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("contact-id") && len(unusedArgs) > 0 {
+		cmd.Set("contact-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	return client.Contacts.Delete(ctx, cmd.Value("contact-id").(string), options...)
+}
+
+func handleContactsMerge(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("contact-id") && len(unusedArgs) > 0 {
+		cmd.Set("contact-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		ApplicationJSON,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	params := zavudev.ContactMergeParams{}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Contacts.Merge(
+		ctx,
+		cmd.Value("contact-id").(string),
+		params,
+		options...,
+	)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "contacts merge",
+		Transform:      transform,
+	})
 }
 
 func handleContactsRetrieveByPhone(ctx context.Context, cmd *cli.Command) error {
@@ -243,6 +494,13 @@ func handleContactsRetrieveByPhone(ctx context.Context, cmd *cli.Command) error 
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "contacts retrieve-by-phone", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "contacts retrieve-by-phone",
+		Transform:      transform,
+	})
 }

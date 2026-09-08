@@ -120,6 +120,7 @@ func TestPhoneNumbersSearchAvailable(t *testing.T) {
 			"--api-key", "string",
 			"phone-numbers", "search-available",
 			"--country-code", "xx",
+			"--capabilities", "voice,sms",
 			"--contains", "contains",
 			"--limit", "50",
 			"--type", "local",

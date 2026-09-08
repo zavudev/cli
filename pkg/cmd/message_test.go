@@ -29,11 +29,23 @@ func TestMessagesList(t *testing.T) {
 			"--api-key", "string",
 			"messages", "list",
 			"--max-items", "10",
-			"--channel", "auto",
+			"--channel", "sms",
 			"--cursor", "cursor",
 			"--limit", "100",
 			"--status", "queued",
 			"--to", "to",
+		)
+	})
+}
+
+func TestMessagesListAttachments(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"messages", "list-attachments",
+			"--message-id", "messageId",
 		)
 	})
 }
@@ -74,7 +86,7 @@ func TestMessagesSend(t *testing.T) {
 			"--to", "+56912345678",
 			"--attachment", "{filename: invoice.pdf, content: content, content_id: logo, content_type: application/pdf, path: https://example.com}",
 			"--channel", "auto",
-			"--content", "{buttons: [{id: id, title: title}], contacts: [{name: name, phones: [string]}], emoji: emoji, filename: invoice.pdf, latitude: 0, listButton: listButton, locationAddress: locationAddress, locationName: locationName, longitude: 0, mediaId: mediaId, mediaUrl: https://example.com/image.jpg, mimeType: image/jpeg, reactToMessageId: reactToMessageId, sections: [{rows: [{id: id, title: title, description: description}], title: title}], templateId: templateId, templateVariables: {'1': John, '2': ORD-12345}}",
+			"--content", "{buttons: [{id: id, title: title}], contacts: [{name: name, phones: [string]}], ctaDisplayText: See Dates, ctaHeaderMediaUrl: https://example.com, ctaHeaderText: ctaHeaderText, ctaHeaderType: text, ctaUrl: https://example.com/schedule, emoji: emoji, filename: invoice.pdf, footerText: Dates subject to change., latitude: 0, listButton: listButton, locationAddress: locationAddress, locationName: locationName, longitude: 0, mediaId: mediaId, mediaUrl: https://example.com/image.jpg, mimeType: image/jpeg, reactToMessageId: reactToMessageId, referral: {body: body, ctwaClid: ARIzZm9vYmFyY3R3YWNsaWQ, headline: headline, imageUrl: https://example.com, mediaType: image, sourceId: '120210000000000000', sourceType: ad, sourceUrl: https://example.com, thumbnailUrl: https://example.com, videoUrl: https://example.com}, replyToFrom: replyToFrom, replyToMessageId: replyToMessageId, replyToMessageType: replyToMessageType, replyToProviderMessageId: replyToProviderMessageId, replyToText: replyToText, sections: [{rows: [{id: id, title: title, description: description}], title: title}], templateButtonVariables: {'0': abc-report-token}, templateHeaderVariables: {'1': Jorge y Laura}, templateId: templateId, templateVariables: {'1': John, '2': ORD-12345}}",
 			"--fallback-enabled=true",
 			"--html-body", "htmlBody",
 			"--idempotency-key", "msg_01HZY4ZP7VQY2J3BRW7Z6G0QGE",
@@ -106,8 +118,14 @@ func TestMessagesSend(t *testing.T) {
 			"--channel", "auto",
 			"--content.buttons", "[{id: id, title: title}]",
 			"--content.contacts", "[{name: name, phones: [string]}]",
+			"--content.cta-display-text", "See Dates",
+			"--content.cta-header-media-url", "https://example.com",
+			"--content.cta-header-text", "ctaHeaderText",
+			"--content.cta-header-type", "text",
+			"--content.cta-url", "https://example.com/schedule",
 			"--content.emoji", "emoji",
 			"--content.filename", "invoice.pdf",
+			"--content.footer-text", "Dates subject to change.",
 			"--content.latitude", "0",
 			"--content.list-button", "listButton",
 			"--content.location-address", "locationAddress",
@@ -117,7 +135,15 @@ func TestMessagesSend(t *testing.T) {
 			"--content.media-url", "https://example.com/image.jpg",
 			"--content.mime-type", "image/jpeg",
 			"--content.react-to-message-id", "reactToMessageId",
+			"--content.referral", "{body: body, ctwaClid: ARIzZm9vYmFyY3R3YWNsaWQ, headline: headline, imageUrl: https://example.com, mediaType: image, sourceId: '120210000000000000', sourceType: ad, sourceUrl: https://example.com, thumbnailUrl: https://example.com, videoUrl: https://example.com}",
+			"--content.reply-to-from", "replyToFrom",
+			"--content.reply-to-message-id", "replyToMessageId",
+			"--content.reply-to-message-type", "replyToMessageType",
+			"--content.reply-to-provider-message-id", "replyToProviderMessageId",
+			"--content.reply-to-text", "replyToText",
 			"--content.sections", "[{rows: [{id: id, title: title, description: description}], title: title}]",
+			"--content.template-button-variables", "{'0': abc-report-token}",
+			"--content.template-header-variables", "{'1': Jorge y Laura}",
 			"--content.template-id", "templateId",
 			"--content.template-variables", "{'1': John, '2': ORD-12345}",
 			"--fallback-enabled=true",
@@ -152,8 +178,14 @@ func TestMessagesSend(t *testing.T) {
 			"    - name: name\n" +
 			"      phones:\n" +
 			"        - string\n" +
+			"  ctaDisplayText: See Dates\n" +
+			"  ctaHeaderMediaUrl: https://example.com\n" +
+			"  ctaHeaderText: ctaHeaderText\n" +
+			"  ctaHeaderType: text\n" +
+			"  ctaUrl: https://example.com/schedule\n" +
 			"  emoji: emoji\n" +
 			"  filename: invoice.pdf\n" +
+			"  footerText: Dates subject to change.\n" +
 			"  latitude: 0\n" +
 			"  listButton: listButton\n" +
 			"  locationAddress: locationAddress\n" +
@@ -163,12 +195,32 @@ func TestMessagesSend(t *testing.T) {
 			"  mediaUrl: https://example.com/image.jpg\n" +
 			"  mimeType: image/jpeg\n" +
 			"  reactToMessageId: reactToMessageId\n" +
+			"  referral:\n" +
+			"    body: body\n" +
+			"    ctwaClid: ARIzZm9vYmFyY3R3YWNsaWQ\n" +
+			"    headline: headline\n" +
+			"    imageUrl: https://example.com\n" +
+			"    mediaType: image\n" +
+			"    sourceId: '120210000000000000'\n" +
+			"    sourceType: ad\n" +
+			"    sourceUrl: https://example.com\n" +
+			"    thumbnailUrl: https://example.com\n" +
+			"    videoUrl: https://example.com\n" +
+			"  replyToFrom: replyToFrom\n" +
+			"  replyToMessageId: replyToMessageId\n" +
+			"  replyToMessageType: replyToMessageType\n" +
+			"  replyToProviderMessageId: replyToProviderMessageId\n" +
+			"  replyToText: replyToText\n" +
 			"  sections:\n" +
 			"    - rows:\n" +
 			"        - id: id\n" +
 			"          title: title\n" +
 			"          description: description\n" +
 			"      title: title\n" +
+			"  templateButtonVariables:\n" +
+			"    '0': abc-report-token\n" +
+			"  templateHeaderVariables:\n" +
+			"    '1': Jorge y Laura\n" +
 			"  templateId: templateId\n" +
 			"  templateVariables:\n" +
 			"    '1': John\n" +
@@ -187,6 +239,19 @@ func TestMessagesSend(t *testing.T) {
 			t, pipeData,
 			"--api-key", "string",
 			"messages", "send",
+			"--zavu-sender", "sender_12345",
+		)
+	})
+}
+
+func TestMessagesShowTyping(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"messages", "show-typing",
+			"--message-id", "messageId",
 			"--zavu-sender", "sender_12345",
 		)
 	})

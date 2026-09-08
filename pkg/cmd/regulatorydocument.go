@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -58,8 +57,9 @@ var regulatoryDocumentsRetrieve = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "document-id",
-			Required: true,
+			Name:      "document-id",
+			Required:  true,
+			PathParam: "documentId",
 		},
 	},
 	Action:          handleRegulatoryDocumentsRetrieve,
@@ -95,8 +95,9 @@ var regulatoryDocumentsDelete = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "document-id",
-			Required: true,
+			Name:      "document-id",
+			Required:  true,
+			PathParam: "documentId",
 		},
 	},
 	Action:          handleRegulatoryDocumentsDelete,
@@ -120,8 +121,6 @@ func handleRegulatoryDocumentsCreate(ctx context.Context, cmd *cli.Command) erro
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.RegulatoryDocumentNewParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -133,6 +132,8 @@ func handleRegulatoryDocumentsCreate(ctx context.Context, cmd *cli.Command) erro
 		return err
 	}
 
+	params := zavudev.RegulatoryDocumentNewParams{}
+
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
 	_, err = client.RegulatoryDocuments.New(ctx, params, options...)
@@ -142,8 +143,15 @@ func handleRegulatoryDocumentsCreate(ctx context.Context, cmd *cli.Command) erro
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "regulatory-documents create", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "regulatory-documents create",
+		Transform:      transform,
+	})
 }
 
 func handleRegulatoryDocumentsRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -177,8 +185,15 @@ func handleRegulatoryDocumentsRetrieve(ctx context.Context, cmd *cli.Command) er
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "regulatory-documents retrieve", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "regulatory-documents retrieve",
+		Transform:      transform,
+	})
 }
 
 func handleRegulatoryDocumentsList(ctx context.Context, cmd *cli.Command) error {
@@ -188,8 +203,6 @@ func handleRegulatoryDocumentsList(ctx context.Context, cmd *cli.Command) error 
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
-
-	params := zavudev.RegulatoryDocumentListParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -202,7 +215,10 @@ func handleRegulatoryDocumentsList(ctx context.Context, cmd *cli.Command) error 
 		return err
 	}
 
+	params := zavudev.RegulatoryDocumentListParams{}
+
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -212,14 +228,26 @@ func handleRegulatoryDocumentsList(ctx context.Context, cmd *cli.Command) error 
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "regulatory-documents list", obj, format, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "regulatory-documents list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.RegulatoryDocuments.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "regulatory-documents list", iter, format, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "regulatory-documents list",
+			Transform:      transform,
+		})
 	}
 }
 
@@ -276,6 +304,13 @@ func handleRegulatoryDocumentsUploadURL(ctx context.Context, cmd *cli.Command) e
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "regulatory-documents upload-url", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "regulatory-documents upload-url",
+		Transform:      transform,
+	})
 }

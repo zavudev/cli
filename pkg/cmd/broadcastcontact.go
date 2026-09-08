@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -21,8 +20,9 @@ var broadcastsContactsList = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 		&requestflag.Flag[string]{
 			Name:      "cursor",
@@ -53,8 +53,9 @@ var broadcastsContactsAdd = requestflag.WithInnerFlags(cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 		&requestflag.Flag[[]map[string]any]{
 			Name:     "contact",
@@ -73,8 +74,18 @@ var broadcastsContactsAdd = requestflag.WithInnerFlags(cli.Command{
 			InnerField: "recipient",
 		},
 		&requestflag.InnerFlag[map[string]any]{
+			Name:       "contact.template-button-variables",
+			Usage:      "Per-contact button variables for dynamic URL/OTP buttons. Keys are the button index (0, 1, 2).",
+			InnerField: "templateButtonVariables",
+		},
+		&requestflag.InnerFlag[map[string]any]{
+			Name:       "contact.template-header-variables",
+			Usage:      "Per-contact value for a text-header variable, keyed by `1`. If omitted, Zavu resolves the header from `templateVariables` by the header placeholder's name.",
+			InnerField: "templateHeaderVariables",
+		},
+		&requestflag.InnerFlag[map[string]any]{
 			Name:       "contact.template-variables",
-			Usage:      "Per-contact template variables to personalize the message.",
+			Usage:      "Per-contact body variables. Key them to match the template body: by position (`1`, `2`, ...) for positional templates, or by name (e.g. `customer_name`) for named templates. Zavu detects the template's format and sends the correct payload to Meta. Do not mix positional and named keys.",
 			InnerField: "templateVariables",
 		},
 	},
@@ -86,12 +97,14 @@ var broadcastsContactsRemove = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "broadcast-id",
-			Required: true,
+			Name:      "broadcast-id",
+			Required:  true,
+			PathParam: "broadcastId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "contact-id",
-			Required: true,
+			Name:      "contact-id",
+			Required:  true,
+			PathParam: "contactId",
 		},
 	},
 	Action:          handleBroadcastsContactsRemove,
@@ -109,8 +122,6 @@ func handleBroadcastsContactsList(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.BroadcastContactListParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -122,7 +133,10 @@ func handleBroadcastsContactsList(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	params := zavudev.BroadcastContactListParams{}
+
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -137,7 +151,13 @@ func handleBroadcastsContactsList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "broadcasts:contacts list", obj, format, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "broadcasts:contacts list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.Broadcasts.Contacts.ListAutoPaging(
 			ctx,
@@ -149,7 +169,13 @@ func handleBroadcastsContactsList(ctx context.Context, cmd *cli.Command) error {
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "broadcasts:contacts list", iter, format, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "broadcasts:contacts list",
+			Transform:      transform,
+		})
 	}
 }
 
@@ -164,8 +190,6 @@ func handleBroadcastsContactsAdd(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.BroadcastContactAddParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -176,6 +200,8 @@ func handleBroadcastsContactsAdd(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.BroadcastContactAddParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -191,8 +217,15 @@ func handleBroadcastsContactsAdd(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "broadcasts:contacts add", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "broadcasts:contacts add",
+		Transform:      transform,
+	})
 }
 
 func handleBroadcastsContactsRemove(ctx context.Context, cmd *cli.Command) error {
@@ -206,10 +239,6 @@ func handleBroadcastsContactsRemove(ctx context.Context, cmd *cli.Command) error
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.BroadcastContactRemoveParams{
-		BroadcastID: cmd.Value("broadcast-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -219,6 +248,10 @@ func handleBroadcastsContactsRemove(ctx context.Context, cmd *cli.Command) error
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.BroadcastContactRemoveParams{
+		BroadcastID: cmd.Value("broadcast-id").(string),
 	}
 
 	return client.Broadcasts.Contacts.Remove(

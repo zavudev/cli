@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -53,6 +52,21 @@ var templatesCreate = requestflag.WithInnerFlags(cli.Command{
 			BodyPath: "codeExpirationMinutes",
 		},
 		&requestflag.Flag[string]{
+			Name:     "footer",
+			Usage:    "Footer text for the template.",
+			BodyPath: "footer",
+		},
+		&requestflag.Flag[string]{
+			Name:     "header-content",
+			Usage:    "Header content (text string or media URL).",
+			BodyPath: "headerContent",
+		},
+		&requestflag.Flag[string]{
+			Name:     "header-type",
+			Usage:    "Type of header for the template.",
+			BodyPath: "headerType",
+		},
+		&requestflag.Flag[string]{
 			Name:     "instagram-body",
 			Usage:    "Channel-specific body for Instagram. Falls back to `body` if not set.",
 			BodyPath: "instagramBody",
@@ -82,13 +96,14 @@ var templatesCreate = requestflag.WithInnerFlags(cli.Command{
 }, map[string][]requestflag.HasOuterFlag{
 	"button": {
 		&requestflag.InnerFlag[string]{
-			Name:       "button.text",
-			InnerField: "text",
+			Name:       "button.type",
+			Usage:      "`request_contact_info` renders a fixed **Share Contact Info** button that asks the recipient to share their phone number — useful when a contact adopted a WhatsApp username and you only know their BSUID. It takes no other fields.",
+			InnerField: "type",
 		},
 		&requestflag.InnerFlag[string]{
-			Name:       "button.type",
-			Usage:      `Allowed values: "quick_reply", "url", "phone", "otp".`,
-			InnerField: "type",
+			Name:       "button.example",
+			Usage:      "Sample value Meta uses to review templates with a dynamic URL button. Substituted into `{{1}}` of the URL when the template is submitted to Meta. Only meaningful when `url` contains `{{1}}`; ignored for static URLs.",
+			InnerField: "example",
 		},
 		&requestflag.InnerFlag[string]{
 			Name:       "button.otp-type",
@@ -110,7 +125,13 @@ var templatesCreate = requestflag.WithInnerFlags(cli.Command{
 			InnerField: "signatureHash",
 		},
 		&requestflag.InnerFlag[string]{
+			Name:       "button.text",
+			Usage:      "Button label. Required for every type except `request_contact_info`, whose label is fixed by WhatsApp.",
+			InnerField: "text",
+		},
+		&requestflag.InnerFlag[string]{
 			Name:       "button.url",
+			Usage:      "Button destination. Use `{{1}}` exactly once for a dynamic URL (e.g. `https://example.com/orders/{{1}}`); WhatsApp only accepts the strict `{{1}}` form. Static URLs must not contain any `{{...}}` placeholder.",
 			InnerField: "url",
 		},
 	},
@@ -122,8 +143,9 @@ var templatesRetrieve = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "template-id",
-			Required: true,
+			Name:      "template-id",
+			Required:  true,
+			PathParam: "templateId",
 		},
 	},
 	Action:          handleTemplatesRetrieve,
@@ -159,8 +181,9 @@ var templatesDelete = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "template-id",
-			Required: true,
+			Name:      "template-id",
+			Required:  true,
+			PathParam: "templateId",
 		},
 	},
 	Action:          handleTemplatesDelete,
@@ -173,8 +196,9 @@ var templatesSubmit = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "template-id",
-			Required: true,
+			Name:      "template-id",
+			Required:  true,
+			PathParam: "templateId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "sender-id",
@@ -192,6 +216,21 @@ var templatesSubmit = cli.Command{
 	HideHelpCommand: true,
 }
 
+var templatesSync = cli.Command{
+	Name:    "sync",
+	Usage:   "Reconcile this project's templates against WhatsApp. Two things happen per\nconnected WhatsApp Business Account: templates that exist on Meta but not in\nZavu are imported (or linked to an existing template with the same name), and\nthe approval status of the templates Zavu already knows about is refreshed from\nMeta.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:     "sender-id",
+			Usage:    "Sync only the WhatsApp Business Account attached to this sender. If omitted, every WhatsApp sender in the project is synced.",
+			BodyPath: "senderId",
+		},
+	},
+	Action:          handleTemplatesSync,
+	HideHelpCommand: true,
+}
+
 func handleTemplatesCreate(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
@@ -199,8 +238,6 @@ func handleTemplatesCreate(ctx context.Context, cmd *cli.Command) error {
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
-
-	params := zavudev.TemplateNewParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -213,6 +250,8 @@ func handleTemplatesCreate(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	params := zavudev.TemplateNewParams{}
+
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
 	_, err = client.Templates.New(ctx, params, options...)
@@ -222,8 +261,15 @@ func handleTemplatesCreate(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "templates create", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "templates create",
+		Transform:      transform,
+	})
 }
 
 func handleTemplatesRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -257,8 +303,15 @@ func handleTemplatesRetrieve(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "templates retrieve", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "templates retrieve",
+		Transform:      transform,
+	})
 }
 
 func handleTemplatesList(ctx context.Context, cmd *cli.Command) error {
@@ -268,8 +321,6 @@ func handleTemplatesList(ctx context.Context, cmd *cli.Command) error {
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
-
-	params := zavudev.TemplateListParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -282,7 +333,10 @@ func handleTemplatesList(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	params := zavudev.TemplateListParams{}
+
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -292,14 +346,26 @@ func handleTemplatesList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "templates list", obj, format, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "templates list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.Templates.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "templates list", iter, format, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "templates list",
+			Transform:      transform,
+		})
 	}
 }
 
@@ -339,8 +405,6 @@ func handleTemplatesSubmit(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.TemplateSubmitParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -351,6 +415,8 @@ func handleTemplatesSubmit(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.TemplateSubmitParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -366,6 +432,54 @@ func handleTemplatesSubmit(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "templates submit", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "templates submit",
+		Transform:      transform,
+	})
+}
+
+func handleTemplatesSync(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		ApplicationJSON,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	params := zavudev.TemplateSyncParams{}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Templates.Sync(ctx, params, options...)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "templates sync",
+		Transform:      transform,
+	})
 }

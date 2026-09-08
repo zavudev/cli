@@ -1,0 +1,255 @@
+// File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+
+package cmd
+
+import (
+	"testing"
+
+	"github.com/zavudev/cli/internal/mocktest"
+)
+
+func TestFunctionsCreate(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"functions", "create",
+			"--name", "Order Bot",
+			"--slug", "order-bot",
+			"--dependencies", "{openai: ^4.20.0}",
+			"--description", "Replies to order status questions on WhatsApp.",
+			"--entrypoint", "index.ts",
+			"--files", `{index.ts: "import { formatOrder } from './lib/orders';\n\nexport default async function handler(event) {\n  return { statusCode: 200, body: formatOrder(event) };\n}\n", lib/orders.ts: "export function formatOrder(event) {\n  return JSON.stringify(event);\n}\n"}`,
+			"--http-enabled=true",
+			"--memory-mb", "128",
+			"--runtime", "nodejs24",
+			"--source-code", "import { defineFunction } from '@zavudev/functions';\n\nexport default defineFunction(async (event, ctx) => {\n  ctx.log('received', event.type);\n});\n",
+			"--timeout-sec", "1",
+		)
+	})
+
+	t.Run("piping data", func(t *testing.T) {
+		// Test piping YAML data over stdin
+		pipeData := []byte("" +
+			"name: Order Bot\n" +
+			"slug: order-bot\n" +
+			"dependencies:\n" +
+			"  openai: ^4.20.0\n" +
+			"description: Replies to order status questions on WhatsApp.\n" +
+			"entrypoint: index.ts\n" +
+			"files:\n" +
+			"  index.ts: |\n" +
+			"    import { formatOrder } from './lib/orders';\n" +
+			"\n" +
+			"    export default async function handler(event) {\n" +
+			"      return { statusCode: 200, body: formatOrder(event) };\n" +
+			"    }\n" +
+			"  lib/orders.ts: |\n" +
+			"    export function formatOrder(event) {\n" +
+			"      return JSON.stringify(event);\n" +
+			"    }\n" +
+			"httpEnabled: true\n" +
+			"memoryMb: 128\n" +
+			"runtime: nodejs24\n" +
+			"sourceCode: |\n" +
+			"  import { defineFunction } from '@zavudev/functions';\n" +
+			"\n" +
+			"  export default defineFunction(async (event, ctx) => {\n" +
+			"    ctx.log('received', event.type);\n" +
+			"  });\n" +
+			"timeoutSec: 1\n")
+		mocktest.TestRunMockTestWithPipeAndFlags(
+			t, pipeData,
+			"--api-key", "string",
+			"functions", "create",
+		)
+	})
+}
+
+func TestFunctionsRetrieve(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"functions", "retrieve",
+			"--function-id", "functionId",
+		)
+	})
+}
+
+func TestFunctionsUpdate(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"functions", "update",
+			"--function-id", "functionId",
+			"--dependencies", "{foo: string}",
+			"--entrypoint", "index.ts",
+			"--files", `{index.ts: "import { formatOrder } from './lib/orders';\n\nexport default async function handler(event) {\n  return { statusCode: 200, body: formatOrder(event) };\n}\n", lib/orders.ts: "export function formatOrder(event) {\n  return JSON.stringify(event);\n}\n"}`,
+			"--http-enabled=true",
+			"--source-code", "sourceCode",
+		)
+	})
+
+	t.Run("piping data", func(t *testing.T) {
+		// Test piping YAML data over stdin
+		pipeData := []byte("" +
+			"dependencies:\n" +
+			"  foo: string\n" +
+			"entrypoint: index.ts\n" +
+			"files:\n" +
+			"  index.ts: |\n" +
+			"    import { formatOrder } from './lib/orders';\n" +
+			"\n" +
+			"    export default async function handler(event) {\n" +
+			"      return { statusCode: 200, body: formatOrder(event) };\n" +
+			"    }\n" +
+			"  lib/orders.ts: |\n" +
+			"    export function formatOrder(event) {\n" +
+			"      return JSON.stringify(event);\n" +
+			"    }\n" +
+			"httpEnabled: true\n" +
+			"sourceCode: sourceCode\n")
+		mocktest.TestRunMockTestWithPipeAndFlags(
+			t, pipeData,
+			"--api-key", "string",
+			"functions", "update",
+			"--function-id", "functionId",
+		)
+	})
+}
+
+func TestFunctionsDelete(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"functions", "delete",
+			"--function-id", "functionId",
+		)
+	})
+}
+
+func TestFunctionsDeploy(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"functions", "deploy",
+			"--function-id", "functionId",
+			"--dependencies", "{foo: string}",
+			"--entrypoint", "index.ts",
+			"--files", `{index.ts: "import { formatOrder } from './lib/orders';\n\nexport default async function handler(event) {\n  return { statusCode: 200, body: formatOrder(event) };\n}\n", lib/orders.ts: "export function formatOrder(event) {\n  return JSON.stringify(event);\n}\n"}`,
+			"--source-code", "sourceCode",
+		)
+	})
+
+	t.Run("piping data", func(t *testing.T) {
+		// Test piping YAML data over stdin
+		pipeData := []byte("" +
+			"dependencies:\n" +
+			"  foo: string\n" +
+			"entrypoint: index.ts\n" +
+			"files:\n" +
+			"  index.ts: |\n" +
+			"    import { formatOrder } from './lib/orders';\n" +
+			"\n" +
+			"    export default async function handler(event) {\n" +
+			"      return { statusCode: 200, body: formatOrder(event) };\n" +
+			"    }\n" +
+			"  lib/orders.ts: |\n" +
+			"    export function formatOrder(event) {\n" +
+			"      return JSON.stringify(event);\n" +
+			"    }\n" +
+			"sourceCode: sourceCode\n")
+		mocktest.TestRunMockTestWithPipeAndFlags(
+			t, pipeData,
+			"--api-key", "string",
+			"functions", "deploy",
+			"--function-id", "functionId",
+		)
+	})
+}
+
+func TestFunctionsGetDeployment(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"functions", "get-deployment",
+			"--deployment-id", "deploymentId",
+		)
+	})
+}
+
+func TestFunctionsListDeployments(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"functions", "list-deployments",
+			"--function-id", "functionId",
+			"--limit", "100",
+		)
+	})
+}
+
+func TestFunctionsListEventTypes(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"functions", "list-event-types",
+		)
+	})
+}
+
+func TestFunctionsRollbackDeployment(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"functions", "rollback-deployment",
+			"--function-id", "functionId",
+			"--deployment-id", "fnd_abc123",
+		)
+	})
+
+	t.Run("piping data", func(t *testing.T) {
+		// Test piping YAML data over stdin
+		pipeData := []byte("deploymentId: fnd_abc123")
+		mocktest.TestRunMockTestWithPipeAndFlags(
+			t, pipeData,
+			"--api-key", "string",
+			"functions", "rollback-deployment",
+			"--function-id", "functionId",
+		)
+	})
+}
+
+func TestFunctionsTailLogs(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"functions", "tail-logs",
+			"--function-id", "functionId",
+			"--end-time", "0",
+			"--filter-pattern", "filterPattern",
+			"--limit", "1",
+			"--next-token", "nextToken",
+			"--start-time", "0",
+		)
+	})
+}
