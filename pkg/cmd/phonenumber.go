@@ -132,7 +132,7 @@ var phoneNumbersRequirements = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:      "type",
-			Usage:     `Allowed values: "local", "national", "tollFree".`,
+			Usage:     "Type of phone number. `mobile` is stocked in countries where no geographic (`local`) or non-geographic (`national`) inventory exists, and in several markets it is the only type that can receive SMS.",
 			QueryPath: "type",
 		},
 	},
@@ -169,7 +169,7 @@ var phoneNumbersSearchAvailable = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:      "type",
-			Usage:     `Allowed values: "local", "national", "tollFree".`,
+			Usage:     "Type of phone number. `mobile` is stocked in countries where no geographic (`local`) or non-geographic (`national`) inventory exists, and in several markets it is the only type that can receive SMS.",
 			QueryPath: "type",
 		},
 	},
