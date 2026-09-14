@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -14,6 +13,26 @@ import (
 	"github.com/zavudev/sdk-go"
 	"github.com/zavudev/sdk-go/option"
 )
+
+var introspectValidateEmail = cli.Command{
+	Name:    "validate-email",
+	Usage:   "Heuristic email validation to run before sending: catches invalid syntax, dead\ndomains (no MX/A records), disposable inboxes, role-based addresses (info@,\ncontacto@, sales@), and addresses already on your project's suppression list.\nUse it to clean a list before a broadcast and keep your bounce rate low.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:     "email",
+			Usage:    "Single email address to validate.",
+			BodyPath: "email",
+		},
+		&requestflag.Flag[[]string]{
+			Name:     "email",
+			Usage:    "Batch of email addresses to validate (max 100).",
+			BodyPath: "emails",
+		},
+	},
+	Action:          handleIntrospectValidateEmail,
+	HideHelpCommand: true,
+}
 
 var introspectValidatePhone = cli.Command{
 	Name:    "validate-phone",
@@ -30,15 +49,13 @@ var introspectValidatePhone = cli.Command{
 	HideHelpCommand: true,
 }
 
-func handleIntrospectValidatePhone(ctx context.Context, cmd *cli.Command) error {
+func handleIntrospectValidateEmail(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
-
-	params := zavudev.IntrospectValidatePhoneParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -51,6 +68,49 @@ func handleIntrospectValidatePhone(ctx context.Context, cmd *cli.Command) error 
 		return err
 	}
 
+	params := zavudev.IntrospectValidateEmailParams{}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Introspect.ValidateEmail(ctx, params, options...)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "introspect validate-email",
+		Transform:      transform,
+	})
+}
+
+func handleIntrospectValidatePhone(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		ApplicationJSON,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	params := zavudev.IntrospectValidatePhoneParams{}
+
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
 	_, err = client.Introspect.ValidatePhone(ctx, params, options...)
@@ -60,6 +120,13 @@ func handleIntrospectValidatePhone(ctx context.Context, cmd *cli.Command) error 
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "introspect validate-phone", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "introspect validate-phone",
+		Transform:      transform,
+	})
 }

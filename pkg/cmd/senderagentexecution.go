@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -15,14 +14,35 @@ import (
 	"github.com/zavudev/sdk-go/option"
 )
 
+var sendersAgentExecutionsRetrieve = cli.Command{
+	Name:    "retrieve",
+	Usage:   "Fetch full details for one execution — including `errorMessage`, `errorCode`,\nand `responseText`. Use this to debug failures surfaced by the list endpoint.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
+		},
+		&requestflag.Flag[string]{
+			Name:      "execution-id",
+			Required:  true,
+			PathParam: "executionId",
+		},
+	},
+	Action:          handleSendersAgentExecutionsRetrieve,
+	HideHelpCommand: true,
+}
+
 var sendersAgentExecutionsList = cli.Command{
 	Name:    "list",
 	Usage:   "List recent agent executions with pagination.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
 			Name:      "cursor",
@@ -47,18 +67,16 @@ var sendersAgentExecutionsList = cli.Command{
 	HideHelpCommand: true,
 }
 
-func handleSendersAgentExecutionsList(ctx context.Context, cmd *cli.Command) error {
+func handleSendersAgentExecutionsRetrieve(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("sender-id") && len(unusedArgs) > 0 {
-		cmd.Set("sender-id", unusedArgs[0])
+	if !cmd.IsSet("execution-id") && len(unusedArgs) > 0 {
+		cmd.Set("execution-id", unusedArgs[0])
 		unusedArgs = unusedArgs[1:]
 	}
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
-
-	params := zavudev.SenderAgentExecutionListParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -71,7 +89,61 @@ func handleSendersAgentExecutionsList(ctx context.Context, cmd *cli.Command) err
 		return err
 	}
 
+	params := zavudev.SenderAgentExecutionGetParams{
+		SenderID: cmd.Value("sender-id").(string),
+	}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Senders.Agent.Executions.Get(
+		ctx,
+		cmd.Value("execution-id").(string),
+		params,
+		options...,
+	)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders:agent:executions retrieve",
+		Transform:      transform,
+	})
+}
+
+func handleSendersAgentExecutionsList(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("sender-id") && len(unusedArgs) > 0 {
+		cmd.Set("sender-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	params := zavudev.SenderAgentExecutionListParams{}
+
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -86,7 +158,13 @@ func handleSendersAgentExecutionsList(ctx context.Context, cmd *cli.Command) err
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "senders:agent:executions list", obj, format, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "senders:agent:executions list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.Senders.Agent.Executions.ListAutoPaging(
 			ctx,
@@ -98,6 +176,12 @@ func handleSendersAgentExecutionsList(ctx context.Context, cmd *cli.Command) err
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "senders:agent:executions list", iter, format, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "senders:agent:executions list",
+			Transform:      transform,
+		})
 	}
 }

@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -21,8 +20,9 @@ var sendersAgentToolsCreate = requestflag.WithInnerFlags(cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "description",
@@ -52,7 +52,7 @@ var sendersAgentToolsCreate = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:     "webhook-secret",
-			Usage:    "Optional secret for webhook signature verification.",
+			Usage:    "Signing secret for the webhook. Optional: Zavu generates one when omitted and returns it on this response only. Supply your own if you already have a secret you want reused.",
 			BodyPath: "webhookSecret",
 		},
 	},
@@ -82,12 +82,14 @@ var sendersAgentToolsRetrieve = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "tool-id",
-			Required: true,
+			Name:      "tool-id",
+			Required:  true,
+			PathParam: "toolId",
 		},
 	},
 	Action:          handleSendersAgentToolsRetrieve,
@@ -100,12 +102,14 @@ var sendersAgentToolsUpdate = requestflag.WithInnerFlags(cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "tool-id",
-			Required: true,
+			Name:      "tool-id",
+			Required:  true,
+			PathParam: "toolId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "description",
@@ -123,7 +127,7 @@ var sendersAgentToolsUpdate = requestflag.WithInnerFlags(cli.Command{
 			Name:     "parameters",
 			BodyPath: "parameters",
 		},
-		&requestflag.Flag[any]{
+		&requestflag.Flag[*string]{
 			Name:     "webhook-secret",
 			BodyPath: "webhookSecret",
 		},
@@ -158,8 +162,9 @@ var sendersAgentToolsList = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
 			Name:      "cursor",
@@ -189,30 +194,59 @@ var sendersAgentToolsDelete = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "tool-id",
-			Required: true,
+			Name:      "tool-id",
+			Required:  true,
+			PathParam: "toolId",
 		},
 	},
 	Action:          handleSendersAgentToolsDelete,
 	HideHelpCommand: true,
 }
 
-var sendersAgentToolsTest = cli.Command{
-	Name:    "test",
-	Usage:   "Test a tool by triggering its webhook with test parameters.",
+var sendersAgentToolsListTestRuns = cli.Command{
+	Name:    "list-test-runs",
+	Usage:   "Recent runs of this tool triggered from the test endpoint, newest first. Covers\nmanual tests only: a tool called by an agent during a real conversation is not\nrecorded here.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "tool-id",
-			Required: true,
+			Name:      "tool-id",
+			Required:  true,
+			PathParam: "toolId",
+		},
+		&requestflag.Flag[int64]{
+			Name:      "limit",
+			Default:   20,
+			QueryPath: "limit",
+		},
+	},
+	Action:          handleSendersAgentToolsListTestRuns,
+	HideHelpCommand: true,
+}
+
+var sendersAgentToolsTest = cli.Command{
+	Name:    "test",
+	Usage:   "Run a tool with the parameters you supply and return what it answered.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
+		},
+		&requestflag.Flag[string]{
+			Name:      "tool-id",
+			Required:  true,
+			PathParam: "toolId",
 		},
 		&requestflag.Flag[map[string]any]{
 			Name:     "test-params",
@@ -236,8 +270,6 @@ func handleSendersAgentToolsCreate(ctx context.Context, cmd *cli.Command) error 
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentToolNewParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -248,6 +280,8 @@ func handleSendersAgentToolsCreate(ctx context.Context, cmd *cli.Command) error 
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.SenderAgentToolNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -263,8 +297,15 @@ func handleSendersAgentToolsCreate(ctx context.Context, cmd *cli.Command) error 
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent:tools create", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders:agent:tools create",
+		Transform:      transform,
+	})
 }
 
 func handleSendersAgentToolsRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -278,10 +319,6 @@ func handleSendersAgentToolsRetrieve(ctx context.Context, cmd *cli.Command) erro
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentToolGetParams{
-		SenderID: cmd.Value("sender-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -291,6 +328,10 @@ func handleSendersAgentToolsRetrieve(ctx context.Context, cmd *cli.Command) erro
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.SenderAgentToolGetParams{
+		SenderID: cmd.Value("sender-id").(string),
 	}
 
 	var res []byte
@@ -307,8 +348,15 @@ func handleSendersAgentToolsRetrieve(ctx context.Context, cmd *cli.Command) erro
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent:tools retrieve", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders:agent:tools retrieve",
+		Transform:      transform,
+	})
 }
 
 func handleSendersAgentToolsUpdate(ctx context.Context, cmd *cli.Command) error {
@@ -322,10 +370,6 @@ func handleSendersAgentToolsUpdate(ctx context.Context, cmd *cli.Command) error 
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentToolUpdateParams{
-		SenderID: cmd.Value("sender-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -335,6 +379,10 @@ func handleSendersAgentToolsUpdate(ctx context.Context, cmd *cli.Command) error 
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.SenderAgentToolUpdateParams{
+		SenderID: cmd.Value("sender-id").(string),
 	}
 
 	var res []byte
@@ -351,8 +399,15 @@ func handleSendersAgentToolsUpdate(ctx context.Context, cmd *cli.Command) error 
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent:tools update", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders:agent:tools update",
+		Transform:      transform,
+	})
 }
 
 func handleSendersAgentToolsList(ctx context.Context, cmd *cli.Command) error {
@@ -366,8 +421,6 @@ func handleSendersAgentToolsList(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentToolListParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -379,7 +432,10 @@ func handleSendersAgentToolsList(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	params := zavudev.SenderAgentToolListParams{}
+
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -394,7 +450,13 @@ func handleSendersAgentToolsList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "senders:agent:tools list", obj, format, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "senders:agent:tools list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.Senders.Agent.Tools.ListAutoPaging(
 			ctx,
@@ -406,7 +468,13 @@ func handleSendersAgentToolsList(ctx context.Context, cmd *cli.Command) error {
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "senders:agent:tools list", iter, format, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "senders:agent:tools list",
+			Transform:      transform,
+		})
 	}
 }
 
@@ -421,8 +489,38 @@ func handleSendersAgentToolsDelete(ctx context.Context, cmd *cli.Command) error 
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
 	params := zavudev.SenderAgentToolDeleteParams{
 		SenderID: cmd.Value("sender-id").(string),
+	}
+
+	return client.Senders.Agent.Tools.Delete(
+		ctx,
+		cmd.Value("tool-id").(string),
+		params,
+		options...,
+	)
+}
+
+func handleSendersAgentToolsListTestRuns(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("tool-id") && len(unusedArgs) > 0 {
+		cmd.Set("tool-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
 	options, err := flagOptions(
@@ -436,12 +534,33 @@ func handleSendersAgentToolsDelete(ctx context.Context, cmd *cli.Command) error 
 		return err
 	}
 
-	return client.Senders.Agent.Tools.Delete(
+	params := zavudev.SenderAgentToolListTestRunsParams{
+		SenderID: cmd.Value("sender-id").(string),
+	}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Senders.Agent.Tools.ListTestRuns(
 		ctx,
 		cmd.Value("tool-id").(string),
 		params,
 		options...,
 	)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders:agent:tools list-test-runs",
+		Transform:      transform,
+	})
 }
 
 func handleSendersAgentToolsTest(ctx context.Context, cmd *cli.Command) error {
@@ -455,10 +574,6 @@ func handleSendersAgentToolsTest(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderAgentToolTestParams{
-		SenderID: cmd.Value("sender-id").(string),
-	}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -468,6 +583,10 @@ func handleSendersAgentToolsTest(ctx context.Context, cmd *cli.Command) error {
 	)
 	if err != nil {
 		return err
+	}
+
+	params := zavudev.SenderAgentToolTestParams{
+		SenderID: cmd.Value("sender-id").(string),
 	}
 
 	var res []byte
@@ -484,6 +603,13 @@ func handleSendersAgentToolsTest(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders:agent:tools test", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders:agent:tools test",
+		Transform:      transform,
+	})
 }

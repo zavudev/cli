@@ -16,9 +16,16 @@ func TestSendersCreate(t *testing.T) {
 			"--api-key", "string",
 			"senders", "create",
 			"--name", "name",
+			"--email-address", "noreply@yourdomain.com",
+			"--email-domain-id", "emailDomainId",
+			"--email-from-name", "emailFromName",
+			"--email-receiving-enabled=true",
+			"--enable-sms-oneway=true",
+			"--enable-voice=true",
 			"--phone-number", "phoneNumber",
 			"--set-as-default=true",
 			"--webhook-event", "message.queued",
+			"--webhook-signature-version", "v2",
 			"--webhook-url", "https://example.com",
 		)
 	})
@@ -27,10 +34,17 @@ func TestSendersCreate(t *testing.T) {
 		// Test piping YAML data over stdin
 		pipeData := []byte("" +
 			"name: name\n" +
+			"emailAddress: noreply@yourdomain.com\n" +
+			"emailDomainId: emailDomainId\n" +
+			"emailFromName: emailFromName\n" +
+			"emailReceivingEnabled: true\n" +
+			"enableSmsOneway: true\n" +
+			"enableVoice: true\n" +
 			"phoneNumber: phoneNumber\n" +
 			"setAsDefault: true\n" +
 			"webhookEvents:\n" +
 			"  - message.queued\n" +
+			"webhookSignatureVersion: v2\n" +
 			"webhookUrl: https://example.com\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
 			t, pipeData,
@@ -60,11 +74,18 @@ func TestSendersUpdate(t *testing.T) {
 			"--api-key", "string",
 			"senders", "update",
 			"--sender-id", "senderId",
+			"--email-address", "noreply@yourdomain.com",
+			"--email-catch-all-enabled=true",
+			"--email-domain-id", "emailDomainId",
+			"--email-from-name", "emailFromName",
 			"--email-receiving-enabled=true",
+			"--enable-sms-oneway=true",
+			"--enable-voice=true",
 			"--name", "name",
 			"--set-as-default=true",
 			"--webhook-active=true",
 			"--webhook-event", "message.queued",
+			"--webhook-signature-version", "v2",
 			"--webhook-url", "https://example.com",
 		)
 	})
@@ -72,12 +93,19 @@ func TestSendersUpdate(t *testing.T) {
 	t.Run("piping data", func(t *testing.T) {
 		// Test piping YAML data over stdin
 		pipeData := []byte("" +
+			"emailAddress: noreply@yourdomain.com\n" +
+			"emailCatchAllEnabled: true\n" +
+			"emailDomainId: emailDomainId\n" +
+			"emailFromName: emailFromName\n" +
 			"emailReceivingEnabled: true\n" +
+			"enableSmsOneway: true\n" +
+			"enableVoice: true\n" +
 			"name: name\n" +
 			"setAsDefault: true\n" +
 			"webhookActive: true\n" +
 			"webhookEvents:\n" +
 			"  - message.queued\n" +
+			"webhookSignatureVersion: v2\n" +
 			"webhookUrl: https://example.com\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
 			t, pipeData,

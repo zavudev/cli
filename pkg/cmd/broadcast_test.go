@@ -18,7 +18,7 @@ func TestBroadcastsCreate(t *testing.T) {
 			"broadcasts", "create",
 			"--channel", "sms",
 			"--name", "Black Friday Sale",
-			"--content", "{filename: filename, mediaId: mediaId, mediaUrl: mediaUrl, mimeType: mimeType, templateId: templateId, templateVariables: {foo: string}}",
+			"--content", "{filename: filename, mediaId: mediaId, mediaUrl: mediaUrl, mimeType: mimeType, templateButtonVariables: {foo: string}, templateHeaderVariables: {foo: string}, templateId: templateId, templateVariables: {foo: string}}",
 			"--email-html-body", "emailHtmlBody",
 			"--email-subject", "emailSubject",
 			"--idempotency-key", "idempotencyKey",
@@ -45,6 +45,8 @@ func TestBroadcastsCreate(t *testing.T) {
 			"--content.media-id", "mediaId",
 			"--content.media-url", "mediaUrl",
 			"--content.mime-type", "mimeType",
+			"--content.template-button-variables", "{foo: string}",
+			"--content.template-header-variables", "{foo: string}",
 			"--content.template-id", "templateId",
 			"--content.template-variables", "{foo: string}",
 			"--email-html-body", "emailHtmlBody",
@@ -68,6 +70,10 @@ func TestBroadcastsCreate(t *testing.T) {
 			"  mediaId: mediaId\n" +
 			"  mediaUrl: mediaUrl\n" +
 			"  mimeType: mimeType\n" +
+			"  templateButtonVariables:\n" +
+			"    foo: string\n" +
+			"  templateHeaderVariables:\n" +
+			"    foo: string\n" +
 			"  templateId: templateId\n" +
 			"  templateVariables:\n" +
 			"    foo: string\n" +
@@ -108,7 +114,7 @@ func TestBroadcastsUpdate(t *testing.T) {
 			"--api-key", "string",
 			"broadcasts", "update",
 			"--broadcast-id", "broadcastId",
-			"--content", "{filename: filename, mediaId: mediaId, mediaUrl: mediaUrl, mimeType: mimeType, templateId: templateId, templateVariables: {foo: string}}",
+			"--content", "{filename: filename, mediaId: mediaId, mediaUrl: mediaUrl, mimeType: mimeType, templateButtonVariables: {foo: string}, templateHeaderVariables: {foo: string}, templateId: templateId, templateVariables: {foo: string}}",
 			"--email-html-body", "emailHtmlBody",
 			"--email-subject", "emailSubject",
 			"--metadata", "{foo: string}",
@@ -131,6 +137,8 @@ func TestBroadcastsUpdate(t *testing.T) {
 			"--content.media-id", "mediaId",
 			"--content.media-url", "mediaUrl",
 			"--content.mime-type", "mimeType",
+			"--content.template-button-variables", "{foo: string}",
+			"--content.template-header-variables", "{foo: string}",
 			"--content.template-id", "templateId",
 			"--content.template-variables", "{foo: string}",
 			"--email-html-body", "emailHtmlBody",
@@ -149,6 +157,10 @@ func TestBroadcastsUpdate(t *testing.T) {
 			"  mediaId: mediaId\n" +
 			"  mediaUrl: mediaUrl\n" +
 			"  mimeType: mimeType\n" +
+			"  templateButtonVariables:\n" +
+			"    foo: string\n" +
+			"  templateHeaderVariables:\n" +
+			"    foo: string\n" +
 			"  templateId: templateId\n" +
 			"  templateVariables:\n" +
 			"    foo: string\n" +
@@ -206,6 +218,18 @@ func TestBroadcastsCancel(t *testing.T) {
 	})
 }
 
+func TestBroadcastsEscalateReview(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"broadcasts", "escalate-review",
+			"--broadcast-id", "broadcastId",
+		)
+	})
+}
+
 func TestBroadcastsProgress(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
@@ -237,6 +261,18 @@ func TestBroadcastsReschedule(t *testing.T) {
 			t, pipeData,
 			"--api-key", "string",
 			"broadcasts", "reschedule",
+			"--broadcast-id", "broadcastId",
+		)
+	})
+}
+
+func TestBroadcastsRetryReview(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"broadcasts", "retry-review",
 			"--broadcast-id", "broadcastId",
 		)
 	})

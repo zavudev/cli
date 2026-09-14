@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -26,8 +25,40 @@ var sendersCreate = cli.Command{
 			BodyPath: "name",
 		},
 		&requestflag.Flag[string]{
+			Name:     "email-address",
+			Usage:    "From-address for the email channel (e.g. noreply@yourdomain.com). The address's domain must be a verified email domain in your project. Setting this attaches the email channel to the sender.",
+			BodyPath: "emailAddress",
+		},
+		&requestflag.Flag[string]{
+			Name:     "email-domain-id",
+			Usage:    "ID of the verified email domain to attach. Optional — resolved from `emailAddress`'s domain when omitted.",
+			BodyPath: "emailDomainId",
+		},
+		&requestflag.Flag[string]{
+			Name:     "email-from-name",
+			Usage:    "Display name shown in the recipient's inbox for the email channel.",
+			BodyPath: "emailFromName",
+		},
+		&requestflag.Flag[bool]{
+			Name:     "email-receiving-enabled",
+			Usage:    "Enable inbound email receiving on this sender. Requires a verified MX record on the domain; ignored otherwise.",
+			BodyPath: "emailReceivingEnabled",
+		},
+		&requestflag.Flag[bool]{
+			Name:     "enable-sms-oneway",
+			Usage:    "Enable the one-way SMS channel (`sms_oneway`). Needs nothing else — no phone number, no credential — so it is the fastest way to get a sender that can send. Recipients cannot reply. Confirm with `sms_oneway` in the `channels` array on the response.",
+			Default:  false,
+			BodyPath: "enableSmsOneway",
+		},
+		&requestflag.Flag[bool]{
+			Name:     "enable-voice",
+			Usage:    "Let this sender place and answer phone calls. Requires `phoneNumber`; enabling it without one returns 400. Check the `channels` array on the response to confirm `voice` is on.",
+			Default:  false,
+			BodyPath: "enableVoice",
+		},
+		&requestflag.Flag[string]{
 			Name:     "phone-number",
-			Required: true,
+			Usage:    "Phone number in E.164 format, and it must be a number your project already owns (see `GET /v1/phone-numbers`). The number is routed to the sender as part of this call, which is what turns the SMS channel on. Passing a number the project does not own, or one already attached to another sender, returns 400 rather than creating a sender that cannot send. Omit for an email-only sender.",
 			BodyPath: "phoneNumber",
 		},
 		&requestflag.Flag[bool]{
@@ -39,6 +70,11 @@ var sendersCreate = cli.Command{
 			Name:     "webhook-event",
 			Usage:    "Events to subscribe to.",
 			BodyPath: "webhookEvents",
+		},
+		&requestflag.Flag[string]{
+			Name:     "webhook-signature-version",
+			Usage:    "Which `X-Zavu-Signature` scheme this receiver is sent.\n\n- `v1`: `v1=HMAC_SHA256(secret, body)`. The scheme used before this was configurable. Existing webhooks stay on it until you move them.\n- `v2`: `v2=HMAC_SHA256(secret, \"{t}.{body}\")`. The current scheme, and the default for new senders. It signs the timestamp together with the body.\n- `v1+v2`: both signatures, sharing one `t`. The migration setting: a receiver reading either one works, so you can deploy and confirm your new verifier before switching over.\n\nMoving from `v1` straight to `v2` returns `400`. Set `v1+v2` first. See https://docs.zavu.dev/guides/receiving-messages/signature-migration",
+			BodyPath: "webhookSignatureVersion",
 		},
 		&requestflag.Flag[string]{
 			Name:     "webhook-url",
@@ -56,8 +92,9 @@ var sendersRetrieve = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 	},
 	Action:          handleSendersRetrieve,
@@ -70,13 +107,44 @@ var sendersUpdate = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
+		},
+		&requestflag.Flag[string]{
+			Name:     "email-address",
+			Usage:    "Attach or change the sender's email from-address (e.g. noreply@yourdomain.com). The domain must be a verified email domain in your project.",
+			BodyPath: "emailAddress",
+		},
+		&requestflag.Flag[bool]{
+			Name:     "email-catch-all-enabled",
+			Usage:    "Enable or disable domain catch-all. When enabled (with emailReceivingEnabled true), this sender receives email for any address at its domain. Ignored (treated as false) if receiving is not enabled.",
+			BodyPath: "emailCatchAllEnabled",
+		},
+		&requestflag.Flag[string]{
+			Name:     "email-domain-id",
+			Usage:    "ID of the verified email domain to attach. Optional — resolved from `emailAddress`'s domain when omitted.",
+			BodyPath: "emailDomainId",
+		},
+		&requestflag.Flag[string]{
+			Name:     "email-from-name",
+			Usage:    "Display name shown in the recipient's inbox for the email channel.",
+			BodyPath: "emailFromName",
 		},
 		&requestflag.Flag[bool]{
 			Name:     "email-receiving-enabled",
 			Usage:    "Enable or disable inbound email receiving for this sender.",
 			BodyPath: "emailReceivingEnabled",
+		},
+		&requestflag.Flag[bool]{
+			Name:     "enable-sms-oneway",
+			Usage:    "Turn the one-way SMS channel on or off. Enabling needs nothing else and takes effect immediately; disabling removes the channel from the sender. Confirm with the `channels` array on the response.",
+			BodyPath: "enableSmsOneway",
+		},
+		&requestflag.Flag[bool]{
+			Name:     "enable-voice",
+			Usage:    "Turn the voice channel on or off. The sender must already have a phone number provisioned for calls; enabling it otherwise returns 400 instead of storing a flag that changes nothing. Confirm with the `channels` array on the response.",
+			BodyPath: "enableVoice",
 		},
 		&requestflag.Flag[string]{
 			Name:     "name",
@@ -96,7 +164,12 @@ var sendersUpdate = cli.Command{
 			Usage:    "Events to subscribe to.",
 			BodyPath: "webhookEvents",
 		},
-		&requestflag.Flag[any]{
+		&requestflag.Flag[string]{
+			Name:     "webhook-signature-version",
+			Usage:    "Which `X-Zavu-Signature` scheme this receiver is sent.\n\n- `v1`: `v1=HMAC_SHA256(secret, body)`. The scheme used before this was configurable. Existing webhooks stay on it until you move them.\n- `v2`: `v2=HMAC_SHA256(secret, \"{t}.{body}\")`. The current scheme, and the default for new senders. It signs the timestamp together with the body.\n- `v1+v2`: both signatures, sharing one `t`. The migration setting: a receiver reading either one works, so you can deploy and confirm your new verifier before switching over.\n\nMoving from `v1` straight to `v2` returns `400`. Set `v1+v2` first. See https://docs.zavu.dev/guides/receiving-messages/signature-migration",
+			BodyPath: "webhookSignatureVersion",
+		},
+		&requestflag.Flag[*string]{
 			Name:     "webhook-url",
 			Usage:    "HTTPS URL for webhook events. Set to null to remove webhook.",
 			BodyPath: "webhookUrl",
@@ -135,8 +208,9 @@ var sendersDelete = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 	},
 	Action:          handleSendersDelete,
@@ -149,8 +223,9 @@ var sendersGetProfile = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 	},
 	Action:          handleSendersGetProfile,
@@ -163,8 +238,9 @@ var sendersRegenerateWebhookSecret = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 	},
 	Action:          handleSendersRegenerateWebhookSecret,
@@ -177,8 +253,9 @@ var sendersUpdateProfile = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "about",
@@ -221,8 +298,9 @@ var sendersUploadProfilePicture = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "sender-id",
-			Required: true,
+			Name:      "sender-id",
+			Required:  true,
+			PathParam: "senderId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "image-url",
@@ -249,8 +327,6 @@ func handleSendersCreate(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderNewParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -262,6 +338,8 @@ func handleSendersCreate(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	params := zavudev.SenderNewParams{}
+
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
 	_, err = client.Senders.New(ctx, params, options...)
@@ -271,8 +349,15 @@ func handleSendersCreate(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders create", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders create",
+		Transform:      transform,
+	})
 }
 
 func handleSendersRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -306,8 +391,15 @@ func handleSendersRetrieve(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders retrieve", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders retrieve",
+		Transform:      transform,
+	})
 }
 
 func handleSendersUpdate(ctx context.Context, cmd *cli.Command) error {
@@ -321,8 +413,6 @@ func handleSendersUpdate(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderUpdateParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -333,6 +423,8 @@ func handleSendersUpdate(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.SenderUpdateParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -348,8 +440,15 @@ func handleSendersUpdate(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders update", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders update",
+		Transform:      transform,
+	})
 }
 
 func handleSendersList(ctx context.Context, cmd *cli.Command) error {
@@ -359,8 +458,6 @@ func handleSendersList(ctx context.Context, cmd *cli.Command) error {
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
-
-	params := zavudev.SenderListParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -373,7 +470,10 @@ func handleSendersList(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	params := zavudev.SenderListParams{}
+
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -383,14 +483,26 @@ func handleSendersList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "senders list", obj, format, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "senders list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.Senders.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "senders list", iter, format, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "senders list",
+			Transform:      transform,
+		})
 	}
 }
 
@@ -450,8 +562,15 @@ func handleSendersGetProfile(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders get-profile", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders get-profile",
+		Transform:      transform,
+	})
 }
 
 func handleSendersRegenerateWebhookSecret(ctx context.Context, cmd *cli.Command) error {
@@ -485,8 +604,15 @@ func handleSendersRegenerateWebhookSecret(ctx context.Context, cmd *cli.Command)
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders regenerate-webhook-secret", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders regenerate-webhook-secret",
+		Transform:      transform,
+	})
 }
 
 func handleSendersUpdateProfile(ctx context.Context, cmd *cli.Command) error {
@@ -500,8 +626,6 @@ func handleSendersUpdateProfile(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderUpdateProfileParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -512,6 +636,8 @@ func handleSendersUpdateProfile(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.SenderUpdateProfileParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -527,8 +653,15 @@ func handleSendersUpdateProfile(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders update-profile", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders update-profile",
+		Transform:      transform,
+	})
 }
 
 func handleSendersUploadProfilePicture(ctx context.Context, cmd *cli.Command) error {
@@ -542,8 +675,6 @@ func handleSendersUploadProfilePicture(ctx context.Context, cmd *cli.Command) er
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.SenderUploadProfilePictureParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -554,6 +685,8 @@ func handleSendersUploadProfilePicture(ctx context.Context, cmd *cli.Command) er
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.SenderUploadProfilePictureParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -569,6 +702,13 @@ func handleSendersUploadProfilePicture(ctx context.Context, cmd *cli.Command) er
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "senders upload-profile-picture", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "senders upload-profile-picture",
+		Transform:      transform,
+	})
 }

@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -71,8 +70,9 @@ var addressesRetrieve = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "address-id",
-			Required: true,
+			Name:      "address-id",
+			Required:  true,
+			PathParam: "addressId",
 		},
 	},
 	Action:          handleAddressesRetrieve,
@@ -108,8 +108,9 @@ var addressesDelete = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "address-id",
-			Required: true,
+			Name:      "address-id",
+			Required:  true,
+			PathParam: "addressId",
 		},
 	},
 	Action:          handleAddressesDelete,
@@ -124,8 +125,6 @@ func handleAddressesCreate(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.AddressNewParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -137,6 +136,8 @@ func handleAddressesCreate(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	params := zavudev.AddressNewParams{}
+
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
 	_, err = client.Addresses.New(ctx, params, options...)
@@ -146,8 +147,15 @@ func handleAddressesCreate(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "addresses create", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "addresses create",
+		Transform:      transform,
+	})
 }
 
 func handleAddressesRetrieve(ctx context.Context, cmd *cli.Command) error {
@@ -181,8 +189,15 @@ func handleAddressesRetrieve(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "addresses retrieve", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "addresses retrieve",
+		Transform:      transform,
+	})
 }
 
 func handleAddressesList(ctx context.Context, cmd *cli.Command) error {
@@ -192,8 +207,6 @@ func handleAddressesList(ctx context.Context, cmd *cli.Command) error {
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
-
-	params := zavudev.AddressListParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -206,7 +219,10 @@ func handleAddressesList(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	params := zavudev.AddressListParams{}
+
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -216,14 +232,26 @@ func handleAddressesList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "addresses list", obj, format, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "addresses list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.Addresses.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "addresses list", iter, format, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "addresses list",
+			Transform:      transform,
+		})
 	}
 }
 

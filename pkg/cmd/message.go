@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -21,8 +20,9 @@ var messagesRetrieve = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "message-id",
-			Required: true,
+			Name:      "message-id",
+			Required:  true,
+			PathParam: "messageId",
 		},
 	},
 	Action:          handleMessagesRetrieve,
@@ -36,7 +36,7 @@ var messagesList = cli.Command{
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
 			Name:      "channel",
-			Usage:     "Delivery channel. Use 'auto' for intelligent routing.",
+			Usage:     "Filter by delivery channel.",
 			QueryPath: "channel",
 		},
 		&requestflag.Flag[string]{
@@ -50,7 +50,7 @@ var messagesList = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:      "status",
-			Usage:     `Allowed values: "queued", "sending", "sent", "delivered", "read", "failed", "received", "pending_url_verification".`,
+			Usage:     "Filter by status. Not all stored statuses are filterable.",
 			QueryPath: "status",
 		},
 		&requestflag.Flag[string]{
@@ -66,14 +66,30 @@ var messagesList = cli.Command{
 	HideHelpCommand: true,
 }
 
+var messagesListAttachments = cli.Command{
+	Name:    "list-attachments",
+	Usage:   "List the stored file attachments for an email message and get a short-lived\nsigned `downloadUrl` for each. Works for both inbound emails (received via\n`message.inbound`) and outbound emails you sent with attachments. Messages\nwithout stored attachments (including SMS, WhatsApp, and other channels) return\nan empty list. Each `downloadUrl` is generated fresh per request and expires —\nfetch the file promptly and do not cache the URL.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "message-id",
+			Required:  true,
+			PathParam: "messageId",
+		},
+	},
+	Action:          handleMessagesListAttachments,
+	HideHelpCommand: true,
+}
+
 var messagesReact = cli.Command{
 	Name:    "react",
 	Usage:   "Send an emoji reaction to an existing WhatsApp message. Reactions are only\nsupported for WhatsApp messages.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "message-id",
-			Required: true,
+			Name:      "message-id",
+			Required:  true,
+			PathParam: "messageId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "emoji",
@@ -97,7 +113,7 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
 			Name:     "to",
-			Usage:    "Recipient phone number in E.164 format, email address, or numeric chat ID (for Telegram/Instagram).",
+			Usage:    "Recipient phone number in E.164 format, email address, WhatsApp business-scoped user ID (BSUID, e.g. `US.13491208655302741918`), or numeric chat ID (for Telegram/Instagram/Messenger). A BSUID is routed to WhatsApp and sent via the `recipient` field; use it to message a contact who adopted a username and whose phone number is hidden.",
 			Required: true,
 			BodyPath: "to",
 		},
@@ -134,7 +150,7 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:     "message-type",
-			Usage:    "Type of message. Non-text types are supported by WhatsApp and Telegram (varies by type).",
+			Usage:    "Type of message. Non-text types are supported by WhatsApp and Telegram (varies by type).\n\n`location_request` asks the recipient to share their location and is WhatsApp-only. It takes no `content` object — the prompt goes in `text` (max 1024 characters) and the button label is fixed by WhatsApp. The recipient's answer arrives as an inbound `location` message whose `content.replyToMessageId` is the ID of the request.\n\n`request_contact_info` asks the recipient to share their phone number and is WhatsApp-only. Like `location_request` it takes no `content` object — the prompt goes in `text` (max 1024 characters) and WhatsApp renders a fixed **Share Contact Info** button. The answer arrives as an inbound `contact` message. Use it to recover the phone number of a contact who adopted a WhatsApp username and is only known by their business-scoped user ID (BSUID); when they share it, Zavu automatically links the phone number to that contact.",
 			BodyPath: "messageType",
 		},
 		&requestflag.Flag[map[string]any]{
@@ -209,6 +225,31 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 			InnerField: "contacts",
 		},
 		&requestflag.InnerFlag[string]{
+			Name:       "content.cta-display-text",
+			Usage:      "Button label for cta_url messages.",
+			InnerField: "ctaDisplayText",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.cta-header-media-url",
+			Usage:      "Public HTTPS URL of the header media when ctaHeaderType is 'image', 'video', or 'document'. WhatsApp fetches this URL — it must be publicly reachable and return the declared content type.",
+			InnerField: "ctaHeaderMediaUrl",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.cta-header-text",
+			Usage:      "Header text when ctaHeaderType is 'text'.",
+			InnerField: "ctaHeaderText",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.cta-header-type",
+			Usage:      "Optional header type for cta_url messages.",
+			InnerField: "ctaHeaderType",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.cta-url",
+			Usage:      "Destination URL opened in the device's default browser when the button is tapped. Used with messageType=cta_url. WhatsApp requires HTTPS in production.",
+			InnerField: "ctaUrl",
+		},
+		&requestflag.InnerFlag[string]{
 			Name:       "content.emoji",
 			Usage:      "Emoji for reaction messages.",
 			InnerField: "emoji",
@@ -217,6 +258,11 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 			Name:       "content.filename",
 			Usage:      "Filename for documents.",
 			InnerField: "filename",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.footer-text",
+			Usage:      "Optional footer text for cta_url messages.",
+			InnerField: "footerText",
 		},
 		&requestflag.InnerFlag[float64]{
 			Name:       "content.latitude",
@@ -263,10 +309,50 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 			Usage:      "Message ID to react to.",
 			InnerField: "reactToMessageId",
 		},
+		&requestflag.InnerFlag[map[string]any]{
+			Name:       "content.referral",
+			Usage:      "Click-to-WhatsApp (CTWA) ad attribution: where an inbound conversation came from.\n\nWhatsApp only. Present on the **first inbound message** of a conversation opened from a Meta ad or post, and on no message after it — so store it when it arrives rather than expecting it again. Organic conversations never carry it.\n\nField names are camelCased to match the rest of this API; Meta sends them as snake_case (`ctwa_clid`, `source_id`, ...). Fields that do not apply are omitted: a `post` source has no click id, and an image ad has no `videoUrl`.",
+			InnerField: "referral",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.reply-to-from",
+			Usage:      "Sender of the quoted message (phone number in E.164 format).",
+			InnerField: "replyToFrom",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.reply-to-message-id",
+			Usage:      "Zavu message ID of the quoted message this message replies to. Present on inbound messages that quote an earlier message. Omitted when the quoted message is not found in Zavu (e.g. an old or unknown message) — use replyToProviderMessageId in that case.",
+			InnerField: "replyToMessageId",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.reply-to-message-type",
+			Usage:      "Type of the quoted message (text, image, video, etc.).",
+			InnerField: "replyToMessageType",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.reply-to-provider-message-id",
+			Usage:      "Provider message ID (WhatsApp WAMID) of the quoted message. Present whenever an inbound message is a reply, even if the quoted message is not stored in Zavu.",
+			InnerField: "replyToProviderMessageId",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "content.reply-to-text",
+			Usage:      "Truncated snippet of the quoted message's text, for display. Empty when the quoted message has no text (e.g. media).",
+			InnerField: "replyToText",
+		},
 		&requestflag.InnerFlag[[]map[string]any]{
 			Name:       "content.sections",
 			Usage:      "Sections for list messages.",
 			InnerField: "sections",
+		},
+		&requestflag.InnerFlag[map[string]any]{
+			Name:       "content.template-button-variables",
+			Usage:      "Variables for dynamic button placeholders (URL buttons and OTP buttons). Keys are the button index (0, 1, 2) in the template's `buttons` array — not the placeholder name. Values substitute the `{{1}}` placeholder inside that button's URL.\n\n**WhatsApp constraints:**\n- URL buttons only accept `{{1}}` — positional, numeric, no whitespace, no name. Named placeholders like `{{token}}` are stored as literal URL text by Meta and cannot be substituted.\n- At most one placeholder per URL button.\n- A template may have at most three buttons.\n- Static URL buttons (no placeholder) and `quick_reply` buttons are not included here.",
+			InnerField: "templateButtonVariables",
+		},
+		&requestflag.InnerFlag[map[string]any]{
+			Name:       "content.template-header-variables",
+			Usage:      "Value for a text-header variable, keyed by `1` (WhatsApp text headers allow at most one variable). Optional override. If omitted, Zavu resolves the header from `templateVariables` using the header placeholder's name (e.g. `novios`). Static text headers need no value.",
+			InnerField: "templateHeaderVariables",
 		},
 		&requestflag.InnerFlag[string]{
 			Name:       "content.template-id",
@@ -275,11 +361,30 @@ var messagesSend = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.InnerFlag[map[string]any]{
 			Name:       "content.template-variables",
-			Usage:      "Variables for template rendering. Keys are variable positions (1, 2, 3...).",
+			Usage:      "Variables for body placeholders. Key them to match the template body: by position (`1`, `2`, ...) for positional templates, or by name (e.g. `customer_name`) for named templates. Zavu detects the template's format and sends the correct payload to Meta. Named keys also resolve a named text-header variable. Do not mix positional and named keys in the same request.",
 			InnerField: "templateVariables",
 		},
 	},
 })
+
+var messagesShowTyping = cli.Command{
+	Name:    "show-typing",
+	Usage:   "Mark an inbound WhatsApp message as read and display a typing indicator to the\nuser while you prepare a response. The indicator is automatically dismissed when\nyou send a reply, or after 25 seconds — whichever comes first. Only valid for\ninbound WhatsApp messages. Use this when a reply will take more than a couple of\nseconds (LLM agent, tool call, lookup) to improve the recipient's experience.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "message-id",
+			Required:  true,
+			PathParam: "messageId",
+		},
+		&requestflag.Flag[string]{
+			Name:       "zavu-sender",
+			HeaderPath: "Zavu-Sender",
+		},
+	},
+	Action:          handleMessagesShowTyping,
+	HideHelpCommand: true,
+}
 
 func handleMessagesRetrieve(ctx context.Context, cmd *cli.Command) error {
 	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
@@ -312,8 +417,15 @@ func handleMessagesRetrieve(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "messages retrieve", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "messages retrieve",
+		Transform:      transform,
+	})
 }
 
 func handleMessagesList(ctx context.Context, cmd *cli.Command) error {
@@ -323,8 +435,6 @@ func handleMessagesList(ctx context.Context, cmd *cli.Command) error {
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
-
-	params := zavudev.MessageListParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -337,7 +447,10 @@ func handleMessagesList(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	params := zavudev.MessageListParams{}
+
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
 	if format == "raw" {
 		var res []byte
@@ -347,15 +460,69 @@ func handleMessagesList(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, "messages list", obj, format, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "messages list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.Messages.ListAutoPaging(ctx, params, options...)
 		maxItems := int64(-1)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, "messages list", iter, format, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "messages list",
+			Transform:      transform,
+		})
 	}
+}
+
+func handleMessagesListAttachments(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("message-id") && len(unusedArgs) > 0 {
+		cmd.Set("message-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Messages.ListAttachments(ctx, cmd.Value("message-id").(string), options...)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "messages list-attachments",
+		Transform:      transform,
+	})
 }
 
 func handleMessagesReact(ctx context.Context, cmd *cli.Command) error {
@@ -369,8 +536,6 @@ func handleMessagesReact(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := zavudev.MessageReactParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -381,6 +546,8 @@ func handleMessagesReact(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+
+	params := zavudev.MessageReactParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -396,8 +563,15 @@ func handleMessagesReact(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "messages react", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "messages react",
+		Transform:      transform,
+	})
 }
 
 func handleMessagesSend(ctx context.Context, cmd *cli.Command) error {
@@ -407,8 +581,6 @@ func handleMessagesSend(ctx context.Context, cmd *cli.Command) error {
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
-
-	params := zavudev.MessageSendParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -421,6 +593,8 @@ func handleMessagesSend(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	params := zavudev.MessageSendParams{}
+
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
 	_, err = client.Messages.Send(ctx, params, options...)
@@ -430,6 +604,62 @@ func handleMessagesSend(ctx context.Context, cmd *cli.Command) error {
 
 	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, "messages send", obj, format, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "messages send",
+		Transform:      transform,
+	})
+}
+
+func handleMessagesShowTyping(ctx context.Context, cmd *cli.Command) error {
+	client := zavudev.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("message-id") && len(unusedArgs) > 0 {
+		cmd.Set("message-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	params := zavudev.MessageShowTypingParams{}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Messages.ShowTyping(
+		ctx,
+		cmd.Value("message-id").(string),
+		params,
+		options...,
+	)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "messages show-typing",
+		Transform:      transform,
+	})
 }
