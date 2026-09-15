@@ -41,7 +41,7 @@ var sendersCreate = cli.Command{
 		},
 		&requestflag.Flag[bool]{
 			Name:     "email-receiving-enabled",
-			Usage:    "Enable inbound email receiving on this sender. Requires a verified MX record on the domain; ignored otherwise.",
+			Usage:    "Enable inbound email receiving on this sender. Requires a verified inbound MX record on the domain; the request is ignored otherwise. Read `emailReceivingEnabled` back off the response to see whether it was applied — it comes back `false` when the MX has not verified.",
 			BodyPath: "emailReceivingEnabled",
 		},
 		&requestflag.Flag[bool]{
@@ -133,7 +133,7 @@ var sendersUpdate = cli.Command{
 		},
 		&requestflag.Flag[bool]{
 			Name:     "email-receiving-enabled",
-			Usage:    "Enable or disable inbound email receiving for this sender.",
+			Usage:    "Enable or disable inbound email receiving for this sender. Enabling requires a verified inbound MX record on the domain; the request is ignored otherwise, and `emailReceivingEnabled` comes back `false` on the response. Disabling always applies.",
 			BodyPath: "emailReceivingEnabled",
 		},
 		&requestflag.Flag[bool]{
