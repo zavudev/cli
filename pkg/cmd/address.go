@@ -16,13 +16,25 @@ import (
 
 var addressesCreate = cli.Command{
 	Name:    "create",
-	Usage:   "Create a regulatory address for phone number purchases. Some countries require a\nverified address before phone numbers can be activated.",
+	Usage:   "Create a regulatory address, to use as the value of an `address` requirement\nwhen buying a phone number. It is registered for review when it is created, with\nstatus `pending`.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
 			Name:     "country-code",
 			Required: true,
 			BodyPath: "countryCode",
+		},
+		&requestflag.Flag[string]{
+			Name:     "first-name",
+			Usage:    "First name of the person the address is registered to.",
+			Required: true,
+			BodyPath: "firstName",
+		},
+		&requestflag.Flag[string]{
+			Name:     "last-name",
+			Usage:    "Last name of the person the address is registered to.",
+			Required: true,
+			BodyPath: "lastName",
 		},
 		&requestflag.Flag[string]{
 			Name:     "locality",
@@ -45,19 +57,12 @@ var addressesCreate = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:     "business-name",
+			Usage:    "Business name, when the address belongs to a business. Defaults to the person's full name.",
 			BodyPath: "businessName",
 		},
 		&requestflag.Flag[string]{
 			Name:     "extended-address",
 			BodyPath: "extendedAddress",
-		},
-		&requestflag.Flag[string]{
-			Name:     "first-name",
-			BodyPath: "firstName",
-		},
-		&requestflag.Flag[string]{
-			Name:     "last-name",
-			BodyPath: "lastName",
 		},
 	},
 	Action:          handleAddressesCreate,
@@ -104,7 +109,7 @@ var addressesList = cli.Command{
 
 var addressesDelete = cli.Command{
 	Name:    "delete",
-	Usage:   "Delete a regulatory address. Cannot delete addresses that are in use.",
+	Usage:   "Delete a regulatory address from this project. Any address can be deleted,\nwhatever its status. Phone numbers already purchased with it are not affected,\nand neither is information already submitted for later purchases in its country.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{

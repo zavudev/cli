@@ -46,7 +46,7 @@ var phoneNumbersUpdate = cli.Command{
 		},
 		&requestflag.Flag[*string]{
 			Name:     "sender-id",
-			Usage:    "Sender ID to assign the phone number to. Set to null to unassign.",
+			Usage:    "Sender ID to assign the phone number to. Set to null to unassign. A number under regulatory review is recorded now and connected to the sender when approved; a rejected number is refused.",
 			BodyPath: "senderId",
 		},
 	},
@@ -71,7 +71,7 @@ var phoneNumbersList = cli.Command{
 		},
 		&requestflag.Flag[string]{
 			Name:      "status",
-			Usage:     `Allowed values: "active", "suspended", "pending".`,
+			Usage:     "Billing state of an owned number, separate from `regulatoryStatus`. `pending` is legacy and is not written to numbers today. The SDKs carry `active`, `suspended` and `pending` only; `releasing` and `released` are returned by the REST API until their next release.",
 			QueryPath: "status",
 		},
 		&requestflag.Flag[int64]{
@@ -83,9 +83,9 @@ var phoneNumbersList = cli.Command{
 	HideHelpCommand: true,
 }
 
-var phoneNumbersPurchase = cli.Command{
+var phoneNumbersPurchase = requestflag.WithInnerFlags(cli.Command{
 	Name:    "purchase",
-	Usage:   "Purchase an available phone number. Requires a paid plan: the Free plan cannot\npurchase phone numbers and receives `402` with code `paid_plan_required`. Paid\nplans include one US number at no charge. The included number is one per account\nand is granted once: claiming it spends the benefit for good, so releasing that\nnumber does not make another one free, and numbers the account already bought do\nnot consume it.",
+	Usage:   "Purchase an available phone number. Requires a paid plan: the Free plan cannot\npurchase phone numbers and receives `402` with code `paid_plan_required`.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
@@ -99,10 +99,33 @@ var phoneNumbersPurchase = cli.Command{
 			Usage:    "Optional custom name for the phone number.",
 			BodyPath: "name",
 		},
+		&requestflag.Flag[[]map[string]any]{
+			Name:     "regulatory-requirement",
+			Usage:    "Regulatory information, for numbers whose requirements list is not empty. Get the list with `GET /v1/phone-numbers/requirements?phoneNumber=...` and send one entry per requirement id, except `action` requirements, which take no value. Every required id must be present, once, and no unknown id may be sent; otherwise the purchase is refused with `400 invalid_request` before anything is charged.\n\nThe information is kept for your project under the number's country and `type`. A later purchase there may omit this field if what is kept still covers that number's requirements. Omit it for numbers without requirements.",
+			BodyPath: "regulatoryRequirements",
+		},
+		&requestflag.Flag[string]{
+			Name:     "type",
+			Usage:    "Type of phone number. `mobile` is stocked in countries where no geographic (`local`) or non-geographic (`national`) inventory exists, and in several markets it is the only type that can receive SMS.",
+			BodyPath: "type",
+		},
 	},
 	Action:          handlePhoneNumbersPurchase,
 	HideHelpCommand: true,
-}
+}, map[string][]requestflag.HasOuterFlag{
+	"regulatory-requirement": {
+		&requestflag.InnerFlag[string]{
+			Name:       "regulatory-requirement.field-value",
+			Usage:      "Depends on the requirement's `type`: the text itself for `textual`; for `address`, the `id` of an address created in this project with `POST /v1/addresses`; for `document`, the `id` of a document created with `POST /v1/documents`. An address or document from another project, or one rejected in review, is refused.",
+			InnerField: "fieldValue",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "regulatory-requirement.requirement-type",
+			Usage:      "A `requirementTypes[].id` from `GET /v1/phone-numbers/requirements`. Each id may appear only once.",
+			InnerField: "requirementType",
+		},
+	},
+})
 
 var phoneNumbersRelease = cli.Command{
 	Name:    "release",
@@ -121,14 +144,18 @@ var phoneNumbersRelease = cli.Command{
 
 var phoneNumbersRequirements = cli.Command{
 	Name:    "requirements",
-	Usage:   "Get regulatory requirements for purchasing phone numbers in a specific country.\nSome countries require additional documentation (addresses, identity documents)\nbefore phone numbers can be activated.",
+	Usage:   "Get the regulatory information needed to buy a phone number, for one specific\nnumber or for a country and number type. Prefer `phoneNumber`: the response is\nthen exactly the list the purchase of that number validates against. Pass each\n`requirementTypes[].id` back as `requirementType` in `regulatoryRequirements` on\n`POST /v1/phone-numbers`.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
 			Name:      "country-code",
-			Usage:     "Two-letter ISO country code.",
-			Required:  true,
+			Usage:     "Two-letter ISO country code. Required unless `phoneNumber` is given.",
 			QueryPath: "countryCode",
+		},
+		&requestflag.Flag[string]{
+			Name:      "phone-number",
+			Usage:     "E.164 number from `GET /v1/phone-numbers/available`, with `+` encoded as `%2B`. Returns the requirements the purchase of that number checks. Takes precedence over `countryCode`.",
+			QueryPath: "phoneNumber",
 		},
 		&requestflag.Flag[string]{
 			Name:      "type",
