@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.6.0 (2026-09-18)
+
+Full Changelog: [v0.5.0...v0.6.0](https://github.com/zavudev/cli/compare/v0.5.0...v0.6.0)
+
+### Features
+
+* **api:** api update ([3ac5428](https://github.com/zavudev/cli/commit/3ac542879c9185b113e799698a0c20d0b2aa796c))
+* **api:** api update ([5597404](https://github.com/zavudev/cli/commit/5597404156c8dff542a6467a7f944308ef67bdcd))
+* **api:** api update ([78967ce](https://github.com/zavudev/cli/commit/78967ce99892dfa4438b0d89af1e93a1f73df408))
+* **api:** api update ([c090781](https://github.com/zavudev/cli/commit/c0907819c7645e321e49192c00653604b1d34f43))
+* **api:** api update ([5e87793](https://github.com/zavudev/cli/commit/5e87793117d3d0c4545b583a2d8d9744dee18645))
+
 ## 0.5.0 (2026-09-08)
 
 Full Changelog: [v0.4.0...v0.5.0](https://github.com/zavudev/cli/compare/v0.4.0...v0.5.0)
