@@ -218,7 +218,7 @@ var templatesSubmit = cli.Command{
 
 var templatesSync = cli.Command{
 	Name:    "sync",
-	Usage:   "Reconcile this project's templates against WhatsApp. Two things happen per\nconnected WhatsApp Business Account: templates that exist on Meta but not in\nZavu are imported (or linked to an existing template with the same name), and\nthe approval status of the templates Zavu already knows about is refreshed from\nMeta.",
+	Usage:   "Reconcile this project's templates against WhatsApp. Three things happen per\nconnected WhatsApp Business Account: templates that exist on Meta but not in\nZavu are imported (or linked to an existing template with the same name), the\napproval status of the templates Zavu already knows about is refreshed from\nMeta, and their **category** is refreshed from Meta.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
