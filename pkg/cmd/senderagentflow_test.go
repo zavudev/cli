@@ -20,7 +20,7 @@ func TestSendersAgentFlowsCreate(t *testing.T) {
 			"--name", "Lead Capture",
 			"--step", "{id: welcome, config: {text: bar}, type: message, nextStepId: ask_name}",
 			"--step", "{id: ask_name, config: {variable: bar, prompt: bar}, type: collect, nextStepId: nextStepId}",
-			"--trigger", "{type: keyword, intent: intent, keywords: [info, pricing, demo]}",
+			"--trigger", "{type: keyword, intent: quiere saber precios o cotizar, keywords: [info, pricing, demo]}",
 			"--description", "Capture lead information",
 			"--enabled=true",
 			"--priority", "0",
@@ -47,7 +47,7 @@ func TestSendersAgentFlowsCreate(t *testing.T) {
 			"--step.type", "collect",
 			"--step.next-step-id", "nextStepId",
 			"--trigger.type", "keyword",
-			"--trigger.intent", "intent",
+			"--trigger.intent", "quiere saber precios o cotizar",
 			"--trigger.keywords", "[info, pricing, demo]",
 			"--description", "Capture lead information",
 			"--enabled=true",
@@ -73,7 +73,7 @@ func TestSendersAgentFlowsCreate(t *testing.T) {
 			"    nextStepId: nextStepId\n" +
 			"trigger:\n" +
 			"  type: keyword\n" +
-			"  intent: intent\n" +
+			"  intent: quiere saber precios o cotizar\n" +
 			"  keywords:\n" +
 			"    - info\n" +
 			"    - pricing\n" +
@@ -117,7 +117,7 @@ func TestSendersAgentFlowsUpdate(t *testing.T) {
 			"--name", "name",
 			"--priority", "0",
 			"--step", "{id: id, config: {foo: bar}, type: message, nextStepId: nextStepId}",
-			"--trigger", "{type: keyword, intent: intent, keywords: [string]}",
+			"--trigger", "{type: keyword, intent: quiere saber precios o cotizar, keywords: [string]}",
 		)
 	})
 
@@ -141,7 +141,7 @@ func TestSendersAgentFlowsUpdate(t *testing.T) {
 			"--step.type", "message",
 			"--step.next-step-id", "nextStepId",
 			"--trigger.type", "keyword",
-			"--trigger.intent", "intent",
+			"--trigger.intent", "quiere saber precios o cotizar",
 			"--trigger.keywords", "[string]",
 		)
 	})
@@ -161,7 +161,7 @@ func TestSendersAgentFlowsUpdate(t *testing.T) {
 			"    nextStepId: nextStepId\n" +
 			"trigger:\n" +
 			"  type: keyword\n" +
-			"  intent: intent\n" +
+			"  intent: quiere saber precios o cotizar\n" +
 			"  keywords:\n" +
 			"    - string\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(

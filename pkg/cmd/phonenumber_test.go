@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/zavudev/cli/internal/mocktest"
+	"github.com/zavudev/cli/internal/requestflag"
 )
 
 func TestPhoneNumbersRetrieve(t *testing.T) {
@@ -71,6 +72,25 @@ func TestPhoneNumbersPurchase(t *testing.T) {
 			"phone-numbers", "purchase",
 			"--phone-number", "+15551234567",
 			"--name", "Primary Line",
+			"--regulatory-requirement", "{fieldValue: jd7x2k3m4n5p6q7r8s9t0abc, requirementType: 8c5b1a2e-0f3d-4f5b-9a61-2c7e4d9b1f10}",
+			"--type", "local",
+		)
+	})
+
+	t.Run("inner flags", func(t *testing.T) {
+		// Check that inner flags have been set up correctly
+		requestflag.CheckInnerFlags(phoneNumbersPurchase)
+
+		// Alternative argument passing style using inner flags
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"phone-numbers", "purchase",
+			"--phone-number", "+15551234567",
+			"--name", "Primary Line",
+			"--regulatory-requirement.field-value", "jd7x2k3m4n5p6q7r8s9t0abc",
+			"--regulatory-requirement.requirement-type", "8c5b1a2e-0f3d-4f5b-9a61-2c7e4d9b1f10",
+			"--type", "local",
 		)
 	})
 
@@ -78,7 +98,11 @@ func TestPhoneNumbersPurchase(t *testing.T) {
 		// Test piping YAML data over stdin
 		pipeData := []byte("" +
 			"phoneNumber: '+15551234567'\n" +
-			"name: Primary Line\n")
+			"name: Primary Line\n" +
+			"regulatoryRequirements:\n" +
+			"  - fieldValue: jd7x2k3m4n5p6q7r8s9t0abc\n" +
+			"    requirementType: 8c5b1a2e-0f3d-4f5b-9a61-2c7e4d9b1f10\n" +
+			"type: local\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
 			t, pipeData,
 			"--api-key", "string",
@@ -107,6 +131,7 @@ func TestPhoneNumbersRequirements(t *testing.T) {
 			"--api-key", "string",
 			"phone-numbers", "requirements",
 			"--country-code", "xx",
+			"--phone-number", "phoneNumber",
 			"--type", "local",
 		)
 	})

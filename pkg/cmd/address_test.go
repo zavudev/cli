@@ -16,14 +16,14 @@ func TestAddressesCreate(t *testing.T) {
 			"--api-key", "string",
 			"addresses", "create",
 			"--country-code", "DE",
+			"--first-name", "John",
+			"--last-name", "Doe",
 			"--locality", "Berlin",
 			"--postal-code", "10115",
 			"--street-address", "123 Main St",
 			"--administrative-area", "administrativeArea",
 			"--business-name", "businessName",
 			"--extended-address", "extendedAddress",
-			"--first-name", "John",
-			"--last-name", "Doe",
 		)
 	})
 
@@ -31,14 +31,14 @@ func TestAddressesCreate(t *testing.T) {
 		// Test piping YAML data over stdin
 		pipeData := []byte("" +
 			"countryCode: DE\n" +
+			"firstName: John\n" +
+			"lastName: Doe\n" +
 			"locality: Berlin\n" +
 			"postalCode: '10115'\n" +
 			"streetAddress: 123 Main St\n" +
 			"administrativeArea: administrativeArea\n" +
 			"businessName: businessName\n" +
-			"extendedAddress: extendedAddress\n" +
-			"firstName: John\n" +
-			"lastName: Doe\n")
+			"extendedAddress: extendedAddress\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
 			t, pipeData,
 			"--api-key", "string",
