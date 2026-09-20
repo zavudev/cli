@@ -82,17 +82,17 @@ var sendersAgentFlowsCreate = requestflag.WithInnerFlags(cli.Command{
 	"trigger": {
 		&requestflag.InnerFlag[string]{
 			Name:       "trigger.type",
-			Usage:      "Type of trigger for a flow.",
+			Usage:      "What starts a flow.\n\n- `keyword`: the message contains one of the words listed in `keywords`. Plain substring matching, so a word inside another word still counts.\n- `intent`: the message MEANS what `intent` describes, whatever words it uses.\n- `always`: any message starts it.\n- `manual`: reserved. Nothing starts a `manual` flow today — it is accepted and stored, and no message or endpoint runs it.",
 			InnerField: "type",
 		},
 		&requestflag.InnerFlag[string]{
 			Name:       "trigger.intent",
-			Usage:      "Intent that triggers the flow (for intent type).",
+			Usage:      "One plain sentence describing what the contact wants, for `intent` triggers. Any language.\n\nThe message is judged for meaning, not for words, so \"kiero saber el presio\" starts a flow whose intent is \"quiere saber precios o cotizar\", and \"no quiero info de precios\" starts nothing.\n\nA `keyword` or `always` flow with a higher `priority` is matched first and wins. At most 12 intent flows are considered per message, highest priority first. When the classification is unavailable or uncertain, the message is handled as if no intent matched, so a flow never starts on a guess.",
 			InnerField: "intent",
 		},
 		&requestflag.InnerFlag[[]string]{
 			Name:       "trigger.keywords",
-			Usage:      "Keywords that trigger the flow (for keyword type).",
+			Usage:      "Words that start the flow, for `keyword` triggers. Matched as substrings, case-insensitively, against the whole message: a flow on `info` also starts on \"no quiero info\". Use `intent` when that matters.",
 			InnerField: "keywords",
 		},
 	},
@@ -186,17 +186,17 @@ var sendersAgentFlowsUpdate = requestflag.WithInnerFlags(cli.Command{
 	"trigger": {
 		&requestflag.InnerFlag[string]{
 			Name:       "trigger.type",
-			Usage:      "Type of trigger for a flow.",
+			Usage:      "What starts a flow.\n\n- `keyword`: the message contains one of the words listed in `keywords`. Plain substring matching, so a word inside another word still counts.\n- `intent`: the message MEANS what `intent` describes, whatever words it uses.\n- `always`: any message starts it.\n- `manual`: reserved. Nothing starts a `manual` flow today — it is accepted and stored, and no message or endpoint runs it.",
 			InnerField: "type",
 		},
 		&requestflag.InnerFlag[string]{
 			Name:       "trigger.intent",
-			Usage:      "Intent that triggers the flow (for intent type).",
+			Usage:      "One plain sentence describing what the contact wants, for `intent` triggers. Any language.\n\nThe message is judged for meaning, not for words, so \"kiero saber el presio\" starts a flow whose intent is \"quiere saber precios o cotizar\", and \"no quiero info de precios\" starts nothing.\n\nA `keyword` or `always` flow with a higher `priority` is matched first and wins. At most 12 intent flows are considered per message, highest priority first. When the classification is unavailable or uncertain, the message is handled as if no intent matched, so a flow never starts on a guess.",
 			InnerField: "intent",
 		},
 		&requestflag.InnerFlag[[]string]{
 			Name:       "trigger.keywords",
-			Usage:      "Keywords that trigger the flow (for keyword type).",
+			Usage:      "Words that start the flow, for `keyword` triggers. Matched as substrings, case-insensitively, against the whole message: a flow on `info` also starts on \"no quiero info\". Use `intent` when that matters.",
 			InnerField: "keywords",
 		},
 	},
